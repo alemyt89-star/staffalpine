@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Lavoratore - StaffAlpine</title>
+    
+    <style>
+        body { visibility: hidden; background: #f4f7f6; margin: 0; display: flex; font-family: 'Segoe UI', sans-serif;}
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        /* Stili Notifiche */
+        .notifica-card {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            border-left: 5px solid var(--blu);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            position: relative;
+        }
+        .notifica-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .notifica-azienda {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--blu);
+        }
+        .notifica-data {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+        .notifica-messaggio {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 8px;
+            font-style: italic;
+            color: #475569;
+            margin: 10px 0;
+        }
+        .notifica-contatto {
+            background: #e1f5fe;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #0277bd;
+            font-weight: bold;
+        }
+
+        :root { --blu: #2c3e50; --oro: #d4af37; --grigio: #f4f7f6; --verde: #27ae60; }
+        
+        /* Sidebar */
+        .sidebar { width: 250px; background: var(--blu); color: white; height: 100vh; padding: 20px; position: fixed; z-index: 100;}
+        .sidebar h2 { color: var(--oro); font-size: 20px; margin-bottom: 30px; }
+        .nav-link { display: block; color: white; text-decoration: none; padding: 12px; border-radius: 8px; margin-bottom: 10px; transition: 0.3s; cursor: pointer; }
+        .nav-link:hover { background: rgba(255,255,255,0.1); }
+        .nav-link.active { background: var(--oro); color: var(--blu); font-weight: bold; }
+
+        /* Main Content */
+        .main-content { margin-left: 250px; padding: 40px; width: calc(100% - 250px); min-height: 100vh; }
+        .section { display: none; }
+        .section.active { display: block; }
+
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; position: relative;}
+        .btn-gold { background: var(--oro); color: var(--blu); border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-danger { background: #e74c3c; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; }
+        
+        /* Grid per Ricerca */
+        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        input, select { padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
+        
+        .offerta-item, .recensione-item { border-left: 4px solid var(--oro); padding: 15px; background: #fafafa; margin-bottom: 10px; border-radius: 0 8px 8px 0; }
+        
+        .badge-cert {
+            background: #e8f5e9;
+            color: #27ae60;
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: bold;
+            border: 1px solid #c8e6c9;
+            margin-right: 5px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+    <h2>StaffAlpine</h2>
+    <div class="nav-link active" id="lnk-profilo" onclick="showSection('mio-profilo')">👤 Area Personale</div>
+    
+    <div class="nav-link" id="lnk-recensioni" onclick="showSection('le-mie-recensioni')">✍️ Mie Recensioni</div>
+    <div class="nav-link" id="lnk-cerca" onclick="showSection('cerca-azienda')">🏢 Cerca Azienda</div>
+    <div class="nav-link" id="lnk-offerte" onclick="showSection('offerte-lavoro')">💼 Offerte Lavoro</div>
+    <hr style="margin: 20px 0; opacity: 0.2;">
+    <div class="nav-link" onclick="logout()" style="color: #ff7675;">Esci</div>
+</div>
+
+   <div class="main-content">
+        <div id="mio-profilo" class="section active">
+            <h1>👤 Area Personale</h1>
+            
+            <div class="card">
+                <div id="profilo-content">
+                    <p>Caricamento profilo...</p>
+                </div>
+                <button class="btn-gold" style="margin-top: 15px;" onclick="apriModificaProfilo()">✏️ Modifica Competenze</button>
+            </div>
+
+            <div id="modal-modifica" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; align-items:center; justify-content:center; overflow-y: auto;">
+                <div style="background:white; padding:30px; border-radius:15px; max-width:500px; width:90%; margin: 20px auto;">
+                    <h2 style="color:var(--blu); margin-top:0;">Aggiorna il tuo Profilo</h2>
+                    
+                    <label>Tipo di Disponibilità</label>
+                    <select id="edit-dispo" style="width:100%; margin-bottom:15px;">
+                        <option value="Stagionale Invernale">Stagionale Invernale</option>
+                        <option value="Stagionale Estiva">Stagionale Estiva</option>
+                        <option value="Extra">Extra / Weekend</option>
+                        <option value="Fisso">Fisso</option>
+                    </select>
+
+                    <label>Esigenza Alloggio</label>
+                    <select id="edit-alloggio" style="width:100%; margin-bottom:20px;">
+                        <option value="true">Ho bisogno di vitto e alloggio</option>
+                        <option value="false">Non ho bisogno di alloggio</option>
+                    </select>
+
+                    <label>Mansione Principale</label>
+                    <input type="text" id="edit-mansione" style="width:100%; margin-bottom:15px;">
+
+                    <label>Settore</label>
+                    <select id="edit-settore" style="width:100%; margin-bottom:15px;">
+                        <option value="Sala/Bar">Sala / Bar</option>
+                        <option value="Cucina">Cucina</option>
+                        <option value="Ricevimento">Ricevimento</option>
+                        <option value="Piani">Piani / Pulizie</option>
+                    </select>
+
+                    <label>Località Preferita</label>
+                    <select id="edit-localita" style="width:100%; margin-bottom:15px;">
+                        <option value="Alta Valle">Alta Valle</option>
+                        <option value="Aosta">Aosta e dintorni</option>
+                        <option value="Bassa Valle">Bassa Valle</option>
+                        <option value="Ayas-Gressoney">Val d'Ayas / Gressoney</option>
+                    </select>
+
+                    <div style="display:flex; gap:10px; margin-bottom:15px;">
+                        <div style="flex:1;">
+                            <label>FR</label>
+                            <select id="edit-fr" style="width:100%;"><option value="Nessuno">Nessuno</option><option value="Base">Base</option><option value="Buono">Buono</option><option value="Ottimo">Ottimo</option></select>
+                        </div>
+                        <div style="flex:1;">
+                            <label>EN</label>
+                            <select id="edit-en" style="width:100%;"><option value="Nessuno">Nessuno</option><option value="Base">Base</option><option value="Buono">Buono</option><option value="Ottimo">Ottimo</option></select>
+                        </div>
+                    </div> 
+
+                    <label style="display: block; margin-bottom: 10px;">Certificazioni</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
+                        <label style="font-weight: normal; font-size: 14px;"><input type="checkbox" id="edit-haccp"> HACCP</label>
+                        <label style="font-weight: normal; font-size: 14px;"><input type="checkbox" id="edit-sicurezza"> Sicurezza</label>
+                        <label style="font-weight: normal; font-size: 14px;"><input type="checkbox" id="edit-sommelier"> Sommelier</label>
+                        <label style="font-weight: normal; font-size: 14px;"><input type="checkbox" id="edit-barman"> Barman Cert.</label>
+                    </div>
+
+                    <button onclick="salvaModificheProfilo()" style="background:var(--verde); color:white; border:none; padding:12px; width:100%; border-radius:8px; font-weight:bold; cursor:pointer;">💾 Salva Modifiche</button>
+                    <button onclick="document.getElementById('modal-modifica').style.display='none'" style="background:none; border:none; color:gray; width:100%; margin-top:10px; cursor:pointer;">Annulla</button>
+                </div>
+            </div>
+            
+            <div class="container" style="margin-top: 30px;">
+                <h2 style="color: var(--blu); display: flex; align-items: center; gap: 10px;">
+                    🔔 Proposte di Lavoro per Te 
+                    <span id="badge-notifiche" style="display:none; background:red; color:white; font-size:12px; padding:2px 8px; border-radius:10px;">New</span>
+                </h2>
+                <div id="lista-notifiche">
+                    <p style="color:#94a3b8;">Nessuna proposta ricevuta al momento.</p>
+                </div>
+            </div>
+
+            <div class="card" style="border: 1px solid #ff7675; margin-top: 30px;">
+                <p>Cancellando il tuo profilo esperienza, le aziende Premium non potranno più trovarti.</p>
+                <button class="btn-danger" onclick="eliminaProfiloEsperienza()">Elimina Profilo Esperienza</button>
+            </div>
+        </div> <div id="le-mie-recensioni" class="section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h1>✍️ Le Mie Recensioni</h1>
+                <button class="btn-gold" onclick="window.location.href='index.html'" style="background: var(--verde); color: white;">+ Scrivi Nuova</button>
+            </div>
+            <div id="lista-mie-recensioni"></div>
+        </div>
+
+        <div id="cerca-azienda" class="section">
+            <h1>🏢 Cerca un'Azienda</h1>
+            <div class="search-box">
+                <input type="text" id="input-cerca-az" placeholder="Inserisci nome azienda..." style="flex:1;">
+                <button class="btn-gold" onclick="cercaAzienda()">Cerca</button>
+            </div>
+            <div id="risultato-ricerca-az"></div>
+        </div>
+
+        <div id="offerte-lavoro" class="section">
+            <h1>💼 Offerte di Lavoro in Valle</h1>
+            <div id="lista-offerte" style="min-height: 200px;"></div>
+        </div>
+    </div> <script>
+        const SUPABASE_URL = "https://maeoqoxzjzusjwrdrkbd.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX"; 
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function inizializzaDashboardLavoratore() {
+            const { data: { user }, error } = await supabaseClient.auth.getUser();
+            if (error || !user) { window.location.replace('login.html'); return; }
+            document.body.style.visibility = "visible";
+            
+            caricaProfilo(user.id);
+            caricaOfferte();
+            caricaNotifiche();
+            caricaMieRecensioni(); // <-- Questa riga attiva il messaggio se la recensione è stata eliminata
+        }
+
+       function showSection(id) {
+    // Nasconde tutte le sezioni
+    document.querySelectorAll('.section').forEach(s => { 
+        s.classList.remove('active'); 
+        s.style.display = 'none'; 
+    });
+    
+    // Rimuove lo stato attivo da tutti i link della sidebar
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    
+    // Mostra la sezione cliccata
+    const target = document.getElementById(id);
+    if(target) { 
+        target.classList.add('active'); 
+        target.style.display = 'block'; 
+    }
+
+    // Carica i dati specifici se necessario
+    if(id === 'offerte-lavoro') caricaOfferte();
+    if(id === 'le-mie-recensioni') caricaMieRecensioni();
+}
+
+      async function caricaProfilo(uid) {
+    const div = document.getElementById('profilo-content');
+    const { data: prof } = await supabaseClient.from('esperienze_lavoratori').select('*').eq('user_id', uid).single();
+    
+    if (!prof) { 
+        div.innerHTML = `<p>⚠️ Profilo non trovato.</p>`; 
+        return; 
+    }
+
+    // Colore per l'alloggio: Arancione se serve, Verde se è indipendente
+    const alloggioColor = prof.bisogno_vitto_alloggio ? '#e67e22' : '#27ae60';
+    const alloggioTesto = prof.bisogno_vitto_alloggio ? '🏠 Richiede Vitto/Alloggio' : '🏠 Indipendente (No Alloggio)';
+
+    div.innerHTML = `
+        <div style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; display:flex; justify-content:space-between; align-items:center;">
+            <h2 style="margin:0; color:var(--blu);">${prof.mansione_principale}</h2>
+            <span style="font-size:12px; font-weight:bold; color:${alloggioColor}">${alloggioTesto}</span>
+        </div>
+        <p>📍 <b>Zona:</b> ${prof.localita_preferita} | <b>Settore:</b> ${prof.settore}</p>
+        <p>📅 <b>Contratto cercato:</b> ${prof.tipo_disponibilita}</p>
+        <p>🌍 <b>Lingue:</b> FR: ${prof.lingua_francese} | EN: ${prof.lingua_inglese}</p>
+        <div style="margin-top:10px;">
+            ${prof.cert_haccp ? '<span class="badge-cert">HACCP</span>' : ''}
+            ${prof.cert_sicurezza ? '<span class="badge-cert">Sicurezza</span>' : ''}
+            ${prof.cert_sommelier ? '<span class="badge-cert">Sommelier</span>' : ''}
+            ${prof.cert_barman ? '<span class="badge-cert">Barman</span>' : ''}
+        </div>
+    `;
+}
+        let datiProfiloAttuali = null; // Variabile globale per tenere i dati
+
+async function apriModificaProfilo() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    const { data: prof } = await supabaseClient.from('esperienze_lavoratori').select('*').eq('user_id', user.id).single();
+    
+    if (prof) {
+        datiProfiloAttuali = prof;
+        // Pre-compiliamo i campi del modale
+        document.getElementById('edit-mansione').value = prof.mansione_principale;
+        document.getElementById('edit-settore').value = prof.settore;
+        document.getElementById('edit-localita').value = prof.localita_preferita;
+        document.getElementById('edit-fr').value = prof.lingua_francese;
+        document.getElementById('edit-en').value = prof.lingua_inglese;
+        document.getElementById('edit-dispo').value = prof.tipo_disponibilita;
+document.getElementById('edit-alloggio').value = prof.bisogno_vitto_alloggio.toString();
+        // Pre-compiliamo i checkbox
+document.getElementById('edit-haccp').checked = prof.cert_haccp;
+document.getElementById('edit-sicurezza').checked = prof.cert_sicurezza;
+document.getElementById('edit-sommelier').checked = prof.cert_sommelier;
+document.getElementById('edit-barman').checked = prof.cert_barman;
+        document.getElementById('modal-modifica').style.display = 'flex';
+    }
+}
+
+async function salvaModificheProfilo() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    
+    const aggiornamenti = {
+    mansione_principale: document.getElementById('edit-mansione').value,
+    settore: document.getElementById('edit-settore').value,
+    localita_preferita: document.getElementById('edit-localita').value,
+    lingua_francese: document.getElementById('edit-fr').value,
+    lingua_inglese: document.getElementById('edit-en').value,
+    tipo_disponibilita: document.getElementById('edit-dispo').value,
+    bisogno_vitto_alloggio: document.getElementById('edit-alloggio').value === 'true',
+    // AGGIUNTA CERTIFICAZIONI
+    cert_haccp: document.getElementById('edit-haccp').checked,
+    cert_sicurezza: document.getElementById('edit-sicurezza').checked,
+    cert_sommelier: document.getElementById('edit-sommelier').checked,
+    cert_barman: document.getElementById('edit-barman').checked
+};
+
+    const { error } = await supabaseClient
+        .from('esperienze_lavoratori')
+        .update(aggiornamenti)
+        .eq('user_id', user.id);
+
+    if (!error) {
+        alert("Profilo aggiornato con successo!");
+        document.getElementById('modal-modifica').style.display = 'none';
+        caricaProfilo(user.id); // Ricarica la vista
+    } else {
+        alert("Errore nell'aggiornamento: " + error.message);
+    }
+}
+
+        async function caricaNotifiche() {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            const { data: notifiche } = await supabaseClient
+                .from('notifiche_lavoratori')
+                .select('*')
+                .eq('lavoratore_id', user.id)
+                .order('created_at', { ascending: false });
+
+            const container = document.getElementById('lista-notifiche');
+            const badge = document.getElementById('badge-notifiche');
+
+            if (notifiche && notifiche.length > 0) {
+                badge.style.display = "inline";
+                container.innerHTML = notifiche.map(n => `
+                    <div class="notifica-card">
+                        <div class="notifica-header">
+                            <span class="notifica-azienda">🏢 ${n.nome_azienda}</span>
+                            <span class="notifica-data">${new Date(n.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <div class="notifica-messaggio">"${n.messaggio}"</div>
+                        <div class="notifica-contatto">
+                            📞 Contatto: <b>${n.contatto_azienda ? n.contatto_azienda : 'Non specificato'}</b>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <button class="btn-gold" style="font-size: 12px; padding: 8px 15px;" 
+                                onclick="vaiADettaglioAzienda('${n.nome_azienda.replace(/'/g, "\\'")}')">
+                                ⭐ Vedi Recensioni Azienda
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function vaiADettaglioAzienda(nome) {
+            window.location.href = `dettaglio-azienda.html?nome=${encodeURIComponent(nome)}`;
+        }
+
+     async function caricaOfferte() {
+    // 1. Recuperiamo tutte le offerte attive
+    const { data: offerte } = await supabaseClient.from('offerte_lavoro').select('*').eq('is_attiva', true);
+    
+    const container = document.getElementById('lista-offerte');
+    
+    if (offerte && container) {
+        container.innerHTML = offerte.map(o => {
+            // DINAMICO: Prendi il nome dalla colonna 'nome_azienda' di Supabase.
+            // Se la colonna è vuota (null), usa 'Azienda StaffAlpine' come ruota di scorta.
+            const nomeDaTabella = o.nome_azienda || 'Azienda StaffAlpine';
+            
+            return `
+                <div class="worker-card" style="border-left: 5px solid var(--oro); background: white; padding: 20px; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <h3 style="margin: 0; color: var(--scuro);">${o.ruolo || 'Posizione Aperta'}</h3>
+                        <span style="font-size: 11px; color: #94a3b8;">${new Date(o.created_at).toLocaleDateString()}</span>
+                    </div>
+                    
+                    <p style="margin: 8px 0; color: var(--oro); font-weight: bold;">
+                        🏢 ${nomeDaTabella}
+                    </p>
+                    
+                    <p style="font-size: 14px; color: #64748b; margin: 10px 0;">${o.descrizione || ''}</p>
+                    
+                    <div style="background: #f8fafc; padding: 12px; border-radius: 8px; font-size: 13px; border: 1px solid #edf2f7;">
+                        📧 <b>Contatti:</b> ${o.contatti || 'Contattare in piattaforma'}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+}
+
+        async function cercaAzienda() {
+            const nome = document.getElementById('input-cerca-az').value;
+            window.location.href = `dettaglio-azienda.html?nome=${encodeURIComponent(nome)}`;
+        }
+
+        async function logout() {
+            if (!confirm("Vuoi uscire dalla sessione?")) return;
+            await supabaseClient.auth.signOut();
+            window.location.replace('index.html');
+        }
+        
+        // --- FUNZIONE PER MOSTRARE LE MIE RECENSIONI CON MESSAGGIO DI VERIFICA ED ELIMINAZIONE ---
+        async function caricaMieRecensioni() {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            const { data: recensioni, error } = await supabaseClient
+                .from('RECENSIONI')
+                .select('*')
+                .eq('USER_HASH', user.id);
+
+            const container = document.getElementById('lista-mie-recensioni');
+            if (!container) return;
+            
+            if(!recensioni || recensioni.length === 0) { 
+                container.innerHTML = `
+                    <div style="background: #fff5f5; border-left: 5px solid #e74c3c; padding: 25px; border-radius: 12px; margin-top: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                        <h3 style="color: #c0392b; margin-top: 0; font-size: 18px;">⚠️ Stato Recensioni</h3>
+                        <p style="color: #475569; line-height: 1.6; font-size: 14px;">
+                            Non risultano recensioni attive per il tuo account. Se ne avevi inviata una recentemente, 
+                            è probabile che sia stata <b>eliminata dall'Admin</b> poiché non è stato possibile verificarne 
+                            la veridicità (es. prova di lavoro mancante, illeggibile o non corrispondente).
+                        </p>
+                        <p style="color: #64748b; font-size: 13px; margin-top: 10px;">
+                            <i>Puoi scriverne una nuova assicurandoti di allegare un documento valido.</i>
+                        </p>
+                    </div>
+                `; 
+                return; 
+            }
+
+            container.innerHTML = recensioni.map(r => {
+                const isVerificata = r.VERIFICATA === true;
+                return `
+                    <div class="card" style="border-left: 5px solid ${isVerificata ? 'var(--verde)' : '#f1c40f'}; margin-bottom: 15px; padding:20px; border-radius:12px; background:white;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h3 style="margin:0; color:var(--blu);">🏢 ${r.AZIENDA}</h3>
+                            <span style="padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; 
+                                background: ${isVerificata ? '#d4edda' : '#fff3cd'}; 
+                                color: ${isVerificata ? '#155724' : '#856404'};">
+                                ${isVerificata ? '✅ Verificata' : '⏳ In attesa'}
+                            </span>
+                        </div>
+                        <div style="margin-top: 15px; font-size: 14px; color: #64748b;">
+                            Paga: <b>${r.VOTO_PAGA}/5</b> | Ambiente: <b>${r.RISPETTO_TITOLARE}/5</b>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        async function eliminaProfiloEsperienza() {
+            if(!confirm("Sei sicuro di voler eliminare il tuo profilo? Questa azione non può essere annullata.")) return;
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            const { error } = await supabaseClient.from('esperienze_lavoratori').delete().eq('user_id', user.id);
+            if(error) alert("Errore: " + error.message);
+            else { alert("Profilo eliminato."); location.reload(); }
+        }
+
+        inizializzaDashboardLavoratore();
+    </script>
+</body>
+</html>

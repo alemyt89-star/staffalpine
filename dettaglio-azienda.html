@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dettagli Azienda - StaffAlpine</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --verde: #27ae60; --scuro: #2c3e50; --oro: #d4af37; --rosso: #e74c3c; --giallo: #f1c40f; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; margin: 0; padding: 0; }
+        
+        .main-nav { background: var(--scuro); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; color: white; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .nav-logo { font-size: 22px; font-weight: 800; color: var(--oro); text-decoration: none; }
+        .nav-links { display: flex; gap: 20px; align-items: center; }
+        .nav-links a { color: white; text-decoration: none; font-size: 14px; font-weight: bold; cursor: pointer; }
+
+        .container { max-width: 900px; margin: 40px auto; padding: 20px; }
+        .header-azienda { background: white; padding: 30px; border-radius: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; margin-bottom: 30px; border-bottom: 5px solid var(--oro); }
+        
+        /* Contenitore che verrà sfocato */
+        #contenuto-protetto { position: relative; transition: 0.3s; }
+        .blur-lock { filter: blur(8px); pointer-events: none; user-select: none; }
+
+        /* Messaggio di blocco Premium */
+        #premium-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.6); z-index: 100;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            border-radius: 20px; text-align: center; padding: 20px;
+        }
+
+        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: white; padding: 20px; border-radius: 18px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.04); border: 1px solid #eee; }
+        .stat-voto { font-size: 32px; font-weight: bold; color: var(--verde); display: block; }
+        .stat-label { font-size: 11px; color: #7f8c8d; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+
+        .info-gestione { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 20px; }
+        .info-item { background: #fff; padding: 15px 20px; border-radius: 12px; border-left: 4px solid var(--oro); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .info-item b { font-size: 13px; color: var(--scuro); }
+        .info-val { font-size: 14px; color: #2c3e50; font-weight: 500; }
+
+        .btn-back { display: inline-block; margin-bottom: 20px; color: var(--scuro); text-decoration: none; font-weight: bold; font-size: 14px; cursor: pointer; }
+        .btn-upgrade { background: var(--oro); color: var(--scuro); padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 15px; display: inline-block; }
+    </style>
+</head>
+<body>
+
+    <nav id="dynamic-nav" class="main-nav">
+        <a href="index.html" class="nav-logo">StaffAlpine</a>
+        <div id="nav-elements" class="nav-links"></div>
+    </nav>
+
+    <div class="container">
+        <div class="btn-back" onclick="window.history.back()">⬅ Torna indietro</div>
+        
+        <div class="header-azienda">
+            <h1 id="nome-hotel" style="margin:0 0 10px 0;">Caricamento...</h1>
+            <div id="media-generale" style="font-size: 48px; font-weight: bold; color: var(--verde);">--</div>
+            <p id="tot-recensioni" style="color: #7f8c8d; font-weight: 500;">Recupero esperienze...</p>
+            <small style="color: #94a3b8; font-style: italic;">Valutazione basata su recensioni verificate (1-5)</small>
+        </div>
+
+        <div id="contenitore-totale" style="position: relative;">
+            
+            <div id="premium-overlay">
+                <div style="background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 400px;">
+                    <h2 style="color: var(--scuro); margin-top: 0;">⭐ Funzionalità Business</h2>
+                    <p>Le aziende possono consultare i dettagli analitici e la gestione operativa solo con il profilo <b>Premium</b>.</p>
+                    <a href="dashboard-azienda.html" class="btn-upgrade">Attiva Premium Ora</a>
+                </div>
+            </div>
+
+            <div id="contenuto-protetto">
+                <h3 style="color: var(--scuro); margin-bottom: 15px;">📊 Medie Valutazioni</h3>
+                <div class="grid-stats">
+                    <div class="stat-card">
+                        <span class="stat-label">Soddisfazione Paga</span>
+                        <span id="voto-paga" class="stat-voto">--</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Rispetto Titolare</span>
+                        <span id="voto-rispetto" class="stat-voto">--</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Qualità Alloggio</span>
+                        <span id="voto-alloggio" class="stat-voto">--</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Qualità Vitto</span>
+                        <span id="voto-vitto" class="stat-voto">--</span>
+                    </div>
+                </div>
+
+                <h3 style="color: var(--scuro); margin-top: 40px; margin-bottom: 15px;">🛠️ Dettagli Gestione Operativa</h3>
+                <div id="info-gestione" class="info-gestione"></div>
+            </div>
+        </div>
+        </div>
+
+  <script>
+    async function verificaPermessiAccesso() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) return; // Se non è loggato, lasciamo che veda come visitatore (o gestisci tu)
+
+    // 1. Capiamo chi è l'utente
+    const { data: mioProfilo } = await supabaseClient.from('profili_aziende').select('id, is_premium').eq('id', user.id).maybeSingle();
+    
+    // 2. Capiamo se sta guardando la sua stessa azienda
+    const urlParams = new URLSearchParams(window.location.search);
+    const idProfiloPagina = urlParams.get('id_profilo'); 
+
+    // Se è un'azienda (ha un profilo) MA non è Premium E non è la sua azienda...
+    if (mioProfilo && mioProfilo.is_premium === false && mioProfilo.id !== idProfiloPagina) {
+        alert("Accesso limitato: I dettagli della concorrenza sono riservati agli utenti Premium.");
+        window.location.href = 'esplora-aziende.html';
+    }
+}
+
+// Chiama la funzione subito
+verificaPermessiAccesso();
+        const SUPABASE_URL = "https://maeoqoxzjzusjwrdrkbd.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX"; 
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const nomeAzienda = urlParams.get('nome');
+
+        async function caricaDettagli() {
+            if(!nomeAzienda) return;
+            document.getElementById('nome-hotel').innerText = nomeAzienda;
+
+            // 1. CONTROLLO PERMESSI
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (user) {
+                const { data: profiloLoggato } = await supabaseClient
+                    .from('profili_aziende')
+                    .select('is_premium')
+                    .eq('id', user.id)
+                    .maybeSingle();
+                
+                if (profiloLoggato && profiloLoggato.is_premium === false) {
+                    document.getElementById('contenuto-protetto').classList.add('blur-lock');
+                    document.getElementById('premium-overlay').style.display = 'flex';
+                } else {
+                    document.getElementById('contenuto-protetto').classList.remove('blur-lock');
+                    document.getElementById('premium-overlay').style.display = 'none';
+                }
+            }
+
+            // 2. RECUPERO DATI RECENSIONI (MODIFICATA CON % PER TROVARE TUTTO)
+            const nomeRicerca = nomeAzienda.trim();
+            
+            const { data: recs, error } = await supabaseClient
+                .from('RECENSIONI')
+                .select('*')
+                // Usiamo % prima e dopo per trovare il nome anche se ci sono spazi extra nel DB
+                .ilike('AZIENDA', `%${nomeRicerca}%`) 
+                .eq('VERIFICATA', true);
+            
+            // --- SENSORI DI DEBUG (Controlla la console F12) ---
+            console.log("Azienda cercata:", nomeRicerca);
+            console.log("Recensioni verificate trovate:", recs ? recs.length : 0);
+            if(recs) console.log("Dettaglio recs:", recs);
+
+            if (error || !recs || recs.length === 0) {
+                document.getElementById('tot-recensioni').innerText = "Nessuna recensione verificata disponibile.";
+                document.getElementById('media-generale').innerText = "--";
+                return;
+            }
+
+            // FUNZIONI CALCOLO (Migliorate per gestire i numeri correttamente)
+            const calcolaMedia = (col) => {
+                const validi = recs.map(r => parseFloat(r[col])).filter(v => !isNaN(v));
+                if (validi.length === 0) return "N/D";
+                const somma = validi.reduce((a, b) => a + b, 0);
+                return (somma / validi.length).toFixed(1);
+            };
+
+            const calcolaPrevalenza = (col) => {
+                const conteggio = {};
+                recs.forEach(r => { 
+                    const val = r[col] ? r[col].toString().trim() : null;
+                    if(val) conteggio[val] = (conteggio[val] || 0) + 1; 
+                });
+                const chiavi = Object.keys(conteggio);
+                return chiavi.length ? chiavi.reduce((a, b) => conteggio[a] > conteggio[b] ? a : b) : "N/D";
+            };
+
+            // RIEMPIMENTO DATI
+            const mp = calcolaMedia('VOTO_PAGA');
+            const mr = calcolaMedia('RISPETTO_TITOLARE');
+            const ma = calcolaMedia('QUALITA_ALLOGGIO');
+            const mv = calcolaMedia('QUALITA_VITTO');
+
+            document.getElementById('voto-paga').innerText = mp !== "N/D" ? mp + "/5" : mp;
+            document.getElementById('voto-rispetto').innerText = mr !== "N/D" ? mr + "/5" : mr;
+            document.getElementById('voto-alloggio').innerText = ma !== "N/D" ? ma + "/5" : ma;
+            document.getElementById('voto-vitto').innerText = mv !== "N/D" ? mv + "/5" : mv;
+
+            // Media Generale
+            const numPaga = parseFloat(mp) || 0;
+            const numRisp = parseFloat(mr) || 0;
+            let mediaGen = 0;
+            
+            if(numPaga > 0 && numRisp > 0) mediaGen = ((numPaga + numRisp) / 2).toFixed(1);
+            else mediaGen = Math.max(numPaga, numRisp).toFixed(1);
+
+            const mediaElem = document.getElementById('media-generale');
+            mediaElem.innerText = mediaGen > 0 ? mediaGen : "--";
+            mediaElem.style.color = mediaGen >= 4 ? "var(--verde)" : (mediaGen >= 3 ? "var(--giallo)" : "var(--rosso)");
+
+            document.getElementById('tot-recensioni').innerText = `Analisi basata su ${recs.length} esperienze verificate`;
+
+            document.getElementById('info-gestione').innerHTML = `
+                <div class="info-item"><b>Puntualità Pagamenti</b> <span class="info-val">${calcolaPrevalenza('PAGA_PUNTUALITA')}</span></div>
+                <div class="info-item"><b>Straordinari</b> <span class="info-val">${calcolaPrevalenza('STRAORDINARI')}</span></div>
+                <div class="info-item"><b>Gestione Mance</b> <span class="info-val">${calcolaPrevalenza('MANCE')}</span></div>
+                <div class="info-item"><b>Giorno di Riposo</b> <span class="info-val">${calcolaPrevalenza('RIPOSO')}</span></div>
+            `;
+        }
+
+        async function aggiornaNavbar() {
+            const navElements = document.getElementById('nav-elements');
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) {
+                navElements.innerHTML = `<a href="login.html" style="color:var(--oro);">Accedi</a>`;
+                return;
+            }
+            const { data: azienda } = await supabaseClient.from('profili_aziende').select('id').eq('id', user.id).maybeSingle();
+            navElements.innerHTML = `
+                <a href="esplora-aziende.html">Esplora</a>
+                <a href="${azienda ? 'dashboard-azienda.html' : 'dashboard-lavoratore.html'}" style="font-weight:bold;">👤 Area Personale</a>
+                <a onclick="logout()" style="cursor:pointer; color:var(--rosso); margin-left:15px;">Esci</a>
+            `;
+        }
+
+        async function logout() { await supabaseClient.auth.signOut(); window.location.replace('index.html'); }
+
+        aggiornaNavbar();
+        caricaDettagli();
+    </script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ricerca Talenti Premium - StaffAlpine</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; color: #1a2a3a; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        h1 { color: #2980b9; text-align: center; }
+        
+        nav { text-align: center; margin-bottom: 30px; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        nav a { margin: 0 15px; text-decoration: none; color: #2980b9; font-weight: bold; }
+
+        .filters { background: white; padding: 20px; border-radius: 15px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        select, input { padding: 10px; border: 1px solid #ddd; border-radius: 8px; width: 100%; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 5px solid #2980b9; position: relative; }
+        .card h3 { margin-top: 0; color: #2c3e50; text-transform: uppercase; font-size: 16px; }
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 5px; font-size: 11px; margin: 2px; font-weight: bold; }
+        .badge-lang { background: #e1f5fe; color: #0288d1; }
+        .badge-cert { background: #e8f5e9; color: #2e7d32; }
+        .badge-loc { background: #fff3e0; color: #ef6c00; }
+        
+        .contact-btn { width: 100%; margin-top: 15px; padding: 10px; background: #2980b9; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .contact-btn:hover { background: #3498db; }
+
+        /* Stile per blocco non premium */
+        #lock-overlay { display: none; text-align: center; padding: 50px; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .btn-upgrade { background: #f1c40f; color: #1a2a3a; padding: 15px 30px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="dashboard-azienda.html">Dashboard</a>
+        <a href="premium.html">Ricerca Personale</a>
+    </nav>
+    <nav id="main-nav">
+    <a href="login.html">Home</a>
+    <a href="index.html">Recensisci</a>
+    <a href="esplora-aziende.html">Cerca Hotel</a>
+    <span id="admin-link-container"></span>
+</nav>
+
+    <div class="container" id="premium-content" style="display: none;">
+        <h1>Ricerca Talenti Valle d'Aosta</h1>
+        <p style="text-align:center;">Database esclusivo per aziende partner Premium.</p>
+
+        <div class="filters">
+            <select id="filter-settore" onchange="caricaLavoratori()">
+                <option value="">Tutti i settori</option>
+                <option value="sala">Sala / Bar</option>
+                <option value="cucina">Cucina</option>
+                <option value="piani">Piani / Pulizie</option>
+                <option value="reception">Reception</option>
+            </select>
+            <select id="filter-localita" onchange="caricaLavoratori()">
+                <option value="">Tutte le località</option>
+                <option value="alta_valle">Alta Valle</option>
+                <option value="aosta_dintorni">Aosta</option>
+                <option value="bassa_valle">Bassa Valle</option>
+                <option value="ayas_gressoney">Ayas / Gressoney</option>
+            </select>
+            <button onclick="caricaLavoratori()" style="background:#2980b9; color:white; border:none; border-radius:8px; cursor:pointer;">Applica Filtri</button>
+        </div>
+
+        <div id="lista-lavoratori" class="grid"></div>
+    </div>
+
+    <div class="container" id="lock-overlay">
+        <h2>Contenuto Riservato</h2>
+        <p>Devi essere un'azienda con abbonamento <strong>Premium</strong> attivo per visualizzare i profili dei lavoratori e inviare proposte.</p>
+        <a href="dashboard-azienda.html" class="btn-upgrade">Attiva Premium nella Dashboard</a>
+    </div>
+
+    <script>
+        async function mostraTastoAdminSeAutorizzato() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    
+    if (user && user.email === 'mititelu.alexandra@tiscali.it') {
+        const container = document.getElementById('admin-link-container');
+        if (container) {
+            container.innerHTML = `<a href="admin.html" style="color: #e74c3c; border: 1px solid #e74c3c; padding: 5px 10px; border-radius: 5px; margin-left: 15px;">Pannello Admin 🛡️</a>`;
+        }
+    }
+}
+
+// Lancia il controllo all'avvio della pagina
+mostraTastoAdminSeAutorizzato();
+        const SUPABASE_URL = "https://maeoqoxzjzusjwrdrkbd.supabase.co"; 
+        const SUPABASE_KEY = "sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function verificaAccesso() {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            
+            if (!user) {
+                window.location.href = 'registrazione-azienda.html';
+                return;
+            }
+
+            // Controlla se l'utente è un'azienda Premium
+            const { data: azienda } = await supabaseClient
+                .from('profili_aziende')
+                .select('is_premium')
+                .eq('id', user.id)
+                .single();
+
+            if (azienda && azienda.is_premium) {
+                document.getElementById('premium-content').style.display = 'block';
+                caricaLavoratori();
+            } else {
+                document.getElementById('lock-overlay').style.display = 'block';
+            }
+        }
+
+        async function caricaLavoratori() {
+            const listaDiv = document.getElementById('lista-lavoratori');
+            listaDiv.innerHTML = "<p>Caricamento talenti...</p>";
+
+            const settore = document.getElementById('filter-settore').value;
+            const localita = document.getElementById('filter-localita').value;
+
+            let query = supabaseClient.from('esperienze_lavoratori').select('*');
+            if (settore) query = query.eq('settore', settore);
+            if (localita) query = query.eq('localita_preferita', localita);
+
+            const { data, error } = await query;
+
+            if (error) {
+                listaDiv.innerHTML = "Errore nel caricamento.";
+                return;
+            }
+
+            listaDiv.innerHTML = "";
+            data.forEach(lav => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                let certs = "";
+                if(lav.cert_haccp) certs += `<span class="badge badge-cert">HACCP</span>`;
+                if(lav.cert_sicurezza) certs += `<span class="badge badge-cert">Sicurezza</span>`;
+
+                card.innerHTML = `
+                    <h3>${lav.mansione_principale || 'Lavoratore'}</h3>
+                    <p><strong>Settore:</strong> ${lav.settore}</p>
+                    <p><strong>Località:</strong> <span class="badge badge-loc">${lav.localita_preferita}</span></p>
+                    <p><strong>Lingue:</strong> <span class="badge badge-lang">FR: ${lav.lingua_francese}</span></p>
+                    <div>${certs}</div>
+                    <button class="contact-btn" onclick="contatta('${lav.user_id}')">Invia Proposta</button>
+                `;
+                listaDiv.appendChild(card);
+            });
+        }
+
+        function contatta(userId) {
+            alert("Richiesta inviata! Il lavoratore riceverà una notifica e potrà decidere se mostrarti il suo contatto.");
+        }
+
+        verificaAccesso();
+    </script>
+</body>
+</html>

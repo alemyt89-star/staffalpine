@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business - Registrazione Azienda</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #1a2a3a; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: rgba(255, 255, 255, 0.1); padding: 40px; border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); width: 100%; max-width: 400px; text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; }
+        button { width: 100%; padding: 15px; background: #2980b9; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #3498db; }
+        .step { display: none; }
+        .active { display: block; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>StaffAlpine Business</h1>
+        <p id="desc">Registra la tua attività per trovare personale qualificato.</p>
+
+        <div id="step-1" class="step active">
+            <input type="text" id="ragione_sociale" placeholder="Ragione Sociale (Nome Hotel/Rist)">
+            <input type="text" id="p_iva" placeholder="Partita IVA">
+            <input type="email" id="email_azienda" placeholder="Email Aziendale">
+            <button onclick="procediAlCodice()">Ricevi Codice Accesso</button>
+        </div>
+
+        <div id="step-2" class="step">
+            <p>Inserisci il codice inviato alla tua email aziendale</p>
+            <input type="text" id="otp_code" placeholder="Codice 6 cifre" maxlength="6">
+            <button onclick="completaRegistrazione()">Verifica e Accedi</button>
+        </div>
+    </div>
+
+    <script>
+        function convalidaPIVA(piva) {
+    if (!/^[0-9]{11}$/.test(piva)) return false; // Deve essere di 11 cifre numeriche
+    
+    let s = 0;
+    for (let i = 0; i < 10; i++) {
+        let n = parseInt(piva.charAt(i));
+        if (i % 2 !== 0) { // Posizioni dispari (1ª, 3ª, ecc. calcolate come indice 0, 2...)
+            n *= 2;
+            if (n > 9) n -= 9;
+        }
+        s += n;
+    }
+    
+    let attesa = (10 - (s % 10)) % 10;
+    let controllo = parseInt(piva.charAt(10));
+    
+    return attesa === controllo;
+}
+
+// Esempio di utilizzo durante l'invio del form
+async function registraAzienda() {
+    const piva = document.getElementById('partita_iva').value;
+    
+    if (!convalidaPIVA(piva)) {
+        alert("La Partita IVA inserita non è valida. Controlla i dati.");
+        return; // Blocca la registrazione
+    }
+    
+    // ... prosegui con l'inserimento in Supabase ...
+}
+        async function mostraTastoAdminSeAutorizzato() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    
+    if (user && user.email === 'mititelu.alexandra@tiscali.it') {
+        const container = document.getElementById('admin-link-container');
+        if (container) {
+            container.innerHTML = `<a href="admin.html" style="color: #e74c3c; border: 1px solid #e74c3c; padding: 5px 10px; border-radius: 5px; margin-left: 15px;">Pannello Admin 🛡️</a>`;
+        }
+    }
+}
+
+// Lancia il controllo all'avvio della pagina
+mostraTastoAdminSeAutorizzato();
+        const SUPABASE_URL = "https://maeoqoxzjzusjwrdrkbd.supabase.co"; 
+        const SUPABASE_KEY = "sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function procediAlCodice() {
+            const email = document.getElementById('email_azienda').value;
+            if(!email) return alert("Inserisci l'email!");
+
+            const { error } = await supabaseClient.auth.signInWithOtp({ email });
+
+            if (error) {
+                alert("Errore: " + error.message);
+            } else {
+                document.getElementById('step-1').classList.remove('active');
+                document.getElementById('step-2').classList.add('active');
+                alert("Codice inviato!");
+            }
+        }
+
+        async function completaRegistrazione() {
+    const email = document.getElementById('email_azienda').value;
+    const token = document.getElementById('otp_code').value;
+    const ragioneSociale = document.getElementById('ragione_sociale').value;
+    const pIva = document.getElementById('p_iva').value;
+
+    if (!ragioneSociale || !pIva) return alert("Mancano i dati dell'azienda!");
+
+    // 1. Verifica il codice OTP
+    const { data, error } = await supabaseClient.auth.verifyOtp({
+        email, token, type: 'email'
+    });
+
+    if (error) {
+        alert("Codice errato o scaduto.");
+        return;
+    }
+
+    // 2. Salviamo i dati aziendali
+    // Usiamo .upsert invece di .insert: se il profilo esiste già lo aggiorna, altrimenti lo crea
+    const { error: dbError } = await supabaseClient
+        .from('profili_aziende')
+        .upsert([{ 
+            id: data.user.id, 
+            nome_azienda: ragioneSociale, 
+            partita_iva: pIva,
+            is_approvata: false // Importante per la sicurezza
+        }]);
+
+    if (dbError) {
+        console.error("Errore database:", dbError);
+        alert("Errore nel salvataggio del profilo: " + dbError.message);
+    } else {
+        alert("Registrazione completata! In attesa di approvazione.");
+        // Mandiamoli a una pagina di conferma o alla dashboard (che mostrerà il messaggio "in attesa")
+        window.location.href = 'dashboard-azienda.html';
+    }
+}
+    </script>
+</body>
+</html>

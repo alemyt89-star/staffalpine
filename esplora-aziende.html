@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esplora Aziende - StaffAlpine</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* --- STILE GLOBALE STAFFALPINE --- */
+        :root { 
+            --verde: #27ae60; 
+            --scuro: #2c3e50; 
+            --oro: #d4af37; 
+            --rosso: #e74c3c; 
+            --giallo: #f1c40f; 
+            --grigio: #f8fafc;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--grigio); margin: 0; padding: 0; }
+        
+        .main-nav { background: var(--scuro); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; color: white; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .nav-logo { font-size: 22px; font-weight: 800; color: var(--oro); text-decoration: none; }
+        .nav-links { display: flex; gap: 20px; align-items: center; }
+        .nav-links a { color: white; text-decoration: none; font-size: 14px; font-weight: bold; cursor: pointer; }
+
+        .container { max-width: 900px; margin: 40px auto; padding: 20px; }
+        
+        /* --- MODIFICA: GRIGLIA E CARD PIÙ COMPATTE --- */
+        #lista-aziende { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 15px; 
+            margin-top: 30px; 
+        }
+        
+        .azienda-card { 
+            background: white; 
+            padding: 20px; /* Ridotto padding */
+            border-radius: 12px; /* Arrotondamento più sobrio */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+            border: 1px solid #eee; 
+            transition: 0.2s; 
+            position: relative; 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .azienda-card:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+        
+        .azienda-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .azienda-nome { font-size: 16px; font-weight: bold; color: var(--scuro); margin: 0; flex: 1; padding-right: 10px; }
+        
+        .voto-badge { 
+            background: #e8f5e9; 
+            color: var(--verde); 
+            padding: 4px 10px; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            font-size: 13px; 
+            white-space: nowrap;
+        }
+
+        .premium-badge { 
+            background: linear-gradient(135deg, #d4af37 0%, #f1c40f 100%); 
+            color: white; 
+            padding: 4px 10px; 
+            border-radius: 8px; 
+            font-size: 11px; 
+            font-weight: bold; 
+            white-space: nowrap;
+        }
+
+        .azienda-loc { font-size: 12px; color: #7f8c8d; margin: 5px 0 15px 0;}
+
+        .btn-dettaglio { 
+            display: block; 
+            width: 100%; 
+            background: var(--verde); 
+            color: white; 
+            border: none; 
+            padding: 10px; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            font-size: 13px; 
+            cursor: pointer; 
+            text-align: center; 
+            text-decoration: none; 
+            box-sizing: border-box;
+        }
+        .btn-dettaglio:hover { background: #2ecc71; }
+
+        .info-panel { background: white; padding: 15px; border-radius: 12px; border-left: 4px solid var(--oro); margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); display: flex; gap: 10px; align-items: center; }
+    </style>
+</head>
+<body>
+
+    <nav id="dynamic-nav" class="main-nav">
+        <a href="index.html" class="nav-logo">StaffAlpine</a>
+        <div id="nav-elements" class="nav-links"></div>
+    </nav>
+
+    <div class="container">
+        
+        <div class="header-esplora" style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: var(--scuro); margin: 0; font-size: 28px;">Esplora le Aziende</h1>
+            <p style="color: #7f8c8d; margin-top: 5px;">Trova le migliori attività in Valle d'Aosta.</p>
+        </div>
+
+        <div style="background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); position: relative;">
+            <input type="text" id="input-cerca-hotel" 
+                   placeholder="Scrivi il nome e premi Invio per cercare..." 
+                   onkeypress="handleSearch(event)"
+                   style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-size:14px; box-sizing: border-box;">
+            <span style="position: absolute; right: 25px; top: 28px; color: #ccc;">🔍</span>
+        </div>
+
+        <div id="lista-aziende">
+            <p style="text-align: center; grid-column: 1/-1;">Recupero attività...</p>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://maeoqoxzjzusjwrdrkbd.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX"; 
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // MODIFICA: GESTIONE TASTO INVIO
+        function handleSearch(e) {
+            if (e.key === 'Enter') {
+                const termine = document.getElementById('input-cerca-hotel').value;
+                caricaAziende(termine);
+            }
+        }
+
+  async function caricaAziende(filtro = "") {
+    const container = document.getElementById('lista-aziende');
+    container.innerHTML = "<p style='text-align: center; grid-column: 1/-1;'>Caricamento...</p>";
+    
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    let isPremium = false;
+    let isLavoratore = true;
+    let mioIdAzienda = null;
+
+    if (user) {
+        const { data: mioProfilo } = await supabaseClient.from('profili_aziende').select('id, is_premium').eq('id', user.id).maybeSingle();
+        if (mioProfilo) { isLavoratore = false; isPremium = mioProfilo.is_premium === true; mioIdAzienda = mioProfilo.id; }
+    }
+
+    // 1. Recuperiamo le Aziende Approvare
+    let query = supabaseClient.from('profili_aziende').select('*').eq('is_approvata', true);
+    if (filtro) query = query.ilike('nome_azienda', `%${filtro}%`);
+    const { data: aziende } = await query;
+
+    // 2. Recuperiamo TUTTE le recensioni verificate
+    const { data: tutteLeRecs } = await supabaseClient.from('RECENSIONI').select('*').eq('VERIFICATA', true);
+
+    container.innerHTML = "";
+
+    // Mappa per tenere traccia di quali aziende abbiamo già mostrato
+    const aziendeMostrate = new Set();
+
+    // Ciclo 1: Mostriamo le aziende che hanno un profilo ufficiale
+    if (aziende) {
+        aziende.forEach(az => {
+            const nomePulitoProfilo = az.nome_azienda.toLowerCase().trim();
+            aziendeMostrate.add(nomePulitoProfilo);
+
+            const recs = tutteLeRecs ? tutteLeRecs.filter(r => 
+                r.AZIENDA && r.AZIENDA.toLowerCase().trim().includes(nomePulitoProfilo)
+            ) : [];
+
+            renderizzaCard(container, az.nome_azienda, az.localita, recs, isLavoratore, isPremium, mioIdAzienda === az.id);
+        });
+    }
+
+    // Ciclo 2: Mostriamo le aziende che hanno recensioni ma NON hanno ancora un profilo (COSI VEDI LE 3 RECENSIONI!)
+    if (tutteLeRecs) {
+        const nomiAziendeDaRecensioni = [...new Set(tutteLeRecs.map(r => r.AZIENDA))];
+        
+        nomiAziendeDaRecensioni.forEach(nomeRec => {
+            if (!nomeRec) return;
+            const nomePulitoRec = nomeRec.toLowerCase().trim();
+            
+            // Se non l'abbiamo già mostrata nel ciclo precedente, la aggiungiamo ora
+            if (![...aziendeMostrate].some(n => nomePulitoRec.includes(n) || n.includes(nomePulitoRec))) {
+                const recs = tutteLeRecs.filter(r => r.AZIENDA && r.AZIENDA.toLowerCase().trim() === nomePulitoRec);
+                renderizzaCard(container, nomeRec, "Valle d'Aosta", recs, isLavoratore, isPremium, false);
+                aziendeMostrate.add(nomePulitoRec);
+            }
+        });
+    }
+}
+
+// Funzione di supporto per creare graficamente la card
+function renderizzaCard(container, nome, localita, recs, isLavoratore, isPremium, eMiaAzienda) {
+    let media = "--";
+    if (recs.length > 0) {
+        const somma = recs.reduce((acc, r) => acc + (parseFloat(r.VOTO_PAGA) || 0) + (parseFloat(r.RISPETTO_TITOLARE) || 0), 0);
+        media = (somma / (recs.length * 2)).toFixed(1);
+    }
+
+    // Recuperiamo l'utente attuale per il controllo sicurezza
+    const user = supabaseClient.auth.user ? supabaseClient.auth.user() : null;
+
+    // LOGICA DI ACCESSO:
+    // Entra se: è un lavoratore OPPURE è Premium OPPURE sta guardando la sua stessa azienda
+    const puoCliccare = isLavoratore || isPremium || eMiaAzienda;
+
+    // Definiamo il tasto in base ai permessi
+    const htmlBottone = puoCliccare 
+        ? `<a href="dettaglio-azienda.html?nome=${encodeURIComponent(nome)}" class="btn-dettaglio">Vedi Analisi</a>`
+        : `<a onclick="alert('Abbonati a Premium per vedere i dettagli e i commenti della concorrenza!')" class="btn-dettaglio" style="background:#94a3b8; cursor:pointer;">🔒 Solo Premium</a>`;
+
+    const div = document.createElement('div');
+    div.className = 'azienda-card';
+    div.innerHTML = `
+        <div class="azienda-card-header">
+            <h3 class="azienda-nome">${nome}</h3>
+            <span class="voto-badge">⭐ ${media}</span> 
+        </div>
+        <p class="azienda-loc">📍 ${localita || 'Valle d\'Aosta'}</p>
+        ${htmlBottone}
+    `;
+    container.appendChild(div);
+}
+        async function aggiornaNavbar() {
+            const navElements = document.getElementById('nav-elements');
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) {
+                navElements.innerHTML = `<a href="login.html" style="color:var(--oro);">Accedi</a>`;
+                return;
+            }
+            const { data: azienda } = await supabaseClient.from('profili_aziende').select('id').eq('id', user.id).maybeSingle();
+            navElements.innerHTML = `
+                <a href="${azienda ? 'dashboard-azienda.html' : 'dashboard-lavoratore.html'}" style="font-weight:bold;">👤 Area Personale</a>
+                <a onclick="logout()" style="cursor:pointer; color:var(--rosso); margin-left:15px;">Esci</a>
+            `;
+        }
+
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            window.location.replace('index.html');
+        }
+
+        aggiornaNavbar();
+        caricaAziende();
+    </script>
+</body>
+</html>

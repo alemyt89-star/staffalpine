@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Admin - StaffAlpine</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #1a2a3a; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; color: white; }
+        .login-box { background: rgba(255,255,255,0.1); padding: 40px; border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); text-align: center; width: 350px; }
+        input { width: 100%; padding: 12px; margin: 15px 0; border-radius: 8px; border: none; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: #c0392b; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        button:hover { background: #e74c3c; }
+    </style>
+</head>
+<body>
+
+<div class="login-box">
+    <h2>🛡️ Accesso Amministratore</h2>
+    <input type="email" id="email-admin" placeholder="La tua email admin">
+    <button id="btn-invio" onclick="richiediAccesso()">Invia Codice Magico</button>
+    
+    <div id="otp-section" style="display:none; margin-top: 20px;">
+        <p style="font-size: 13px;">Inserisci il codice a 6 cifre ricevuto via email:</p>
+        <input type="text" id="codice-otp" placeholder="Codice OTP">
+        <button onclick="confermaAccesso()" style="background: #27ae60;">Entra nel Pannello</button>
+    </div>
+</div>
+
+<script>
+    // 2. CONFIGURAZIONE SUPABASE
+    const SUPABASE_URL = "https://maeoqoxzjzusjwrdrkbd.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX"; 
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function richiediAccesso() {
+        const email = document.getElementById('email-admin').value;
+        if(email !== 'mititelu.alexandra@tiscali.it') return alert("Accesso Negato: Email non autorizzata.");
+        
+        document.getElementById('btn-invio').innerText = "Inviando...";
+
+        const { error } = await supabaseClient.auth.signInWithOtp({ email });
+        
+        if (error) {
+            alert("Errore: " + error.message);
+            document.getElementById('btn-invio').innerText = "Invia Codice Magico";
+        } else {
+            document.getElementById('otp-section').style.display = 'block';
+            document.getElementById('btn-invio').style.display = 'none';
+            alert("Codice inviato alla tua email!");
+        }
+    }
+
+    async function confermaAccesso() {
+        const email = document.getElementById('email-admin').value;
+        const token = document.getElementById('codice-otp').value;
+
+        // 3. FIX: Cambiato da 'magiclink' a 'email' per accettare il codice OTP numerico
+        const { error } = await supabaseClient.auth.verifyOtp({ 
+            email, 
+            token, 
+            type: 'email' 
+        });
+        
+        if(!error) {
+            window.location.href = 'admin.html';
+        } else {
+            alert("Codice errato o scaduto: " + error.message);
+        }
+    }
+</script>
+
+</body>
+</html>

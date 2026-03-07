@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benvenuti su StaffAlpine - Valle d'Aosta</title>
+    <style>
+        :root { 
+            --verde: #27ae60; 
+            --scuro: #2c3e50; 
+            --oro: #d4af37; 
+            --grigio: #f4f7f6; 
+        }
+        
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            color: var(--scuro); 
+            background: var(--grigio); 
+        }
+
+       /* Hero Section con il Cervino */
+        .hero { 
+            background: linear-gradient(rgba(44, 62, 80, 0.6), rgba(44, 62, 80, 0.6)), 
+                        url('sfondo-home.jpg'); /* ValleReview */
+            background-size: cover; 
+            background-position: center;
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+            color: white; 
+            padding: 0 20px;
+        }
+        
+        .hero h1 { 
+            font-size: 4rem; 
+            margin: 0; 
+            color: var(--oro); 
+            letter-spacing: -1px;
+        }
+        
+        .hero p { 
+            font-size: 1.4rem; 
+            max-width: 700px; 
+            margin: 20px 0 40px 0; 
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        .btn-container { 
+            display: flex; 
+            gap: 20px; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+        }
+
+        .btn { 
+            padding: 18px 45px; 
+            border-radius: 12px; 
+            text-decoration: none; 
+            font-weight: bold; 
+            font-size: 18px; 
+            transition: 0.3s; 
+            text-transform: uppercase;
+        }
+
+        .btn-start { 
+            background: var(--verde); 
+            color: white; 
+            border: 2px solid var(--verde); 
+        }
+
+        .btn-start:hover { 
+            background: #219150; 
+            transform: translateY(-3px); 
+        }
+
+        .btn-info { 
+            background: transparent; 
+            color: white; 
+            border: 2px solid white; 
+        }
+
+        .btn-info:hover { 
+            background: white; 
+            color: var(--scuro); 
+        }
+
+        /* Sezione Spiegazione Rapida */
+        .info-section { 
+            padding: 80px 10%; 
+            background: white;
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 40px; 
+        }
+
+        .info-card { 
+            text-align: center; 
+            padding: 20px;
+        }
+
+        .info-card span { 
+            font-size: 50px; 
+            display: block; 
+            margin-bottom: 20px; 
+        }
+
+        .info-card h3 { 
+            color: var(--scuro); 
+            margin-bottom: 15px; 
+        }
+
+        .info-card p { 
+            color: #666; 
+            line-height: 1.5;
+        }
+
+        footer { 
+            background: var(--scuro); 
+            color: white; 
+            padding: 30px; 
+            text-align: center; 
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<div style="background: var(--oro); color: var(--scuro); text-align: center; font-size: 12px; font-weight: bold; padding: 5px; position: sticky; top: 0; z-index: 2000;">
+    🚀 VERSIONE BETA: Aiutaci a migliorare segnalando eventuali errori!
+</div>
+    <section class="hero">
+        <h1>StaffAlpine</h1>
+        <p>Valorizziamo il lavoro nel turismo in Valle d'Aosta attraverso la trasparenza e la condivisione delle esperienze reali.</p>
+        
+       <div class="btn-container">
+    <a href="login.html" class="btn btn-start">Area Lavoratori</a>
+    
+    <a href="login.html?role=business" class="btn btn-info">Area Business 💼</a>
+</div>
+    </section>
+    
+
+    <div class="info-section">
+        <div class="info-card">
+            <span>🛡️</span>
+            <h3>Per i Lavoratori</h3>
+            <p>Lascia recensioni verificate su pagamenti, alloggi e gestione. Aiuta i tuoi colleghi a trovare i posti migliori dove fare stagione.</p>
+        </div>
+        <div class="info-card">
+            <span>💎</span>
+            <h3>Per le Aziende</h3>
+            <p>Metti in mostra la tua professionalità, analizza il feedback dei dipendenti e trova i migliori talenti locali.</p>
+        </div>
+        <div class="info-card">
+            <span>⛰️</span>
+            <h3>100% Valle d'Aosta</h3>
+            <p>L'unica piattaforma dedicata esclusivamente alle dinamiche del territorio valdostano, da Courmayeur a Gressoney.</p>
+        </div>
+    </div>
+
+    <footer style="background: var(--scuro); color: white; padding: 40px 10%; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+        <div style="text-align: left;">
+            <h4 style="margin: 0; color: var(--oro);">Contattaci</h4>
+            <p style="font-size: 13px; opacity: 0.8;">Info & Supporto: info@staffalpine.it</p>
+        </div>
+        
+        <div style="text-align: center;">
+            <p style="margin-bottom: 10px; font-weight: bold;">StaffAlpine © 2026</p>
+            <div style="font-size: 13px; display: flex; gap: 15px; justify-content: center; opacity: 0.6;">
+                <a href="#" style="color: white; text-decoration: none;">Facebook</a>
+                <a href="#" style="color: white; text-decoration: none;">Instagram</a>
+                <span>|</span>
+                <a href="login.html" style="color: var(--oro); text-decoration: none; font-weight: bold;">Accesso Staff 🛡️</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

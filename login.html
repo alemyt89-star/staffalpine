@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StaffAlpine - Login Sicuro</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* RESET E BASE */
+        body, html { height: 100%; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background-color: #1a2a3a; overflow: hidden; }
+        .bg-image { background-image: url('sfondo.jpg'); background-position: center; background-repeat: no-repeat; background-size: cover; height: 100vh; width: 100vw; position: fixed; top: 0; left: 0; z-index: -2; filter: brightness(0.5); }
+        .bg-overlay { height: 100vh; width: 100vw; position: fixed; top: 0; left: 0; z-index: -1; background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.6)); }
+        nav { background: rgba(44, 62, 80, 0.8); padding: 15px; text-align: center; position: fixed; top: 0; width: 100%; z-index: 1000; backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.1); }
+        nav a { color: white; margin: 0 20px; text-decoration: none; font-weight: 600; }
+        .wrapper { height: 100vh; display: flex; justify-content: center; align-items: center; }
+        .login-card { background: rgba(255, 255, 255, 0.1); padding: 45px; border-radius: 24px; backdrop-filter: blur(18px); border: 1px solid rgba(255, 255, 255, 0.2); text-align: center; max-width: 400px; width: 90%; color: white; }
+        h1 { margin: 0 0 10px 0; font-size: 2.5rem; font-weight: 800; }
+        input { width: 100%; padding: 15px; margin-bottom: 18px; border-radius: 12px; border: none; font-size: 16px; }
+        button { width: 100%; padding: 16px; background: #27ae60; color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer; }
+        button:hover { background: #2ecc71; transform: translateY(-2px); }
+        .secondary-link { margin-top: 15px; font-size: 13px; cursor: pointer; text-decoration: underline; opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+    <div class="bg-image"></div>
+    <div class="bg-overlay"></div>
+
+    <nav id="main-nav">
+        <a href="index.html">Torna alla Home</a> 
+        <a href="esplora-aziende.html">Esplora Hotel</a>
+        <span id="admin-link-container"></span>
+    </nav>
+
+    <div class="wrapper">
+        <div class="login-card">
+            <h1>StaffAlpine</h1>
+            <p id="instruction-text">Inserisci l'email per accedere al tuo profilo professionale o aziendale.</p>
+            
+            <div id="step-1">
+                <input type="email" id="email" placeholder="Indirizzo Email">
+                <button onclick="inviaCodice()">Invia Codice Accesso</button>
+            </div>
+
+            <div id="step-2" style="display:none;">
+                <input type="text" id="otp-code" placeholder="Codice OTP" maxlength="6" style="text-align:center; font-size: 24px; letter-spacing: 4px;">
+                <button onclick="verificaCodice()">Verifica e Accedi</button>
+                <div class="secondary-link" onclick="location.reload()">Torna indietro</div>
+            </div>
+            
+            <div style="margin-top:25px; font-size: 11px; opacity: 0.6;">
+                © 2026 StaffAlpine - Sicuro, Anonimo, Trasparente
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. CONFIGURAZIONE SUPABASE (Sempre per prima!)
+        const SUPABASE_URL = "https://maeoqoxzjzusjwrdrkbd.supabase.co"; 
+        const SUPABASE_KEY = "sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // 2. FUNZIONI DI ACCESSO
+       async function inviaCodice() {
+    const email = document.getElementById('email').value;
+    const btn = document.querySelector('#step-1 button');
+    
+    if(!email) return alert("Inserisci un indirizzo email!");
+
+    // 1. AZIONE IMMEDIATA: Cambia l'interfaccia subito
+    document.getElementById('step-1').style.display = 'none';
+    document.getElementById('step-2').style.display = 'block';
+    document.getElementById('instruction-text').innerText = "Abbiamo inviato un codice a " + email;
+    
+    // Metti il focus automatico sul campo OTP per far scrivere subito l'utente
+    document.getElementById('otp-code').focus();
+
+    // 2. AZIONE IN BACKGROUND: Chiama Supabase
+    const { error } = await supabaseClient.auth.signInWithOtp({
+        email: email,
+        options: { shouldCreateUser: true }
+    });
+
+    if (error) {
+        // Se c'è un errore, torna indietro e avvisa l'utente
+        alert("Errore nell'invio: " + error.message);
+        document.getElementById('step-1').style.display = 'block';
+        document.getElementById('step-2').style.display = 'none';
+        document.getElementById('instruction-text').innerText = "Inserisci l'email per accedere al tuo profilo.";
+    }
+}
+
+       async function verificaCodice() {
+    const email = document.getElementById('email').value;
+    const token = document.getElementById('otp-code').value;
+
+    const { data, error } = await supabaseClient.auth.verifyOtp({
+        email: email,
+        token: token,
+        type: 'email'
+    });
+
+    if (error) {
+        alert("Codice errato o scaduto.");
+    } else if (data.user) {
+        // Usiamo solo smistaUtente: gestisce lei Admin, Aziende e Lavoratori
+        smistaUtente(data.user);
+    }
+}
+
+// Crea questa funzione separata per i lavoratori per non fare confusione
+async function controlloLavoratore(user) {
+    const { data: lavoratore } = await supabaseClient
+        .from('esperienze_lavoratori')
+        .select('nome_reale')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+    if (lavoratore && lavoratore.nome_reale) {
+        window.location.href = 'dashboard-lavoratore.html';
+    } else {
+        window.location.href = 'index.html';
+    }
+}
+
+       async function smistaUtente(user) {
+    console.log("Inizio smistamento per:", user.email);
+
+    // 1. PRIORITÀ ASSOLUTA: ADMIN
+    if (user.email === 'mititelu.alexandra@tiscali.it') {
+        console.log("Riconosciuto come Admin");
+        window.location.href = 'admin.html';
+        return;
+    }
+
+    // 2. CONTROLLO AZIENDA
+    const { data: azienda } = await supabaseClient
+        .from('profili_aziende')
+        .select('id')
+        .eq('id', user.id)
+        .maybeSingle();
+
+    if (azienda) {
+        console.log("Riconosciuto come Azienda");
+        window.location.href = 'dashboard-azienda.html';
+        return;
+    }
+
+    // 3. CONTROLLO LAVORATORE ESISTENTE
+    const { data: lavoratore } = await supabaseClient
+        .from('esperienze_lavoratori')
+        .select('nome_reale')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+    if (lavoratore && lavoratore.nome_reale) {
+        console.log("Riconosciuto come Lavoratore esistente");
+        window.location.href = 'dashboard-lavoratore.html';
+        return;
+    }
+
+    // 4. NUOVO UTENTE (Se non è admin, non è azienda e non ha profilo lavoratore)
+    // Se è arrivato qui dal tasto "Area Business", lo mandiamo a registrarsi come azienda
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('role') === 'business') {
+        console.log("Nuovo utente Business -> Registrazione");
+        window.location.href = 'registrazione_aziende.html';
+    } else {
+        console.log("Nuovo utente Lavoratore -> Index");
+        window.location.href = 'recensione.html';
+    }
+}
+
+        async function mostraTastoAdminSeAutorizzato() {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (user && user.email === 'mititelu.alexandra@tiscali.it') {
+                const container = document.getElementById('admin-link-container');
+                if (container) container.innerHTML = `<a href="admin.html" style="color: #e74c3c; border: 1px solid #e74c3c; padding: 5px 10px; border-radius: 5px;">Admin 🛡️</a>`;
+            }
+        }
+
+        // 3. ESECUZIONE AL CARICAMENTO
+        // NOTA: Ho tolto checkSession() così non ti sbatte fuori dalla pagina se sei già loggata
+        mostraTastoAdminSeAutorizzato();
+    </script>
+</body>
+</html>
