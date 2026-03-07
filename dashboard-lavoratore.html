@@ -90,6 +90,45 @@
             display: inline-block;
             margin-top: 5px;
         }
+        /* Ottimizzazione per Cellulari (Schermi sotto i 768px) */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+        padding: 10px;
+        margin-top: 20px;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+        text-align: center;
+    }
+
+    /* Trasforma le tabelle o le liste in schede verticali */
+    .dashboard-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .card {
+        padding: 15px;
+        border-radius: 12px;
+    }
+
+    /* Rende i bottoni più grandi e facili da cliccare col pollice */
+    .btn {
+        width: 100%;
+        display: block;
+        padding: 15px;
+        font-size: 1rem;
+        margin-bottom: 10px;
+    }
+
+    /* Se hai una tabella, la rendiamo scorrevole orizzontalmente */
+    .table-container {
+        overflow-x: auto;
+    }
+}
     </style>
 </head>
 <body>
