@@ -91,42 +91,58 @@
             margin-top: 5px;
         }
         /* Ottimizzazione per Cellulari (Schermi sotto i 768px) */
+/* Ottimizzazione REALE per Cellulari */
 @media (max-width: 768px) {
-    .container {
-        width: 95%;
-        padding: 10px;
-        margin-top: 20px;
+    body {
+        flex-direction: column; /* La sidebar andrà sopra, il contenuto sotto */
     }
 
-    h1 {
-        font-size: 1.5rem;
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative; /* Non più fissa a sinistra */
+        padding: 10px;
+        box-sizing: border-box;
+    }
+
+    .sidebar h2 {
+        margin-bottom: 15px;
         text-align: center;
     }
 
-    /* Trasforma le tabelle o le liste in schede verticali */
-    .dashboard-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
+    .nav-link {
+        display: inline-block; /* I tasti del menu diventano quadratini affiancati */
+        margin: 5px;
+        padding: 8px 12px;
+        font-size: 13px;
     }
 
-    .card {
-        padding: 15px;
-        border-radius: 12px;
+    .main-content {
+        margin-left: 0 !important; /* ELIMINA lo spazio vuoto a sinistra */
+        width: 100% !important;
+        padding: 15px !important;
+        box-sizing: border-box;
     }
 
-    /* Rende i bottoni più grandi e facili da cliccare col pollice */
-    .btn {
+    .search-box {
+        flex-direction: column; /* Input e tasto cerca uno sopra l'altro */
+    }
+
+    input, select, .btn-gold {
         width: 100%;
-        display: block;
-        padding: 15px;
-        font-size: 1rem;
-        margin-bottom: 10px;
     }
 
-    /* Se hai una tabella, la rendiamo scorrevole orizzontalmente */
-    .table-container {
-        overflow-x: auto;
+    .notifica-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    /* Modale (pop-up) a tutto schermo su mobile */
+    #modal-modifica > div {
+        width: 95% !important;
+        padding: 15px !important;
+        margin: 10px auto !important;
     }
 }
     </style>
