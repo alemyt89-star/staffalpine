@@ -1,0 +1,21 @@
+{
+  "name": "StaffAlpine",
+  "short_name": "StaffAlpine",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#2c3e50",
+  "theme_color": "#2c3e50",
+  "description": "Lavoro e Recensioni nel settore Hospitality in Valle d'Aosta",
+  "icons": [
+    {
+      "src": "https://staffalpine.it/icona-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://staffalpine.it/icona-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
