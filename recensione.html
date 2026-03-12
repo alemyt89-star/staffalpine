@@ -495,6 +495,19 @@
         btn.disabled=false;
         btn.innerHTML='🚀 Pubblica Recensione';
       }else{
+        // Notifica email ad Alexandra
+        try {
+          await fetch('/api/nuova-recensione', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              nomeAzienda: dati['AZIENDA'],
+              valutazione: dati['VOTO_PAGA'],
+              mansione: 'N/D'
+            })
+          });
+        } catch(e) { console.log('Email non inviata:', e); }
+
         alert("✅ Recensione pubblicata! Verrai reindirizzato alla dashboard.");
         window.location.href='dashboard-lavoratore.html';
       }

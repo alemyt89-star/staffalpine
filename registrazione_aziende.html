@@ -366,6 +366,15 @@
         return;
       }
 
+      // Invia email di conferma all'azienda + notifica ad Alexandra
+      try {
+        await fetch('/api/conferma-azienda', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nomeAzienda: ragione, email: email })
+        });
+      } catch(e) { console.log('Email non inviata:', e); }
+
       alert("✅ Registrazione completata! Il tuo profilo è in attesa di approvazione da parte dell'admin.");
       window.location.href='dashboard-azienda.html';
     }
