@@ -1,453 +1,451 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2c3e50">
-<link rel="apple-touch-icon" href="icona-192.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a2e1a">
+  <link rel="apple-touch-icon" href="icona-192.png">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then(() => console.log("PWA StaffAlpine Attiva!"))
+        .catch(err => console.log("Errore PWA:", err));
+    }
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Area Business — StaffAlpine</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --verde:#2d6a4f;--verde-chiaro:#52b788;--verde-accento:#74c69d;
+      --oro:#c9a84c;--oro-chiaro:#e9c46a;--scuro:#1a2e1a;
+      --pietra:#6b705c;--grigio:#f0f2ee;--testo:#2c3e2d;--rosso:#c0392b;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--grigio);color:var(--testo);min-height:100vh;visibility:hidden;}
 
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js')
-      .then(() => console.log("PWA StaffAlpine Attiva!"))
-      .catch(err => console.log("Errore PWA:", err));
-  }
-</script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Business - StaffAlpine</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        /* Protezione iniziale */
-        body { visibility: hidden; font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; padding-top: 70px; }
-        
-        :root { 
-            --oro: #d4af37; 
-            --scuro: #2c3e50; 
-            --verde: #27ae60; 
-            --blu: #2980b9; 
-            --rosso: #e74c3c;
-        }
+    /* NAVBAR */
+    .main-nav{background:var(--scuro);padding:14px 5%;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1000;box-shadow:0 2px 20px rgba(0,0,0,0.2);}
+    .nav-logo{font-family:'Playfair Display',serif;font-size:20px;color:var(--oro-chiaro);letter-spacing:1px;text-decoration:none;}
+    .nav-right{display:flex;align-items:center;gap:12px;}
+    .nav-azienda{font-size:13px;color:rgba(255,255,255,0.6);}
+    .premium-pill{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:0.5px;}
+    .pill-premium{background:linear-gradient(135deg,var(--oro),var(--oro-chiaro));color:var(--scuro);}
+    .pill-base{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.15);}
+    .nav-logout{color:#e88080;font-size:13px;cursor:pointer;border:1px solid rgba(232,128,128,0.3);padding:6px 14px;border-radius:8px;background:none;font-family:'DM Sans',sans-serif;}
 
-        /* Navbar */
-        nav { background: var(--scuro); padding: 15px; text-align: center; position: fixed; top: 0; width: 100%; z-index: 1000; display: flex; justify-content: center; gap: 20px;}
-        nav a { color: white; text-decoration: none; font-weight: bold; }
+    /* TAB BAR */
+    .tab-bar{background:white;border-bottom:1px solid rgba(0,0,0,0.07);padding:0 5%;display:flex;overflow-x:auto;scrollbar-width:none;position:sticky;top:53px;z-index:999;}
+    .tab-bar::-webkit-scrollbar{display:none;}
+    .tab-btn{padding:14px 20px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--pietra);background:none;border:none;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;transition:all 0.2s;display:flex;align-items:center;gap:6px;}
+    .tab-btn:hover{color:var(--testo);}
+    .tab-btn.active{color:var(--verde);border-bottom-color:var(--verde);font-weight:600;}
 
-        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
-        
-        /* Header */
-        .biz-header { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .premium-status { display: inline-block; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-top: 10px; }
-        .is-premium { background: linear-gradient(to right, #d4af37, #f1c40f); color: white; }
-        .is-base { background: #e0e0e0; color: #666; }
+    /* CONTENT */
+    .container{max-width:960px;margin:0 auto;padding:32px 5%;}
+    .section{display:none;}
+    .section.active{display:block;}
 
-        /* Card Lavoratore */
-        .worker-card { background: white; padding: 20px; border-radius: 15px; border-left: 5px solid var(--blu); box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 15px; text-align: left; }
-        .badge-skill { background: #f0f4f8; color: #2980b9; padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: bold; margin-right: 5px; display: inline-block; }
-        .lang-badge { border: 1px solid #ddd; padding: 2px 8px; border-radius: 5px; font-size: 11px; margin-right: 5px; }
+    /* CARDS */
+    .card{background:white;border-radius:16px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.05);margin-bottom:20px;position:relative;}
+    .card-title{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--scuro);margin-bottom:18px;}
 
-        .dashboard-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 25px; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; position: relative; overflow: hidden; }
+    /* STATS */
+    .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:24px;}
+    @media(min-width:600px){.stats-grid{grid-template-columns:repeat(4,1fr);}}
+    .stat-item{background:var(--grigio);padding:16px;border-radius:12px;text-align:center;}
+    .stat-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pietra);display:block;margin-bottom:6px;}
+    .stat-value{font-size:1.6rem;font-weight:700;color:var(--scuro);display:block;font-family:'Playfair Display',serif;}
+    .ops-list{display:flex;flex-direction:column;gap:8px;}
+    .ops-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--grigio);border-radius:10px;font-size:13px;}
+    .ops-row span:last-child{font-weight:700;color:var(--verde);}
 
-        /* Griglia Statistiche */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-top: 20px; }
-        .stat-item { background: #f9f9f9; padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #eee; }
-        .stat-value { font-size: 20px; font-weight: bold; color: var(--scuro); display: block; }
-        .stat-label { font-size: 11px; color: #7f8c8d; text-transform: uppercase; margin-bottom: 5px; display: block; }
-        
-        .text-stat { font-size: 13px; margin: 8px 0; display: flex; justify-content: space-between; border-bottom: 1px solid #f0f0f0; padding-bottom: 4px; }
-        .text-stat b { color: var(--blu); }
+    /* LOCK OVERLAY */
+    .lock-overlay{position:absolute;inset:0;background:rgba(255,255,255,0.92);backdrop-filter:blur(3px);border-radius:16px;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;gap:12px;}
+    .lock-icon{font-size:32px;}
+    .lock-title{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--scuro);}
+    .lock-sub{font-size:13px;color:var(--pietra);}
 
-        /* Locks e Overlay */
-        .blur-lock { filter: blur(5px); pointer-events: none; user-select: none; }
-        .overlay-msg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; background: rgba(255,255,255,0.85); display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; box-sizing: border-box; }
+    /* BOTTONI */
+    .btn-primary{background:linear-gradient(135deg,var(--verde),var(--verde-chiaro));color:white;border:none;padding:10px 22px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all 0.3s;}
+    .btn-primary:hover{opacity:0.9;transform:translateY(-1px);}
+    .btn-oro{background:linear-gradient(135deg,var(--oro),var(--oro-chiaro));color:var(--scuro);border:none;padding:10px 22px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all 0.3s;}
+    .btn-oro:hover{opacity:0.9;transform:translateY(-1px);}
+    .btn-secondary{background:var(--grigio);color:var(--testo);border:1px solid rgba(0,0,0,0.08);padding:10px 20px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;}
 
-        .btn-gold { background: var(--oro); color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; width: 100%; font-weight: bold; }
-        .btn-premium-upgrade { background: linear-gradient(135deg, #d4af37 0%, #f1c40f 100%); color: white; border: none; padding: 10px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-    </style>
+    /* FORM */
+    .form-group{margin-bottom:14px;}
+    .form-label{display:block;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--pietra);font-weight:600;margin-bottom:6px;}
+    .form-control{width:100%;padding:11px 14px;border:1px solid rgba(0,0,0,0.1);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color 0.3s;background:var(--grigio);}
+    .form-control:focus{border-color:var(--verde-chiaro);background:white;}
+    textarea.form-control{resize:vertical;min-height:80px;}
+
+    /* WORKER CARD */
+    .worker-card{background:white;border-radius:14px;padding:18px;border:1px solid rgba(0,0,0,0.05);border-left:4px solid var(--verde-chiaro);box-shadow:0 2px 8px rgba(0,0,0,0.04);margin-bottom:14px;transition:all 0.3s;}
+    .worker-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.08);}
+    .worker-mansione{font-family:'Playfair Display',serif;font-size:1rem;color:var(--scuro);margin-bottom:4px;}
+    .badge-skill{display:inline-block;background:#f0f4f8;color:#2980b9;padding:3px 10px;border-radius:8px;font-size:11px;font-weight:600;margin:2px;}
+    .badge-cert{display:inline-block;background:#e8f5e9;color:var(--verde);padding:3px 10px;border-radius:8px;font-size:11px;font-weight:600;border:1px solid #c8e6c9;margin:2px;}
+    .lang-badge{display:inline-block;border:1px solid #ddd;padding:3px 9px;border-radius:8px;font-size:11px;margin:2px;}
+    .workers-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
+
+    /* FILTRI */
+    .filtri-row{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+    .filtri-row select{flex:1;min-width:160px;padding:10px 14px;border:1px solid rgba(0,0,0,0.1);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;background:white;}
+
+    /* RECENSIONI MERCATO */
+    .rec-card{background:var(--grigio);padding:14px 16px;border-radius:12px;border:1px solid rgba(0,0,0,0.05);margin-bottom:10px;}
+    .rec-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+    .rec-azienda{font-weight:700;font-size:13px;color:var(--scuro);}
+    .rec-data{font-size:10px;color:#94a3b8;}
+    .rec-voti{display:flex;gap:12px;font-size:12px;color:var(--pietra);}
+    .rec-voti b{color:var(--testo);}
+
+    /* EMPTY */
+    .empty-state{text-align:center;padding:50px 20px;color:var(--pietra);}
+    .empty-state .empty-icon{font-size:40px;display:block;margin-bottom:14px;}
+    .empty-state h3{font-family:'Playfair Display',serif;color:var(--scuro);margin-bottom:6px;}
+    .empty-state p{font-size:14px;}
+
+    /* UPGRADE BANNER */
+    .upgrade-banner{background:linear-gradient(135deg,var(--scuro),#2d5016);border-radius:16px;padding:28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:20px;}
+    .upgrade-banner h3{font-family:'Playfair Display',serif;color:var(--oro-chiaro);font-size:1.2rem;margin-bottom:6px;}
+    .upgrade-banner p{color:rgba(255,255,255,0.6);font-size:13px;}
+
+    @media(max-width:480px){.tab-btn{padding:12px 14px;font-size:12px;}.upgrade-banner{flex-direction:column;}}
+  </style>
 </head>
 <body>
 
-   <nav>
-    <a href="esplora-aziende.html">Esplora</a>
-    <a href="dashboard-azienda.html" style="font-weight: bold; color: var(--oro);">👤 Area Personale</a>
-    <a href="#" onclick="logout()" style="color: var(--rosso); margin-left: 15px;">Esci</a>
-</nav>
-
-    <div class="container" id="main-content">
-        <div class="biz-header">
-            <div>
-                <h1 id="txt-nome-azienda" style="margin:0;">Caricamento...</h1>
-                <p id="txt-piva" style="margin:5px 0; color:#7f8c8d;"></p>
-                <div id="badge-premium" class="premium-status"></div>
-            </div>
-            <button id="btn-upgrade-manuale" class="btn-premium-upgrade" style="display:none;" onclick="richiediPremium()">💎 Passa a Premium</button>
-        </div>
-
-        <div class="dashboard-grid">
-            <div class="card">
-                <h3>📊 Analisi Dettagliata Recensioni</h3>
-                <div id="premium-lock" class="overlay-msg" style="display:none;">
-                    <p>⭐ <b>Passa a Premium</b> per vedere i voti dettagliati.</p>
-                </div>
-
-                <div id="stats-content">
-                    <div class="stats-grid">
-                        <div class="stat-item"><span class="stat-label">Paga</span><span class="stat-value" id="val-voto-paga">--</span></div>
-                        <div class="stat-item"><span class="stat-label">Rispetto</span><span class="stat-value" id="val-rispetto">--</span></div>
-                        <div class="stat-item"><span class="stat-label">Alloggio</span><span class="stat-value" id="val-alloggio">--</span></div>
-                        <div class="stat-item"><span class="stat-label">Vitto</span><span class="stat-value" id="val-vitto">--</span></div>
-                    </div>
-                    <div style="margin-top: 30px;">
-                        <h4>🛠️ Gestione Operativa (Prevalenza)</h4>
-                        <div class="text-stat">Puntualità: <b id="txt-puntualita">--</b></div>
-                        <div class="text-stat">Straordinari: <b id="txt-straordinari">--</b></div>
-                        <div class="text-stat">Giorno di Riposo: <b id="txt-riposo">--</b></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <h3>📢 Pubblica Offerta</h3>
-                <div id="job-lock" class="overlay-msg" style="display:none;">
-                    <p>Solo aziende Premium possono pubblicare.</p>
-                </div>
-                <div id="job-form">
-                    <input type="text" id="j-ruolo" placeholder="Ruolo Cercato" style="width:100%; padding:12px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd;">
-                    <textarea id="j-desc" rows="3" placeholder="Descrizione offerta..." style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd;"></textarea>
-                    <input type="text" id="j-contatto" placeholder="Email o Tel per candidature" style="width:100%; padding:12px; margin-top:10px; border-radius:8px; border:1px solid #ddd;">
-                    <button class="btn-gold" style="margin-top:20px;" onclick="pubblicaOfferta()">🚀 Pubblica Offerta</button>
-                </div>
-            </div>
-
-            <div class="card" style="grid-column: span 2;">
-                <h3>🔍 Database Talenti (Lavoratori Disponibili)</h3>
-                <div id="talent-lock" class="overlay-msg" style="display:none;">
-                    <p>⭐ <b>Passa a Premium</b> per consultare i lavoratori.</p>
-                </div>
-                <div id="talent-content">
-    <div style="margin-bottom: 20px; display: flex; gap: 10px; background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-        <select id="filtro-localita" onchange="caricaDatabaseLavoratori()" style="padding:10px; border-radius:8px; border:1px solid #ddd; flex: 1;">
-            <option value="">Tutte le località</option>
-            <option value="Alta Valle">Alta Valle</option>
-            <option value="Aosta">Aosta e dintorni</option>
-            <option value="Bassa Valle">Bassa Valle</option>
-            <option value="Ayas-Gressoney">Val d'Ayas / Gressoney</option>
-        </select>
-        <select id="filtro-settore" onchange="caricaDatabaseLavoratori()" style="padding:10px; border-radius:8px; border:1px solid #ddd; flex: 1;">
-            <option value="">Tutti i settori</option>
-            <option value="Sala/Bar">Sala / Bar</option>
-            <option value="Cucina">Cucina</option>
-            <option value="Ricevimento">Ricevimento</option>
-            <option value="Piani">Piani / Pulizie</option>
-        </select>
+  <!-- NAVBAR -->
+  <nav class="main-nav">
+    <a href="index.html" class="nav-logo">StaffAlpine</a>
+    <div class="nav-right">
+      <span class="nav-azienda" id="nav-nome-az"></span>
+      <span class="premium-pill pill-base" id="nav-premium-pill">BASE</span>
+      <button class="nav-logout" onclick="logout()">Esci</button>
     </div>
-    
-    <div id="lista-talenti" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px;">
+  </nav>
+
+  <!-- TAB BAR -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="showTab('panoramica',this)">📊 Panoramica</button>
+    <button class="tab-btn" onclick="showTab('talenti',this)">🔍 Database Talenti</button>
+    <button class="tab-btn" onclick="showTab('offerte',this)">📢 Pubblica Offerta</button>
+    <button class="tab-btn" onclick="showTab('mercato',this)">📋 Recensioni Mercato</button>
+  </div>
+
+  <div class="container">
+
+    <!-- PANORAMICA -->
+    <div id="panoramica" class="section active">
+
+      <div id="banner-upgrade" class="upgrade-banner" style="display:none;">
+        <div>
+          <h3>💎 Passa a Premium</h3>
+          <p>Accedi al database talenti, pubblica offerte e consulta le recensioni di mercato.</p>
         </div>
-</div>
-            </div>
+        <button class="btn-oro" onclick="richiediPremium()">Richiedi Premium →</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📊 Analisi Recensioni della Tua Azienda</div>
+        <div id="stats-content">
+          <div class="empty-state"><span class="empty-icon">⏳</span><h3>Caricamento...</h3></div>
         </div>
-       
+      </div>
+
     </div>
 
-    <script>
-    const SUPABASE_URL = "https://maeoqoxzjzusjwrdrkbd.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX";
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    <!-- TALENTI -->
+    <div id="talenti" class="section">
+      <div class="card" id="card-talenti">
+        <div class="card-title">🔍 Database Lavoratori Disponibili</div>
+        <div id="lock-talenti" class="lock-overlay" style="display:none;">
+          <span class="lock-icon">🔒</span>
+          <div class="lock-title">Funzione Premium</div>
+          <div class="lock-sub">Passa a Premium per consultare i profili dei lavoratori disponibili in Valle d'Aosta.</div>
+          <button class="btn-oro" onclick="richiediPremium()">💎 Richiedi Premium</button>
+        </div>
+        <div id="talenti-content">
+          <div class="filtri-row">
+            <select id="filtro-localita" onchange="caricaDatabaseLavoratori()">
+              <option value="">Tutte le località</option>
+              <option value="Alta Valle">Alta Valle</option>
+              <option value="Aosta">Aosta e dintorni</option>
+              <option value="Bassa Valle">Bassa Valle</option>
+              <option value="Ayas-Gressoney">Val d'Ayas / Gressoney</option>
+            </select>
+            <select id="filtro-settore" onchange="caricaDatabaseLavoratori()">
+              <option value="">Tutti i settori</option>
+              <option value="Sala/Bar">Sala / Bar</option>
+              <option value="Cucina">Cucina</option>
+              <option value="Ricevimento">Ricevimento</option>
+              <option value="Piani">Piani / Pulizie</option>
+            </select>
+          </div>
+          <div class="workers-grid" id="lista-talenti">
+            <div class="empty-state"><span class="empty-icon">⏳</span><h3>Caricamento...</h3></div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    async function inizializzaDashboard() {
-        const { data: { user }, error } = await supabaseClient.auth.getUser();
-        if (error || !user) { window.location.replace('login.html'); return; }
-        document.body.style.visibility = "visible";
-        caricaDatiAzienda(user);
+    <!-- OFFERTE -->
+    <div id="offerte" class="section">
+      <div class="card" id="card-offerte">
+        <div class="card-title">📢 Pubblica un'Offerta di Lavoro</div>
+        <div id="lock-offerte" class="lock-overlay" style="display:none;">
+          <span class="lock-icon">🔒</span>
+          <div class="lock-title">Funzione Premium</div>
+          <div class="lock-sub">Solo le aziende Premium possono pubblicare offerte di lavoro visibili ai lavoratori.</div>
+          <button class="btn-oro" onclick="richiediPremium()">💎 Richiedi Premium</button>
+        </div>
+        <div id="offerte-form">
+          <div class="form-group">
+            <label class="form-label">Ruolo Cercato</label>
+            <input type="text" id="j-ruolo" class="form-control" placeholder="es. Cameriere di sala, Chef de Rang...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Descrizione Offerta</label>
+            <textarea id="j-desc" class="form-control" placeholder="Descrivi il ruolo, la stagione, eventuali benefit..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Contatto per Candidature</label>
+            <input type="text" id="j-contatto" class="form-control" placeholder="Email o numero di telefono">
+          </div>
+          <button class="btn-primary" onclick="pubblicaOfferta()" style="margin-top:6px;">🚀 Pubblica Offerta</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MERCATO -->
+    <div id="mercato" class="section">
+      <div class="card" id="card-mercato">
+        <div class="card-title">📋 Tutte le Recensioni Verificate</div>
+        <div id="lock-mercato" class="lock-overlay" style="display:none;">
+          <span class="lock-icon">🔒</span>
+          <div class="lock-title">Funzione Premium</div>
+          <div class="lock-sub">Accedi al database completo delle recensioni verificate per analizzare il mercato locale.</div>
+          <button class="btn-oro" onclick="richiediPremium()">💎 Richiedi Premium</button>
+        </div>
+        <div id="lista-tutte-recensioni">
+          <div class="empty-state"><span class="empty-icon">⏳</span><h3>Caricamento...</h3></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const SUPABASE_URL="https://maeoqoxzjzusjwrdrkbd.supabase.co";
+    const SUPABASE_KEY="sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX";
+    const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+    let _isPremium=false;
+    let _nomeAzienda='';
+
+    async function inizializzaDashboard(){
+      const{data:{user},error}=await supabaseClient.auth.getUser();
+      if(error||!user){window.location.replace('login.html');return;}
+      document.body.style.visibility='visible';
+      caricaDatiAzienda(user);
     }
 
-    async function caricaDatiAzienda(user) {
-    const { data: profilo } = await supabaseClient.from('profili_aziende').select('*').eq('id', user.id).single();
-    if (!profilo) return;
-
-    if (!profilo.is_approvata) {
-        document.getElementById('main-content').innerHTML = "<h2 style='text-align:center; padding-top:100px;'>Profilo in attesa di approvazione.</h2>";
+    async function caricaDatiAzienda(user){
+      const{data:profilo}=await supabaseClient.from('profili_aziende').select('*').eq('id',user.id).single();
+      if(!profilo)return;
+      if(!profilo.is_approvata){
+        document.querySelector('.container').innerHTML="<div class='empty-state'><span class='empty-icon'>⏳</span><h3>Profilo in attesa di approvazione</h3><p>Alexandra verificherà il tuo profilo a breve.</p></div>";
         return;
+      }
+      _nomeAzienda=profilo.nome_azienda;
+      _isPremium=profilo.is_premium===true;
+
+      // Aggiorna navbar
+      document.getElementById('nav-nome-az').innerText=_nomeAzienda;
+      const pill=document.getElementById('nav-premium-pill');
+      pill.innerText=_isPremium?'⭐ PREMIUM':'BASE';
+      pill.className='premium-pill '+(_isPremium?'pill-premium':'pill-base');
+
+      // Mostra/nascondi banner upgrade
+      document.getElementById('banner-upgrade').style.display=_isPremium?'none':'flex';
+
+      // Gestisci lock
+      ['lock-talenti','lock-offerte','lock-mercato'].forEach(id=>{
+        const el=document.getElementById(id);
+        if(el)el.style.display=_isPremium?'none':'flex';
+      });
+
+      caricaDatiRecensioni(_nomeAzienda);
+      if(_isPremium){
+        caricaDatabaseLavoratori();
+        caricaTutteLeRecensioni();
+      }
     }
 
-    document.getElementById('txt-nome-azienda').innerText = profilo.nome_azienda;
-    document.getElementById('txt-piva').innerText = "P.IVA: " + profilo.partita_iva;
+    async function caricaDatiRecensioni(nomeAz){
+      const div=document.getElementById('stats-content');
+      const{data:recs}=await supabaseClient.from('RECENSIONI').select('*').ilike('AZIENDA',`%${nomeAz.trim()}%`).eq('VERIFICATA',true);
 
-    const isPrem = profilo.is_premium === true;
-    gestisciInterfacciaPremium(isPrem);
-    caricaDatiRecensioni(profilo.nome_azienda, isPrem);
-    
-    // CORREZIONE: chiama la funzione corretta
-    if (isPrem) caricaDatabaseLavoratori(); 
-}
-
-    function gestisciInterfacciaPremium(isPrem) {
-    const badge = document.getElementById('badge-premium');
-    badge.innerText = isPrem ? "⭐ PREMIUM" : "PROFILO BASE";
-    badge.className = "premium-status " + (isPrem ? "is-premium" : "is-base");
-    document.getElementById('btn-upgrade-manuale').style.display = isPrem ? 'none' : 'block';
-
-    // Sezione Mercato (quella con tutte le recensioni degli altri)
-    if(document.getElementById('premium-all-reviews')) {
-        document.getElementById('premium-all-reviews').style.display = isPrem ? 'block' : 'none';
-    }
-
-    // LOCK PER TALENTI E PUBBLICAZIONE (Questi rimangono bloccati se non è Premium)
-    const locks = ['job-lock', 'talent-lock'];
-    const contents = ['job-form', 'talent-content'];
-
-    locks.forEach(id => document.getElementById(id).style.display = isPrem ? 'none' : 'flex');
-    contents.forEach(id => isPrem ? document.getElementById(id).classList.remove('blur-lock') : document.getElementById(id).classList.add('blur-lock'));
-
-    // --- MODIFICA PER I PROPRI GRAFICI ---
-    // L'azienda deve SEMPRE vedere i suoi voti (stats-content), quindi togliamo il blur e il lock da qui
-    document.getElementById('premium-lock').style.display = 'none'; 
-    document.getElementById('stats-content').classList.remove('blur-lock');
-}
-
-   async function caricaDatiRecensioni(nomeAz, isPrem) {
-        if (!isPrem) return;
-
-        // CORREZIONE: usiamo nomeAz (che è il parametro della funzione)
-        const nomeRicerca = nomeAz.trim(); 
-
-        const { data: recs, error } = await supabaseClient
-            .from('RECENSIONI')
-            .select('*')
-            // Usiamo % per essere elastici e ilike per ignorare maiuscole/minuscole
-            .ilike('AZIENDA', `%${nomeRicerca}%`) 
-            .eq('VERIFICATA', true);
-
-        // Debug per vedere finalmente se ne trova 2
-        console.log("Cerco recensioni per:", nomeRicerca);
-        console.log("Recensioni trovate:", recs ? recs.length : 0);
-
-        if (error || !recs || recs.length === 0) return;
-
-        // ... resto del codice per le medie ...
-
-    // 3. Calcolo Medie (usando Number per evitare errori di stringhe)
-    const mediaVal = (arr, col) => {
-        const validi = arr.map(r => parseFloat(r[col])).filter(v => !isNaN(v));
-        return validi.length ? (validi.reduce((acc, v) => acc + v, 0) / validi.length).toFixed(1) : "--";
-    };
-
-    document.getElementById('val-voto-paga').innerText = mediaVal(recs, 'VOTO_PAGA') + "/5";
-    document.getElementById('val-rispetto').innerText = mediaVal(recs, 'RISPETTO_TITOLARE') + "/5";
-    document.getElementById('val-alloggio').innerText = mediaVal(recs, 'QUALITA_ALLOGGIO') + "/5";
-    document.getElementById('val-vitto').innerText = mediaVal(recs, 'QUALITA_VITTO') + "/5";
-
-    // 4. Prevalenza (per i testi)
-    const prevalenza = (arr, col) => {
-        const counts = {};
-        arr.forEach(r => { if(r[col]) counts[r[col]] = (counts[r[col]] || 0) + 1; });
-        const keys = Object.keys(counts);
-        return keys.length ? keys.reduce((a, b) => counts[a] > counts[b] ? a : b) : "--";
-    };
-
-    document.getElementById('txt-puntualita').innerText = prevalenza(recs, 'PAGA_PUNTUALITA');
-    document.getElementById('txt-straordinari').innerText = prevalenza(recs, 'STRAORDINARI');
-    document.getElementById('txt-riposo').innerText = prevalenza(recs, 'RIPOSO');
-}
-    async function caricaDatabaseLavoratori() {
-    const container = document.getElementById('lista-talenti');
-    container.innerHTML = "<p style='grid-column: 1/-1; text-align:center;'>Caricamento talenti filtrati...</p>";
-
-    // 1. Leggiamo i valori selezionati nei filtri
-    const localitaScelta = document.getElementById('filtro-localita').value;
-    const settoreScelto = document.getElementById('filtro-settore').value;
-
-    // 2. Prepariamo la query base
-    let query = supabaseClient.from('esperienze_lavoratori').select('*');
-
-    // 3. Applichiamo i filtri solo se l'utente ha selezionato qualcosa
-    if (localitaScelta) {
-        query = query.eq('localita_preferita', localitaScelta);
-    }
-    if (settoreScelto) {
-        query = query.eq('settore', settoreScelto);
-    }
-
-    const { data: talenti, error } = await query;
-
-    if (error) {
-        console.error("Errore:", error);
-        container.innerHTML = "Errore nel caricamento dei talenti.";
+      if(!recs||recs.length===0){
+        div.innerHTML=`<div class="empty-state"><span class="empty-icon">📭</span><h3>Nessuna recensione verificata</h3><p>Le recensioni appariranno qui una volta verificate dall'admin.</p></div>`;
         return;
+      }
+
+      const mediaVal=(arr,col)=>{
+        const validi=arr.map(r=>parseFloat(r[col])).filter(v=>!isNaN(v));
+        return validi.length?(validi.reduce((a,v)=>a+v,0)/validi.length).toFixed(1):'--';
+      };
+      const prevalenza=(arr,col)=>{
+        const counts={};
+        arr.forEach(r=>{if(r[col])counts[r[col]]=(counts[r[col]]||0)+1;});
+        const keys=Object.keys(counts);
+        return keys.length?keys.reduce((a,b)=>counts[a]>counts[b]?a:b):'--';
+      };
+
+      div.innerHTML=`
+        <p style="font-size:12px;color:var(--pietra);margin-bottom:16px;">Basato su <b>${recs.length}</b> recension${recs.length===1?'e':'i'} verificat${recs.length===1?'a':'e'}</p>
+        <div class="stats-grid">
+          <div class="stat-item"><span class="stat-label">Paga</span><span class="stat-value">${mediaVal(recs,'VOTO_PAGA')}<small style="font-size:0.5em;color:var(--pietra)">/5</small></span></div>
+          <div class="stat-item"><span class="stat-label">Rispetto</span><span class="stat-value">${mediaVal(recs,'RISPETTO_TITOLARE')}<small style="font-size:0.5em;color:var(--pietra)">/5</small></span></div>
+          <div class="stat-item"><span class="stat-label">Alloggio</span><span class="stat-value">${mediaVal(recs,'QUALITA_ALLOGGIO')}<small style="font-size:0.5em;color:var(--pietra)">/5</small></span></div>
+          <div class="stat-item"><span class="stat-label">Vitto</span><span class="stat-value">${mediaVal(recs,'QUALITA_VITTO')}<small style="font-size:0.5em;color:var(--pietra)">/5</small></span></div>
+        </div>
+        <h4 style="font-family:'Playfair Display',serif;color:var(--scuro);margin-bottom:12px;">🛠️ Gestione Operativa</h4>
+        <div class="ops-list">
+          <div class="ops-row"><span>Puntualità paghe</span><span>${prevalenza(recs,'PAGA_PUNTUALITA')}</span></div>
+          <div class="ops-row"><span>Straordinari</span><span>${prevalenza(recs,'STRAORDINARI')}</span></div>
+          <div class="ops-row"><span>Giorno di riposo</span><span>${prevalenza(recs,'RIPOSO')}</span></div>
+        </div>
+      `;
     }
-    
-    if (talenti.length === 0) {
-        container.innerHTML = "<p style='grid-column: 1/-1; text-align:center; padding:20px;'>Nessun lavoratore corrisponde ai filtri selezionati.</p>";
+
+    async function caricaDatabaseLavoratori(){
+      const container=document.getElementById('lista-talenti');
+      if(!container)return;
+      container.innerHTML=`<div class="empty-state"><span class="empty-icon">⏳</span><h3>Caricamento...</h3></div>`;
+
+      const localita=document.getElementById('filtro-localita').value;
+      const settore=document.getElementById('filtro-settore').value;
+      let query=supabaseClient.from('esperienze_lavoratori').select('*');
+      if(localita)query=query.eq('localita_preferita',localita);
+      if(settore)query=query.eq('settore',settore);
+      const{data:talenti,error}=await query;
+
+      if(error||!talenti||talenti.length===0){
+        container.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><span class="empty-icon">🔍</span><h3>Nessun risultato</h3><p>Prova a cambiare i filtri.</p></div>`;
         return;
-    }
+      }
 
-    container.innerHTML = "";
-    talenti.forEach(worker => {
-        let certs = [];
-        if(worker.cert_haccp) certs.push("HACCP");
-        if(worker.cert_sicurezza) certs.push("Sicurezza");
-        if(worker.cert_sommelier) certs.push("Sommelier");
-        if(worker.cert_barman) certs.push("Barman");
-
-        const div = document.createElement('div');
-        div.className = 'worker-card';
-        div.innerHTML = `
-            <div style="display:flex; justify-content:space-between;">
-                <h3 style="margin:0;">${worker.mansione_principale}</h3>
-                <span class="badge-skill">${worker.tipo_disponibilita}</span>
+      container.innerHTML=talenti.map(w=>{
+        const certs=[w.cert_haccp&&'HACCP',w.cert_sicurezza&&'Sicurezza',w.cert_sommelier&&'Sommelier',w.cert_barman&&'Barman'].filter(Boolean);
+        return `
+          <div class="worker-card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+              <h3 class="worker-mansione">${w.mansione_principale}</h3>
+              <span class="badge-skill">${w.tipo_disponibilita}</span>
             </div>
-            <p style="font-size:13px; color:#666; margin:5px 0;">📍 ${worker.localita_preferita} | ${worker.settore}</p>
-            <div style="margin:10px 0;">
-                <span class="lang-badge">🇫🇷 FR: ${worker.lingua_francese}</span>
-                <span class="lang-badge">🇬🇧 EN: ${worker.lingua_inglese}</span>
+            <p style="font-size:12px;color:var(--pietra);margin-bottom:10px;">📍 ${w.localita_preferita} · ${w.settore}</p>
+            <div style="margin-bottom:8px;">
+              <span class="lang-badge">🇫🇷 ${w.lingua_francese}</span>
+              <span class="lang-badge">🇬🇧 ${w.lingua_inglese}</span>
             </div>
-            <div style="margin-bottom:10px;">
-                ${certs.map(c => `<span class="badge-skill" style="background:#eef6ff">${c}</span>`).join('')}
-            </div>
-            <p style="font-size:11px; margin-bottom:15px; color:${worker.bisogno_vitto_alloggio ? '#e67e22' : '#27ae60'}">
-                🏠 ${worker.bisogno_vitto_alloggio ? 'Richiede Alloggio' : 'Indipendente'}
-            </p>
-            <button onclick="inviaInteresse('${worker.user_id}')" style="width:100%; padding:10px; border:none; border-radius:8px; background:var(--verde); color:white; font-weight:bold; cursor:pointer;">
-                📩 Invia Proposta
-            </button>
+            ${certs.length>0?`<div style="margin-bottom:10px;">${certs.map(c=>`<span class="badge-cert">${c}</span>`).join('')}</div>`:''}
+            <p style="font-size:11px;color:${w.bisogno_vitto_alloggio?'#e67e22':'var(--verde)'};margin-bottom:14px;">🏠 ${w.bisogno_vitto_alloggio?'Richiede Alloggio':'Indipendente'}</p>
+            <button class="btn-primary" style="width:100%;justify-content:center;" onclick="inviaInteresse('${w.user_id}')">📩 Invia Proposta</button>
+          </div>
         `;
-        container.appendChild(div);
-    });
-}
-
-   async function inviaInteresse(lavoratoreId) {
-    const messaggio = prompt("Scrivi un messaggio per il lavoratore (es: Cerchiamo Capo Partita per stagione invernale):");
-    if (!messaggio) return;
-
-    // Recuperiamo il valore dal campo contatti dell'annuncio se presente, 
-    // altrimenti chiediamo all'azienda di inserirlo ora.
-    let contatto = document.getElementById('j-contatto').value;
-    
-    if (!contatto || contatto === "") {
-        contatto = prompt("Inserisci un tuo recapito (Email o Cellulare) che il lavoratore potrà usare per risponderti:");
-        if (!contatto) return; // Annulla se non mette il contatto
+      }).join('');
     }
 
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    const nomeAz = document.getElementById('txt-nome-azienda').innerText;
-
-    const { error } = await supabaseClient.from('notifiche_lavoratori').insert([{
-        lavoratore_id: lavoratoreId,
-        azienda_id: user.id,
-        nome_azienda: nomeAz,
-        contatto_azienda: contatto, // Assicurati che nel DB la colonna si chiami esattamente così
-        messaggio: messaggio
-    }]);
-
-    if (!error) alert("Proposta inviata con il contatto: " + contatto);
-    else alert("Errore: " + error.message);
-}
-
-async function pubblicaOfferta() {
-    const ruolo = document.getElementById('j-ruolo').value;
-    const desc = document.getElementById('j-desc').value;
-    const contatti = document.getElementById('j-contatto').value;
-
-    if(!ruolo || !desc || !contatti) return alert("Compila tutti i campi!");
-
-    const { data: { user } } = await supabaseClient.auth.getUser();
-
-    // 1. Cerchiamo il profilo
-    const { data: profilo } = await supabaseClient
-        .from('profili_aziende')
-        .select('*')
-        .eq('id', user.id)
-        .maybeSingle();
-
-    // 2. Prepariamo i dati (Senza usare variabili esterne che possono resettarsi)
-    const nomeDaSalvare = profilo ? profilo.nome_azienda : "Azienda da Verificare";
-    const locDaSalvare = profilo ? profilo.localita : "Valle d'Aosta";
-
-    // 3. INSERIMENTO (Usiamo direttamente le costanti appena create)
-    const { error } = await supabaseClient.from('offerte_lavoro').insert([{
-        azienda_id: user.id,
-        nome_azienda: nomeDaSalvare,
-        localita: locDaSalvare,
-        ruolo: ruolo,
-        descrizione: desc,
-        contatti: contatti,
-        is_attiva: true
-    }]);
-
-    if(!error) { 
-        alert("Offerta pubblicata con successo per: " + nomeDaSalvare); 
-        location.reload(); 
-    } else {
-        alert("Errore tecnico: " + error.message);
-    }
-}
-    async function richiediPremium() {
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        await supabaseClient.from('richieste_premium').insert([{
-            azienda_id: user.id,
-            nome_azienda: document.getElementById('txt-nome-azienda').innerText,
-            stato: 'in_attesa'
-        }]);
-        alert("Richiesta inviata ad Alexandra!");
+    async function inviaInteresse(lavoratoreId){
+      const messaggio=prompt("Scrivi un messaggio per il lavoratore:");
+      if(!messaggio)return;
+      let contatto=document.getElementById('j-contatto').value;
+      if(!contatto){
+        contatto=prompt("Inserisci un tuo recapito (email o telefono) per la risposta:");
+        if(!contatto)return;
+      }
+      const{data:{user}}=await supabaseClient.auth.getUser();
+      const{error}=await supabaseClient.from('notifiche_lavoratori').insert([{
+        lavoratore_id:lavoratoreId,
+        azienda_id:user.id,
+        nome_azienda:_nomeAzienda,
+        contatto_azienda:contatto,
+        messaggio:messaggio
+      }]);
+      if(!error)alert("✅ Proposta inviata con successo!");
+      else alert("Errore: "+error.message);
     }
 
-    async function logout() {
-    if (!confirm("Vuoi uscire dalla sessione di StaffAlpine?")) return; // Aggiunta conferma
-    await supabaseClient.auth.signOut();
-    window.location.replace('index.html');
-}
-function gestisciInterfacciaPremium(isPrem) {
-    const locks = ['premium-lock', 'job-lock', 'talent-lock'];
-    const contents = ['stats-content', 'job-form', 'talent-content'];
-    const badge = document.getElementById('badge-premium');
-    
-    badge.innerText = isPrem ? "⭐ PREMIUM" : "PROFILO BASE";
-    badge.className = "premium-status " + (isPrem ? "is-premium" : "is-base");
-    document.getElementById('btn-upgrade-manuale').style.display = isPrem ? 'none' : 'block';
-
-    // MOSTRA SEZIONE PREMIUM SE ATTIVA
-    if(document.getElementById('premium-all-reviews')) {
-        document.getElementById('premium-all-reviews').style.display = isPrem ? 'block' : 'none';
+    async function pubblicaOfferta(){
+      const ruolo=document.getElementById('j-ruolo').value;
+      const desc=document.getElementById('j-desc').value;
+      const contatti=document.getElementById('j-contatto').value;
+      if(!ruolo||!desc||!contatti)return alert("Compila tutti i campi!");
+      const{data:{user}}=await supabaseClient.auth.getUser();
+      const{data:profilo}=await supabaseClient.from('profili_aziende').select('*').eq('id',user.id).maybeSingle();
+      const{error}=await supabaseClient.from('offerte_lavoro').insert([{
+        azienda_id:user.id,
+        nome_azienda:profilo?profilo.nome_azienda:'Azienda',
+        localita:profilo?profilo.localita:"Valle d'Aosta",
+        ruolo,descrizione:desc,contatti,is_attiva:true
+      }]);
+      if(!error){alert("✅ Offerta pubblicata!");location.reload();}
+      else alert("Errore: "+error.message);
     }
 
-    locks.forEach(id => document.getElementById(id).style.display = isPrem ? 'none' : 'flex');
-    contents.forEach(id => isPrem ? document.getElementById(id).classList.remove('blur-lock') : document.getElementById(id).classList.add('blur-lock'));
-    
-    // CARICA LE RECENSIONI DI MERCATO SE PREMIUM
-    if (isPrem) caricaTutteLeRecensioni();
-}
-
-// AGGIUNGI QUESTA NUOVA FUNZIONE SOTTO
-async function caricaTutteLeRecensioni() {
-    const container = document.getElementById('lista-tutte-recensioni');
-    if (!container) return;
-
-    const { data: recs, error } = await supabaseClient
-        .from('RECENSIONI')
-        .select('*')
-        .eq('VERIFICATA', true)
-        .order('created_at', { ascending: false });
-
-    if (error || !recs || recs.length === 0) {
-        container.innerHTML = "<p>Nessuna recensione verificata nel database di mercato.</p>";
+    async function caricaTutteLeRecensioni(){
+      const container=document.getElementById('lista-tutte-recensioni');
+      if(!container)return;
+      const{data:recs,error}=await supabaseClient.from('RECENSIONI').select('*').eq('VERIFICATA',true).order('created_at',{ascending:false});
+      if(error||!recs||recs.length===0){
+        container.innerHTML=`<div class="empty-state"><span class="empty-icon">📭</span><h3>Nessuna recensione</h3><p>Le recensioni verificate appariranno qui.</p></div>`;
         return;
+      }
+      container.innerHTML=recs.map(r=>`
+        <div class="rec-card">
+          <div class="rec-header">
+            <span class="rec-azienda">🏢 ${r.AZIENDA}</span>
+            <span class="rec-data">${new Date(r.created_at).toLocaleDateString('it-IT')}</span>
+          </div>
+          <div class="rec-voti">
+            <span>💰 Paga: <b>${r.VOTO_PAGA}/5</b></span>
+            <span>🤝 Rispetto: <b>${r.RISPETTO_TITOLARE}/5</b></span>
+          </div>
+        </div>
+      `).join('');
     }
 
-    container.innerHTML = recs.map(r => `
-        <div style="background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                <strong style="color: var(--scuro); font-size: 14px;">🏢 ${r.AZIENDA}</strong>
-                <span style="font-size: 10px; color: #94a3b8;">${new Date(r.created_at).toLocaleDateString()}</span>
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-size: 11px; color: #475569;">
-                <span>💰 Paga: <b>${r.VOTO_PAGA}/5</b></span>
-                <span>🤝 Rispetto: <b>${r.RISPETTO_TITOLARE}/5</b></span>
-            </div>
-        </div>
-    `).join('');
-}
+    async function richiediPremium(){
+      const{data:{user}}=await supabaseClient.auth.getUser();
+      await supabaseClient.from('richieste_premium').insert([{
+        azienda_id:user.id,
+        nome_azienda:_nomeAzienda,
+        stato:'in_attesa'
+      }]);
+      alert("✅ Richiesta inviata!");
+    }
+
+    function showTab(id,btn){
+      document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      btn.classList.add('active');
+      if(id==='talenti'&&_isPremium)caricaDatabaseLavoratori();
+      if(id==='mercato'&&_isPremium)caricaTutteLeRecensioni();
+    }
+
+    async function logout(){
+      if(!confirm("Vuoi uscire?"))return;
+      await supabaseClient.auth.signOut();
+      window.location.replace('index.html');
+    }
+
     inizializzaDashboard();
-    </script>
+  </script>
 </body>
 </html>

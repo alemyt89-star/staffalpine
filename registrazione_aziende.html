@@ -1,152 +1,374 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2c3e50">
-<link rel="apple-touch-icon" href="icona-192.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a2e1a">
+  <link rel="apple-touch-icon" href="icona-192.png">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then(() => console.log("PWA StaffAlpine Attiva!"))
+        .catch(err => console.log("Errore PWA:", err));
+    }
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registrazione Business — StaffAlpine</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --verde:#2d6a4f;--verde-chiaro:#52b788;--verde-accento:#74c69d;
+      --oro:#c9a84c;--oro-chiaro:#e9c46a;--scuro:#1a2e1a;
+      --pietra:#6b705c;--grigio:#f0f2ee;--testo:#2c3e2d;--rosso:#c0392b;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js')
-      .then(() => console.log("PWA StaffAlpine Attiva!"))
-      .catch(err => console.log("Errore PWA:", err));
-  }
-</script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Business - Registrazione Azienda</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #1a2a3a; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: rgba(255, 255, 255, 0.1); padding: 40px; border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); width: 100%; max-width: 400px; text-align: center; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; }
-        button { width: 100%; padding: 15px; background: #2980b9; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        button:hover { background: #3498db; }
-        .step { display: none; }
-        .active { display: block; }
-    </style>
+    body {
+      font-family:'DM Sans',sans-serif;
+      background:var(--scuro);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    /* Sfondo montagna */
+    body::before {
+      content:'';
+      position:fixed;inset:0;
+      background:
+        radial-gradient(ellipse at 20% 80%, rgba(82,183,136,0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(201,168,76,0.06) 0%, transparent 50%),
+        linear-gradient(135deg,#0d1f0d 0%,var(--scuro) 50%,#1a1a0d 100%);
+      z-index:0;
+    }
+    /* Grana texture */
+    body::after {
+      content:'';
+      position:fixed;inset:0;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      opacity:0.4;z-index:0;pointer-events:none;
+    }
+
+    .page-wrap {
+      position:relative;z-index:1;
+      width:100%;max-width:480px;
+    }
+
+    /* LOGO */
+    .logo-top {
+      text-align:center;margin-bottom:32px;
+    }
+    .logo-top a {
+      font-family:'Playfair Display',serif;
+      font-size:26px;color:var(--oro-chiaro);
+      letter-spacing:1px;text-decoration:none;
+      display:inline-block;
+    }
+    .logo-top p {
+      font-size:12px;color:rgba(255,255,255,0.35);
+      margin-top:6px;letter-spacing:2px;text-transform:uppercase;
+    }
+
+    /* CARD */
+    .card {
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:20px;
+      padding:36px 32px;
+      backdrop-filter:blur(20px);
+    }
+
+    /* STEP INDICATOR */
+    .step-indicator {
+      display:flex;align-items:center;justify-content:center;
+      gap:0;margin-bottom:28px;
+    }
+    .step-dot {
+      width:28px;height:28px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      font-size:11px;font-weight:700;
+      transition:all 0.3s;
+    }
+    .step-dot.done{background:var(--verde-chiaro);color:var(--scuro);}
+    .step-dot.active{background:var(--oro-chiaro);color:var(--scuro);}
+    .step-dot.pending{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.3);}
+    .step-line{width:40px;height:2px;background:rgba(255,255,255,0.1);transition:background 0.3s;}
+    .step-line.done{background:var(--verde-chiaro);}
+
+    /* TITOLO */
+    .card-title {
+      font-family:'Playfair Display',serif;
+      font-size:1.4rem;color:white;
+      margin-bottom:6px;text-align:center;
+    }
+    .card-sub {
+      font-size:13px;color:rgba(255,255,255,0.4);
+      text-align:center;margin-bottom:24px;line-height:1.5;
+    }
+
+    /* FORM */
+    .form-group{margin-bottom:16px;}
+    .form-label{display:block;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.4);font-weight:600;margin-bottom:7px;}
+    .form-control {
+      width:100%;padding:12px 15px;
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.1);
+      border-radius:11px;
+      font-family:'DM Sans',sans-serif;font-size:14px;
+      color:white;outline:none;
+      transition:border-color 0.3s,background 0.3s;
+    }
+    .form-control::placeholder{color:rgba(255,255,255,0.25);}
+    .form-control:focus{border-color:var(--verde-chiaro);background:rgba(255,255,255,0.09);}
+
+    /* OTP */
+    .otp-wrap {
+      display:flex;gap:10px;justify-content:center;margin-bottom:20px;
+    }
+    .otp-digit {
+      width:48px;height:56px;
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.1);
+      border-radius:11px;
+      font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;
+      color:var(--oro-chiaro);text-align:center;outline:none;
+      transition:border-color 0.3s,background 0.3s;
+      -webkit-appearance:none;
+    }
+    .otp-digit:focus{border-color:var(--oro-chiaro);background:rgba(201,168,76,0.08);}
+
+    /* BOTTONI */
+    .btn-primary {
+      width:100%;padding:13px;
+      background:linear-gradient(135deg,var(--verde),var(--verde-chiaro));
+      color:white;border:none;border-radius:12px;
+      font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;
+      cursor:pointer;transition:all 0.3s;
+      display:flex;align-items:center;justify-content:center;gap:8px;
+      margin-top:8px;
+    }
+    .btn-primary:hover{opacity:0.9;transform:translateY(-1px);box-shadow:0 6px 20px rgba(82,183,136,0.3);}
+    .btn-primary:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+
+    /* LINK */
+    .back-link {
+      text-align:center;margin-top:16px;
+      font-size:13px;color:rgba(255,255,255,0.35);
+    }
+    .back-link a{color:rgba(255,255,255,0.55);cursor:pointer;text-decoration:underline;}
+
+    /* BENEFITS */
+    .benefits {
+      margin-top:20px;padding-top:20px;
+      border-top:1px solid rgba(255,255,255,0.07);
+      display:flex;flex-direction:column;gap:8px;
+    }
+    .benefit-row {
+      display:flex;align-items:center;gap:10px;
+      font-size:12px;color:rgba(255,255,255,0.4);
+    }
+    .benefit-icon{font-size:14px;flex-shrink:0;}
+
+    /* SUCCESS */
+    .success-state{text-align:center;padding:10px 0;}
+    .success-icon{font-size:48px;display:block;margin-bottom:16px;}
+
+    /* Step panels */
+    .step-panel{display:none;}
+    .step-panel.active{display:block;}
+
+    @media(max-width:420px){.card{padding:28px 20px;}.otp-digit{width:40px;height:50px;font-size:1.3rem;}}
+  </style>
 </head>
 <body>
 
-    <div class="card">
-        <h1>StaffAlpine Business</h1>
-        <p id="desc">Registra la tua attività per trovare personale qualificato.</p>
+  <div class="page-wrap">
 
-        <div id="step-1" class="step active">
-            <input type="text" id="ragione_sociale" placeholder="Ragione Sociale (Nome Hotel/Rist)">
-            <input type="text" id="p_iva" placeholder="Partita IVA">
-            <input type="email" id="email_azienda" placeholder="Email Aziendale">
-            <button onclick="procediAlCodice()">Ricevi Codice Accesso</button>
-        </div>
-
-        <div id="step-2" class="step">
-            <p>Inserisci il codice inviato alla tua email aziendale</p>
-            <input type="text" id="otp_code" placeholder="Codice 6 cifre" maxlength="6">
-            <button onclick="completaRegistrazione()">Verifica e Accedi</button>
-        </div>
+    <div class="logo-top">
+      <a href="index.html">StaffAlpine</a>
+      <p>Portale Business — Valle d'Aosta</p>
     </div>
 
-    <script>
-        function convalidaPIVA(piva) {
-    if (!/^[0-9]{11}$/.test(piva)) return false; // Deve essere di 11 cifre numeriche
-    
-    let s = 0;
-    for (let i = 0; i < 10; i++) {
-        let n = parseInt(piva.charAt(i));
-        if (i % 2 !== 0) { // Posizioni dispari (1ª, 3ª, ecc. calcolate come indice 0, 2...)
-            n *= 2;
-            if (n > 9) n -= 9;
-        }
-        s += n;
+    <div class="card">
+
+      <!-- STEP INDICATOR -->
+      <div class="step-indicator" id="step-indicator">
+        <div class="step-dot active" id="dot-1">1</div>
+        <div class="step-line" id="line-1"></div>
+        <div class="step-dot pending" id="dot-2">2</div>
+      </div>
+
+      <!-- STEP 1: Dati azienda + email -->
+      <div id="step-1" class="step-panel active">
+        <h2 class="card-title">Registra la tua attività</h2>
+        <p class="card-sub">Accedi al network di lavoratori qualificati in Valle d'Aosta.</p>
+
+        <div class="form-group">
+          <label class="form-label">Ragione Sociale</label>
+          <input type="text" id="ragione_sociale" class="form-control" placeholder="Es. Grand Hôtel Courmayeur">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Partita IVA</label>
+          <input type="text" id="p_iva" class="form-control" placeholder="11 cifre" maxlength="11" inputmode="numeric">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Aziendale</label>
+          <input type="email" id="email_azienda" class="form-control" placeholder="info@tuohotel.it">
+        </div>
+
+        <button class="btn-primary" id="btn-step1" onclick="procediAlCodice()">
+          Ricevi Codice di Accesso →
+        </button>
+
+        <div class="benefits">
+          <div class="benefit-row"><span class="benefit-icon">🔍</span> Accesso al database lavoratori VdA</div>
+          <div class="benefit-row"><span class="benefit-icon">📢</span> Pubblica offerte di lavoro</div>
+          <div class="benefit-row"><span class="benefit-icon">📊</span> Analisi recensioni e mercato</div>
+        </div>
+
+        <div class="back-link" style="margin-top:18px;">
+          Sei un lavoratore? <a href="recensione.html">Entra qui</a>
+        </div>
+      </div>
+
+      <!-- STEP 2: OTP -->
+      <div id="step-2" class="step-panel">
+        <h2 class="card-title">Controlla la tua email</h2>
+        <p class="card-sub" id="otp-desc">Abbiamo inviato un codice a 6 cifre al tuo indirizzo aziendale.</p>
+
+        <div class="otp-wrap" id="otp-wrap">
+          <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" onkeyup="avanzaOTP(this,1)" oninput="avanzaOTP(this,1)">
+          <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" onkeyup="avanzaOTP(this,2)" oninput="avanzaOTP(this,2)">
+          <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" onkeyup="avanzaOTP(this,3)" oninput="avanzaOTP(this,3)">
+          <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" onkeyup="avanzaOTP(this,4)" oninput="avanzaOTP(this,4)">
+          <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" onkeyup="avanzaOTP(this,5)" oninput="avanzaOTP(this,5)">
+          <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" onkeyup="avanzaOTP(this,6)" oninput="avanzaOTP(this,6)">
+        </div>
+
+        <button class="btn-primary" id="btn-step2" onclick="completaRegistrazione()">
+          ✅ Verifica e Registrati
+        </button>
+
+        <div class="back-link">
+          <a onclick="tornaStep1()">← Cambia email</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL="https://maeoqoxzjzusjwrdrkbd.supabase.co";
+    const SUPABASE_KEY="sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX";
+    const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+    // Avanza automaticamente tra i campi OTP
+    function avanzaOTP(el, pos){
+      el.value=el.value.replace(/[^0-9]/g,'');
+      if(el.value.length===1 && pos<6){
+        document.querySelectorAll('.otp-digit')[pos].focus();
+      }
+      // Auto-submit quando tutti e 6 sono compilati
+      const digits=document.querySelectorAll('.otp-digit');
+      const codice=[...digits].map(d=>d.value).join('');
+      if(codice.length===6)completaRegistrazione();
     }
-    
-    let attesa = (10 - (s % 10)) % 10;
-    let controllo = parseInt(piva.charAt(10));
-    
-    return attesa === controllo;
-}
 
-// Esempio di utilizzo durante l'invio del form
-async function registraAzienda() {
-    const piva = document.getElementById('partita_iva').value;
-    
-    if (!convalidaPIVA(piva)) {
-        alert("La Partita IVA inserita non è valida. Controlla i dati.");
-        return; // Blocca la registrazione
+    function getOTPCode(){
+      return [...document.querySelectorAll('.otp-digit')].map(d=>d.value).join('');
     }
-    
-    // ... prosegui con l'inserimento in Supabase ...
-}
-        async function mostraTastoAdminSeAutorizzato() {
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    
-    if (user && user.email === 'mititelu.alexandra@tiscali.it') {
-        const container = document.getElementById('admin-link-container');
-        if (container) {
-            container.innerHTML = `<a href="admin.html" style="color: #e74c3c; border: 1px solid #e74c3c; padding: 5px 10px; border-radius: 5px; margin-left: 15px;">Pannello Admin 🛡️</a>`;
-        }
+
+    function convalidaPIVA(piva){
+      if(!/^[0-9]{11}$/.test(piva))return false;
+      let s=0;
+      for(let i=0;i<10;i++){
+        let n=parseInt(piva.charAt(i));
+        if(i%2!==0){n*=2;if(n>9)n-=9;}
+        s+=n;
+      }
+      return(10-(s%10))%10===parseInt(piva.charAt(10));
     }
-}
 
-// Lancia il controllo all'avvio della pagina
-mostraTastoAdminSeAutorizzato();
-        const SUPABASE_URL = "https://maeoqoxzjzusjwrdrkbd.supabase.co"; 
-        const SUPABASE_KEY = "sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX";
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    function tornaStep1(){
+      document.getElementById('step-2').classList.remove('active');
+      document.getElementById('step-1').classList.add('active');
+      document.getElementById('dot-1').className='step-dot active';
+      document.getElementById('dot-2').className='step-dot pending';
+      document.getElementById('line-1').className='step-line';
+    }
 
-        async function procediAlCodice() {
-            const email = document.getElementById('email_azienda').value;
-            if(!email) return alert("Inserisci l'email!");
+    async function procediAlCodice(){
+      const ragione=document.getElementById('ragione_sociale').value.trim();
+      const piva=document.getElementById('p_iva').value.trim();
+      const email=document.getElementById('email_azienda').value.trim();
 
-            const { error } = await supabaseClient.auth.signInWithOtp({ email });
+      if(!ragione||!piva||!email)return alert("Compila tutti i campi!");
+      if(!convalidaPIVA(piva))return alert("La Partita IVA inserita non è valida. Controlla i dati.");
 
-            if (error) {
-                alert("Errore: " + error.message);
-            } else {
-                document.getElementById('step-1').classList.remove('active');
-                document.getElementById('step-2').classList.add('active');
-                alert("Codice inviato!");
-            }
-        }
+      const btn=document.getElementById('btn-step1');
+      btn.disabled=true;btn.innerHTML='⏳ Invio in corso...';
 
-        async function completaRegistrazione() {
-    const email = document.getElementById('email_azienda').value;
-    const token = document.getElementById('otp_code').value;
-    const ragioneSociale = document.getElementById('ragione_sociale').value;
-    const pIva = document.getElementById('p_iva').value;
-
-    if (!ragioneSociale || !pIva) return alert("Mancano i dati dell'azienda!");
-
-    // 1. Verifica il codice OTP
-    const { data, error } = await supabaseClient.auth.verifyOtp({
-        email, token, type: 'email'
-    });
-
-    if (error) {
-        alert("Codice errato o scaduto.");
+      const{error}=await supabaseClient.auth.signInWithOtp({email});
+      if(error){
+        alert("Errore: "+error.message);
+        btn.disabled=false;btn.innerHTML='Ricevi Codice di Accesso →';
         return;
+      }
+
+      // Aggiorna step indicator
+      document.getElementById('dot-1').className='step-dot done';
+      document.getElementById('dot-1').innerText='✓';
+      document.getElementById('line-1').className='step-line done';
+      document.getElementById('dot-2').className='step-dot active';
+
+      document.getElementById('otp-desc').innerText=`Codice inviato a ${email}. Controlla anche la cartella spam.`;
+      document.getElementById('step-1').classList.remove('active');
+      document.getElementById('step-2').classList.add('active');
+      document.querySelectorAll('.otp-digit')[0].focus();
     }
 
-    // 2. Salviamo i dati aziendali
-    // Usiamo .upsert invece di .insert: se il profilo esiste già lo aggiorna, altrimenti lo crea
-    const { error: dbError } = await supabaseClient
-        .from('profili_aziende')
-        .upsert([{ 
-            id: data.user.id, 
-            nome_azienda: ragioneSociale, 
-            partita_iva: pIva,
-            is_approvata: false // Importante per la sicurezza
-        }]);
+    async function completaRegistrazione(){
+      const token=getOTPCode();
+      if(token.length<6)return;
 
-    if (dbError) {
-        console.error("Errore database:", dbError);
-        alert("Errore nel salvataggio del profilo: " + dbError.message);
-    } else {
-        alert("Registrazione completata! In attesa di approvazione.");
-        // Mandiamoli a una pagina di conferma o alla dashboard (che mostrerà il messaggio "in attesa")
-        window.location.href = 'dashboard-azienda.html';
+      const email=document.getElementById('email_azienda').value.trim();
+      const ragione=document.getElementById('ragione_sociale').value.trim();
+      const piva=document.getElementById('p_iva').value.trim();
+
+      const btn=document.getElementById('btn-step2');
+      btn.disabled=true;btn.innerHTML='⏳ Verifica in corso...';
+
+      const{data,error}=await supabaseClient.auth.verifyOtp({email,token,type:'email'});
+      if(error){
+        alert("Codice errato o scaduto. Riprova.");
+        btn.disabled=false;btn.innerHTML='✅ Verifica e Registrati';
+        document.querySelectorAll('.otp-digit').forEach(d=>d.value='');
+        document.querySelectorAll('.otp-digit')[0].focus();
+        return;
+      }
+
+      const{error:dbError}=await supabaseClient.from('profili_aziende').upsert([{
+        id:data.user.id,
+        nome_azienda:ragione,
+        partita_iva:piva,
+        is_approvata:false
+      }]);
+
+      if(dbError){
+        alert("Errore nel salvataggio: "+dbError.message);
+        btn.disabled=false;btn.innerHTML='✅ Verifica e Registrati';
+        return;
+      }
+
+      alert("✅ Registrazione completata! Il tuo profilo è in attesa di approvazione da parte dell'admin.");
+      window.location.href='dashboard-azienda.html';
     }
-}
-    </script>
+  </script>
 </body>
 </html>

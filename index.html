@@ -2,194 +2,828 @@
 <html lang="it">
 <head>
   <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2c3e50">
-<link rel="apple-touch-icon" href="icona-192.png">
+  <meta name="theme-color" content="#1a2e1a">
+  <link rel="apple-touch-icon" href="icona-192.png">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then(() => console.log("PWA StaffAlpine Attiva!"))
+        .catch(err => console.log("Errore PWA:", err));
+    }
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StaffAlpine — Valle d'Aosta</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --verde:    #2d6a4f;
+      --verde-chiaro: #52b788;
+      --verde-accento: #74c69d;
+      --oro:      #c9a84c;
+      --oro-chiaro: #e9c46a;
+      --scuro:    #1a2e1a;
+      --pietra:   #6b705c;
+      --beige:    #f4f1de;
+      --bianco:   #fafaf8;
+      --testo:    #2c3e2d;
+    }
 
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js')
-      .then(() => console.log("PWA StaffAlpine Attiva!"))
-      .catch(err => console.log("Errore PWA:", err));
-  }
-</script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Benvenuti su StaffAlpine - Valle d'Aosta</title>
-    <style>
-        :root { 
-            --verde: #27ae60; 
-            --scuro: #2c3e50; 
-            --oro: #d4af37; 
-            --grigio: #f4f7f6; 
-        }
-        
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            margin: 0; 
-            padding: 0; 
-            color: var(--scuro); 
-            background: var(--grigio); 
-        }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-       /* Hero Section con il Cervino */
-        .hero { 
-            background: linear-gradient(rgba(44, 62, 80, 0.6), rgba(44, 62, 80, 0.6)), 
-                        url('sfondo-home.jpg'); /* ValleReview */
-            background-size: cover; 
-            background-position: center;
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            text-align: center; 
-            color: white; 
-            padding: 0 20px;
-        }
-        
-        .hero h1 { 
-            font-size: 4rem; 
-            margin: 0; 
-            color: var(--oro); 
-            letter-spacing: -1px;
-        }
-        
-        .hero p { 
-            font-size: 1.4rem; 
-            max-width: 700px; 
-            margin: 20px 0 40px 0; 
-            line-height: 1.6;
-            font-weight: 300;
-        }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bianco);
+      color: var(--testo);
+      overflow-x: hidden;
+    }
 
-        .btn-container { 
-            display: flex; 
-            gap: 20px; 
-            flex-wrap: wrap; 
-            justify-content: center; 
-        }
+    /* ── BETA BANNER ── */
+    .beta-banner {
+      background: var(--oro);
+      color: var(--scuro);
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 20px;
+      letter-spacing: 0.5px;
+      position: relative;
+      z-index: 3000;
+    }
 
-        .btn { 
-            padding: 18px 45px; 
-            border-radius: 12px; 
-            text-decoration: none; 
-            font-weight: bold; 
-            font-size: 18px; 
-            transition: 0.3s; 
-            text-transform: uppercase;
-        }
+    /* ── NAVBAR ── */
+    .navbar {
+      position: fixed;
+      top: 28px;
+      left: 0; right: 0;
+      z-index: 2000;
+      padding: 18px 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.4s ease;
+    }
+    .navbar.scrolled {
+      top: 0;
+      background: rgba(26, 46, 26, 0.97);
+      backdrop-filter: blur(12px);
+      padding: 12px 5%;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      color: var(--oro-chiaro);
+      text-decoration: none;
+      letter-spacing: 1px;
+    }
+    .nav-logo span { color: white; font-weight: 300; font-size: 14px; display: block; letter-spacing: 3px; font-family: 'DM Sans', sans-serif; }
+    .nav-links { display: flex; gap: 30px; align-items: center; }
+    .nav-links a { color: rgba(255,255,255,0.8); text-decoration: none; font-size: 13px; font-weight: 500; letter-spacing: 0.5px; transition: color 0.3s; }
+    .nav-links a:hover { color: var(--oro-chiaro); }
+    .nav-cta {
+      background: var(--verde-chiaro);
+      color: white !important;
+      padding: 8px 20px;
+      border-radius: 6px;
+      font-weight: 600 !important;
+    }
+    .nav-cta:hover { background: var(--verde-accento) !important; color: white !important; }
 
-        .btn-start { 
-            background: var(--verde); 
-            color: white; 
-            border: 2px solid var(--verde); 
-        }
+    /* ── HERO ── */
+    .hero {
+      height: 100vh;
+      min-height: 700px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      overflow: hidden;
+    }
 
-        .btn-start:hover { 
-            background: #219150; 
-            transform: translateY(-3px); 
-        }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(to bottom, rgba(10,25,10,0.5) 0%, rgba(26,46,26,0.7) 60%, rgba(10,20,10,0.9) 100%),
+        url('sfondo-home.jpg');
+      background-size: cover;
+      background-position: center 30%;
+      transform: scale(1.05);
+      animation: slowZoom 20s ease-out forwards;
+    }
 
-        .btn-info { 
-            background: transparent; 
-            color: white; 
-            border: 2px solid white; 
-        }
+    @keyframes slowZoom {
+      from { transform: scale(1.05); }
+      to   { transform: scale(1.0); }
+    }
 
-        .btn-info:hover { 
-            background: white; 
-            color: var(--scuro); 
-        }
+    /* Overlay texture */
+    .hero-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.3;
+      pointer-events: none;
+    }
 
-        /* Sezione Spiegazione Rapida */
-        .info-section { 
-            padding: 80px 10%; 
-            background: white;
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-            gap: 40px; 
-        }
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      padding: 0 20px;
+      max-width: 900px;
+    }
 
-        .info-card { 
-            text-align: center; 
-            padding: 20px;
-        }
+    .hero-pretitle {
+      font-size: 11px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--verde-accento);
+      font-weight: 600;
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.3s forwards;
+    }
 
-        .info-card span { 
-            font-size: 50px; 
-            display: block; 
-            margin-bottom: 20px; 
-        }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3.5rem, 8vw, 7rem);
+      font-weight: 900;
+      color: white;
+      line-height: 1;
+      margin-bottom: 10px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.5s forwards;
+    }
 
-        .info-card h3 { 
-            color: var(--scuro); 
-            margin-bottom: 15px; 
-        }
+    .hero h1 em {
+      color: var(--oro-chiaro);
+      font-style: normal;
+    }
 
-        .info-card p { 
-            color: #666; 
-            line-height: 1.5;
-        }
+    .hero-subtitle {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: rgba(255,255,255,0.75);
+      max-width: 600px;
+      margin: 24px auto 48px;
+      line-height: 1.7;
+      font-weight: 300;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.7s forwards;
+    }
 
-        footer { 
-            background: var(--scuro); 
-            color: white; 
-            padding: 30px; 
-            text-align: center; 
-            font-size: 14px;
-        }
-    </style>
+    .hero-btns {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.9s forwards;
+    }
+
+    .btn-primary {
+      background: var(--verde-chiaro);
+      color: white;
+      padding: 16px 40px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: 0.3px;
+      transition: all 0.3s;
+      border: 2px solid var(--verde-chiaro);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary:hover {
+      background: var(--verde-accento);
+      border-color: var(--verde-accento);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(82,183,136,0.35);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: white;
+      padding: 16px 40px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 15px;
+      transition: all 0.3s;
+      border: 2px solid rgba(255,255,255,0.4);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: white;
+      transform: translateY(-3px);
+    }
+
+    /* Scroll indicator */
+    .scroll-hint {
+      position: absolute;
+      bottom: 35px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: rgba(255,255,255,0.4);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      animation: bounce 2s infinite;
+    }
+    .scroll-hint::after {
+      content: '';
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* ── STATS BAR ── */
+    .stats-bar {
+      background: var(--scuro);
+      padding: 30px 5%;
+      display: flex;
+      justify-content: center;
+      gap: 60px;
+      flex-wrap: wrap;
+    }
+    .stat-item {
+      text-align: center;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.6s ease;
+    }
+    .stat-item.visible { opacity: 1; transform: translateY(0); }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      color: var(--oro-chiaro);
+      font-weight: 700;
+      display: block;
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-top: 6px;
+      display: block;
+    }
+
+    /* ── SEZIONE FEATURES ── */
+    .features {
+      padding: 100px 5%;
+      background: var(--bianco);
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 70px;
+    }
+    .section-tag {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--verde-chiaro);
+      font-weight: 600;
+      margin-bottom: 15px;
+      display: block;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      color: var(--scuro);
+      line-height: 1.2;
+    }
+    .section-title em {
+      color: var(--verde);
+      font-style: normal;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .feature-card {
+      background: white;
+      border-radius: 20px;
+      padding: 40px 35px;
+      border: 1px solid rgba(0,0,0,0.06);
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease, box-shadow 0.3s ease;
+    }
+    .feature-card.visible { opacity: 1; transform: translateY(0); }
+    .feature-card:hover {
+      box-shadow: 0 20px 50px rgba(45,106,79,0.12);
+      transform: translateY(-6px) !important;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(to right, var(--verde), var(--verde-chiaro));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+    .feature-card:hover::before { transform: scaleX(1); }
+
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--verde), var(--verde-chiaro));
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      margin-bottom: 25px;
+      box-shadow: 0 8px 20px rgba(45,106,79,0.25);
+    }
+
+    .feature-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: var(--scuro);
+      margin-bottom: 14px;
+    }
+    .feature-card p {
+      color: #6b7280;
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    /* ── COME FUNZIONA ── */
+    .how-it-works {
+      padding: 100px 5%;
+      background: var(--beige);
+      position: relative;
+      overflow: hidden;
+    }
+    .how-it-works::before {
+      content: '';
+      position: absolute;
+      top: -100px; right: -100px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(82,183,136,0.1), transparent 70%);
+      border-radius: 50%;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 40px;
+      max-width: 1000px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .step {
+      text-align: center;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.6s ease;
+    }
+    .step.visible { opacity: 1; transform: translateY(0); }
+
+    .step-num {
+      width: 50px;
+      height: 50px;
+      background: var(--verde);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin: 0 auto 20px;
+      box-shadow: 0 8px 20px rgba(45,106,79,0.3);
+    }
+    .step h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      color: var(--scuro);
+      margin-bottom: 10px;
+    }
+    .step p { color: var(--pietra); font-size: 14px; line-height: 1.6; }
+
+    /* ── CTA SECTION ── */
+    .cta-section {
+      padding: 100px 5%;
+      background: linear-gradient(135deg, var(--scuro) 0%, #0d1f0d 100%);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2352b788' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .cta-section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      color: white;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .cta-section h2 em { color: var(--oro-chiaro); font-style: normal; }
+    .cta-section p {
+      color: rgba(255,255,255,0.6);
+      font-size: 17px;
+      max-width: 500px;
+      margin: 0 auto 45px;
+      line-height: 1.7;
+      position: relative;
+    }
+    .cta-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; position: relative; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #0d1a0d;
+      color: white;
+      padding: 50px 5% 30px;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 50px;
+      margin-bottom: 40px;
+    }
+    .footer-brand h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      color: var(--oro-chiaro);
+      margin-bottom: 12px;
+    }
+    .footer-brand p {
+      color: rgba(255,255,255,0.45);
+      font-size: 13px;
+      line-height: 1.7;
+      max-width: 280px;
+    }
+    .footer-col h4 {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 18px;
+    }
+    .footer-col a {
+      display: block;
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      font-size: 14px;
+      margin-bottom: 10px;
+      transition: color 0.3s;
+    }
+    .footer-col a:hover { color: var(--verde-chiaro); }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .footer-bottom p { color: rgba(255,255,255,0.3); font-size: 12px; }
+    .footer-badge {
+      background: rgba(82,183,136,0.15);
+      border: 1px solid rgba(82,183,136,0.3);
+      color: var(--verde-accento);
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(25px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      .navbar { padding: 15px 5%; }
+      .nav-links { display: none; }
+      .hero h1 { font-size: 3rem; }
+      .hero-subtitle { font-size: 1rem; }
+      .stats-bar { gap: 30px; }
+      .footer-grid { grid-template-columns: 1fr; gap: 30px; }
+      .hero-btns { flex-direction: column; align-items: center; }
+      .btn-primary, .btn-secondary { width: 260px; justify-content: center; }
+      .cta-btns { flex-direction: column; align-items: center; }
+    }
+  </style>
 </head>
 <body>
-<div style="background: var(--oro); color: var(--scuro); text-align: center; font-size: 12px; font-weight: bold; padding: 5px; position: sticky; top: 0; z-index: 2000;">
-    🚀 VERSIONE BETA: Aiutaci a migliorare segnalando eventuali errori!
-</div>
-    <section class="hero">
-        <h1>StaffAlpine</h1>
-        <p>Valorizziamo il lavoro nel turismo in Valle d'Aosta attraverso la trasparenza e la condivisione delle esperienze reali.</p>
-        
-       <div class="btn-container">
-    <a href="login.html" class="btn btn-start">Area Lavoratori</a>
-    
-    <a href="login.html?role=business" class="btn btn-info">Area Business 💼</a>
-</div>
-    </section>
-    
 
-    <div class="info-section">
-        <div class="info-card">
-            <span>🛡️</span>
-            <h3>Per i Lavoratori</h3>
-            <p>Lascia recensioni verificate su pagamenti, alloggi e gestione. Aiuta i tuoi colleghi a trovare i posti migliori dove fare stagione.</p>
-        </div>
-        <div class="info-card">
-            <span>💎</span>
-            <h3>Per le Aziende</h3>
-            <p>Metti in mostra la tua professionalità, analizza il feedback dei dipendenti e trova i migliori talenti locali.</p>
-        </div>
-        <div class="info-card">
-            <span>⛰️</span>
-            <h3>100% Valle d'Aosta</h3>
-            <p>L'unica piattaforma dedicata esclusivamente alle dinamiche del territorio valdostano, da Courmayeur a Gressoney.</p>
-        </div>
+  <!-- BETA BANNER -->
+  <div class="beta-banner">
+    🚀 VERSIONE BETA — Aiutaci a migliorare segnalando eventuali problemi!
+  </div>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="nav-logo">
+      StaffAlpine
+      <span>Valle d'Aosta</span>
+    </a>
+    <div class="nav-links">
+      <a href="login.html">Per i Lavoratori</a>
+      <a href="login.html?role=business">Per le Aziende</a>
+      <a href="login.html" class="nav-cta">Accedi →</a>
     </div>
+  </nav>
 
-    <footer style="background: var(--scuro); color: white; padding: 40px 10%; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
-        <div style="text-align: left;">
-            <h4 style="margin: 0; color: var(--oro);">Contattaci</h4>
-            <p style="font-size: 13px; opacity: 0.8;">Info & Supporto: info@staffalpine.it</p>
-        </div>
-        
-        <div style="text-align: center;">
-            <p style="margin-bottom: 10px; font-weight: bold;">StaffAlpine © 2026</p>
-            <div style="font-size: 13px; display: flex; gap: 15px; justify-content: center; opacity: 0.6;">
-                <a href="#" style="color: white; text-decoration: none;">Facebook</a>
-                <a href="#" style="color: white; text-decoration: none;">Instagram</a>
-                <span>|</span>
-                <a href="login.html" style="color: var(--oro); text-decoration: none; font-weight: bold;">Accesso Staff 🛡️</a>
-            </div>
-        </div>
-    </footer>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <p class="hero-pretitle">⛰️ Valle d'Aosta · Hospitality · Trasparenza</p>
+      <h1>Staff<em>Alpine</em></h1>
+      <p class="hero-subtitle">
+        La piattaforma che valorizza il lavoro nel turismo valdostano attraverso recensioni verificate e dati reali.
+      </p>
+      <div class="hero-btns">
+        <a href="login.html" class="btn-primary">
+          👷 Sono un Lavoratore
+        </a>
+        <a href="login.html?role=business" class="btn-secondary">
+          💼 Area Business
+        </a>
+      </div>
+    </div>
+    <div class="scroll-hint">Scorri</div>
+  </section>
 
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <span class="stat-num">100%</span>
+      <span class="stat-label">Valle d'Aosta</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">Anonime</span>
+      <span class="stat-label">Recensioni protette</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">Verificate</span>
+      <span class="stat-label">Dati confermati</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">Beta</span>
+      <span class="stat-label">In crescita</span>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <div class="section-header">
+      <span class="section-tag">Cosa offriamo</span>
+      <h2 class="section-title">Costruito per chi lavora<br><em>in montagna</em></h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🛡️</div>
+        <h3>Per i Lavoratori</h3>
+        <p>Lascia recensioni verificate su pagamenti, alloggi e qualità della gestione. Aiuta i colleghi a scegliere dove fare stagione con dati reali.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💎</div>
+        <h3>Per le Aziende</h3>
+        <p>Analizza il feedback dei tuoi dipendenti, migliora la reputazione e accedi al database dei migliori talenti locali con il piano Premium.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⛰️</div>
+        <h3>100% Valle d'Aosta</h3>
+        <p>L'unica piattaforma dedicata al territorio valdostano. Da Courmayeur a Gressoney, da Aosta alla Valpelline.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- COME FUNZIONA -->
+  <section class="how-it-works">
+    <div class="section-header">
+      <span class="section-tag">Come funziona</span>
+      <h2 class="section-title">Semplice, <em>sicuro</em>, anonimo</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h4>Accedi con Email</h4>
+        <p>Nessuna password. Ricevi un codice OTP e sei dentro in 30 secondi.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h4>Lascia la Tua Recensione</h4>
+        <p>Valuta paga, alloggio, gestione. Puoi allegare un documento come prova.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h4>Viene Verificata</h4>
+        <p>Il team controlla la recensione e assegna il badge di autenticità.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h4>La Community ne Beneficia</h4>
+        <p>Tutti i lavoratori possono consultare i dati e fare scelte più consapevoli.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <h2>Pronto a fare<br><em>la differenza?</em></h2>
+    <p>Unisciti alla community che sta rendendo il lavoro stagionale in Valle d'Aosta più trasparente.</p>
+    <div class="cta-btns">
+      <a href="login.html" class="btn-primary">Inizia Ora — È Gratuito</a>
+      <a href="login.html?role=business" class="btn-secondary">Registra la tua Azienda</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h3>StaffAlpine</h3>
+        <p>La piattaforma di trasparenza per il lavoro stagionale in Valle d'Aosta. Recensioni reali, dati verificati.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Piattaforma</h4>
+        <a href="login.html">Area Lavoratori</a>
+        <a href="login.html?role=business">Area Business</a>
+        <a href="login.html">Accedi</a>
+      </div>
+      <div class="footer-col">
+        <h4>Contatti</h4>
+        <a href="/cdn-cgi/l/email-protection#4a23242c250a393e2b2c2c2b263a23242f64233e"><span class="__cf_email__" data-cfemail="325b5c545d724146535454535e425b5c571c5b46">[email&#160;protected]</span></a>
+        <a href="#">Instagram</a>
+        <a href="#">Facebook</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 StaffAlpine — Valle d'Aosta</p>
+      <span class="footer-badge">🏔️ MADE IN VDA</span>
+      <a href="login.html" style="color: rgba(255,255,255,0.3); font-size:12px; text-decoration:none;">Accesso Staff 🛡️</a>
+    </div>
+  </footer>
+
+  <!-- MODAL PRIVACY / TERMINI -->
+  <div id="modal-privacy" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(6px); z-index:99999; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:white; border-radius:20px; max-width:560px; width:100%; max-height:90vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 30px 80px rgba(0,0,0,0.4);">
+
+      <!-- Header -->
+      <div style="background:var(--scuro); padding:24px 28px; flex-shrink:0;">
+        <div style="font-family:'Playfair Display',serif; font-size:1.3rem; color:white; margin-bottom:4px;">📋 Termini e Privacy</div>
+        <div style="font-size:12px; color:rgba(255,255,255,0.4);">Leggi e accetta prima di continuare</div>
+      </div>
+
+      <!-- Contenuto scrollabile -->
+      <div style="overflow-y:auto; padding:28px; flex:1; font-size:13px; line-height:1.7; color:#2c3e2d;">
+
+        <h3 style="font-family:'Playfair Display',serif; color:#1a2e1a; margin-bottom:8px;">1. Trattamento dei Dati Personali (GDPR)</h3>
+        <p style="margin-bottom:16px;">StaffAlpine raccoglie e tratta i dati personali degli utenti (nome, cognome, data di nascita, indirizzo email) esclusivamente per le finalità della piattaforma: verifica dell'identità, pubblicazione di recensioni e gestione del profilo professionale. I dati sono conservati in modo sicuro su Supabase (server EU) e non vengono ceduti a terzi a scopo commerciale. Il titolare del trattamento è <b>Alexandra Mititelu</b>. L'utente può richiedere la cancellazione dei propri dati in qualsiasi momento scrivendo a <b>mititelu.alexandra@tiscali.it</b>.</p>
+
+        <h3 style="font-family:'Playfair Display',serif; color:#1a2e1a; margin-bottom:8px;">2. Anonimato delle Recensioni</h3>
+        <p style="margin-bottom:16px;">Le recensioni pubblicate su StaffAlpine sono <b>anonime</b> nei confronti delle aziende e degli altri utenti. I dati identificativi del recensore (nome, cognome, data di nascita) sono visibili <b>esclusivamente all'amministratore</b> per la verifica della veridicità delle esperienze. L'utente garantisce che le informazioni inserite nelle recensioni sono veritiere e basate su esperienze lavorative reali. La pubblicazione di informazioni false o diffamatorie è vietata.</p>
+
+        <h3 style="font-family:'Playfair Display',serif; color:#1a2e1a; margin-bottom:8px;">3. Regole di Utilizzo della Piattaforma</h3>
+        <p style="margin-bottom:8px;">Utilizzando StaffAlpine l'utente si impegna a:</p>
+        <ul style="margin-bottom:16px; padding-left:18px; display:flex; flex-direction:column; gap:4px;">
+          <li>Fornire informazioni veritiere durante la registrazione e nella compilazione delle recensioni</li>
+          <li>Non pubblicare contenuti offensivi, discriminatori o lesivi della reputazione altrui</li>
+          <li>Non utilizzare la piattaforma per scopi commerciali non autorizzati</li>
+          <li>Non tentare di aggirare i sistemi di verifica delle recensioni</li>
+          <li>Rispettare la privacy degli altri utenti e delle aziende presenti</li>
+        </ul>
+        <p style="margin-bottom:16px;">L'amministratore si riserva il diritto di rimuovere contenuti non conformi e di sospendere account che violino queste regole.</p>
+
+        <h3 style="font-family:'Playfair Display',serif; color:#1a2e1a; margin-bottom:8px;">4. Limitazione di Responsabilità</h3>
+        <p style="margin-bottom:16px;">StaffAlpine è una piattaforma di raccolta recensioni basata sulle esperienze personali degli utenti. Le opinioni espresse non rappresentano la posizione ufficiale della piattaforma. StaffAlpine non garantisce l'accuratezza, la completezza o l'aggiornamento delle informazioni presenti e non è responsabile per decisioni lavorative prese sulla base dei contenuti pubblicati. L'utilizzo della piattaforma avviene sotto la piena responsabilità dell'utente.</p>
+
+        <p style="font-size:11px; color:#94a3b8; border-top:1px solid #f0f2ee; padding-top:12px;">Ultimo aggiornamento: Marzo 2026 · StaffAlpine — Valle d'Aosta</p>
+      </div>
+
+      <!-- Footer azioni -->
+      <div style="padding:20px 28px; border-top:1px solid #f0f2ee; flex-shrink:0; display:flex; flex-direction:column; gap:10px;">
+        <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer; font-size:13px; color:#2c3e2d; line-height:1.4;">
+          <input type="checkbox" id="check-privacy" style="margin-top:2px; accent-color:#2d6a4f; width:16px; height:16px; flex-shrink:0;">
+          Ho letto e accetto i Termini di utilizzo e l'Informativa sulla Privacy di StaffAlpine.
+        </label>
+        <button id="btn-accetta" onclick="accettaPrivacy()" disabled
+          style="width:100%; padding:13px; background:#ccc; color:white; border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:700; cursor:not-allowed; transition:all 0.3s;">
+          Continua →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Navbar scroll effect
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 60);
+    });
+
+    // Intersection Observer per animazioni scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('visible'), i * 80);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.feature-card, .step-item').forEach(el => observer.observe(el));
+
+    // ── MODAL PRIVACY ──
+    const PRIVACY_KEY = 'staffalpine_privacy_v1';
+
+    function mostraModalSeNecessario() {
+      if (!localStorage.getItem(PRIVACY_KEY)) {
+        document.getElementById('modal-privacy').style.display = 'flex';
+      }
+    }
+
+    // Abilita il bottone solo quando il checkbox è spuntato
+    document.getElementById('check-privacy').addEventListener('change', function() {
+      const btn = document.getElementById('btn-accetta');
+      if (this.checked) {
+        btn.disabled = false;
+        btn.style.background = 'linear-gradient(135deg,#2d6a4f,#52b788)';
+        btn.style.cursor = 'pointer';
+      } else {
+        btn.disabled = true;
+        btn.style.background = '#ccc';
+        btn.style.cursor = 'not-allowed';
+      }
+    });
+
+    function accettaPrivacy() {
+      localStorage.setItem(PRIVACY_KEY, '1');
+      document.getElementById('modal-privacy').style.display = 'none';
+    }
+
+    // Intercetta tutti i link verso login.html
+    document.querySelectorAll('a[href="login.html"], a[href="login.html?role=business"]').forEach(link => {
+      link.addEventListener('click', function(e) {
+        if (!localStorage.getItem(PRIVACY_KEY)) {
+          e.preventDefault();
+          // Salva destinazione e mostra modal
+          sessionStorage.setItem('redirect_after_privacy', this.href);
+          document.getElementById('modal-privacy').style.display = 'flex';
+        }
+      });
+    });
+
+    // Dopo accettazione, vai alla destinazione salvata
+    const originalAccetta = window.accettaPrivacy;
+    window.accettaPrivacy = function() {
+      localStorage.setItem(PRIVACY_KEY, '1');
+      document.getElementById('modal-privacy').style.display = 'none';
+      const dest = sessionStorage.getItem('redirect_after_privacy');
+      if (dest) {
+        sessionStorage.removeItem('redirect_after_privacy');
+        window.location.href = dest;
+      }
+    };
+
+    mostraModalSeNecessario();
+  </script>
 </body>
 </html>

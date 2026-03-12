@@ -1,259 +1,571 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2c3e50">
-<link rel="apple-touch-icon" href="icona-192.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a2e1a">
+  <link rel="apple-touch-icon" href="icona-192.png">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then(() => console.log("PWA StaffAlpine Attiva!"))
+        .catch(err => console.log("Errore PWA:", err));
+    }
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Esplora Aziende — StaffAlpine</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --verde:         #2d6a4f;
+      --verde-chiaro:  #52b788;
+      --verde-accento: #74c69d;
+      --oro:           #c9a84c;
+      --oro-chiaro:    #e9c46a;
+      --scuro:         #1a2e1a;
+      --pietra:        #6b705c;
+      --beige:         #f4f1de;
+      --bianco:        #fafaf8;
+      --grigio:        #f0f2ee;
+      --testo:         #2c3e2d;
+      --rosso:         #c0392b;
+    }
 
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js')
-      .then(() => console.log("PWA StaffAlpine Attiva!"))
-      .catch(err => console.log("Errore PWA:", err));
-  }
-</script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Esplora Aziende - StaffAlpine</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        /* --- STILE GLOBALE STAFFALPINE --- */
-        :root { 
-            --verde: #27ae60; 
-            --scuro: #2c3e50; 
-            --oro: #d4af37; 
-            --rosso: #e74c3c; 
-            --giallo: #f1c40f; 
-            --grigio: #f8fafc;
-        }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--grigio); margin: 0; padding: 0; }
-        
-        .main-nav { background: var(--scuro); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; color: white; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .nav-logo { font-size: 22px; font-weight: 800; color: var(--oro); text-decoration: none; }
-        .nav-links { display: flex; gap: 20px; align-items: center; }
-        .nav-links a { color: white; text-decoration: none; font-size: 14px; font-weight: bold; cursor: pointer; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        .container { max-width: 900px; margin: 40px auto; padding: 20px; }
-        
-        /* --- MODIFICA: GRIGLIA E CARD PIÙ COMPATTE --- */
-        #lista-aziende { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-            gap: 15px; 
-            margin-top: 30px; 
-        }
-        
-        .azienda-card { 
-            background: white; 
-            padding: 20px; /* Ridotto padding */
-            border-radius: 12px; /* Arrotondamento più sobrio */
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
-            border: 1px solid #eee; 
-            transition: 0.2s; 
-            position: relative; 
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .azienda-card:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
-        
-        .azienda-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-        .azienda-nome { font-size: 16px; font-weight: bold; color: var(--scuro); margin: 0; flex: 1; padding-right: 10px; }
-        
-        .voto-badge { 
-            background: #e8f5e9; 
-            color: var(--verde); 
-            padding: 4px 10px; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            font-size: 13px; 
-            white-space: nowrap;
-        }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--grigio);
+      color: var(--testo);
+      min-height: 100vh;
+    }
 
-        .premium-badge { 
-            background: linear-gradient(135deg, #d4af37 0%, #f1c40f 100%); 
-            color: white; 
-            padding: 4px 10px; 
-            border-radius: 8px; 
-            font-size: 11px; 
-            font-weight: bold; 
-            white-space: nowrap;
-        }
+    /* ── NAVBAR ── */
+    .main-nav {
+      background: var(--scuro);
+      padding: 16px 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.2);
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      color: var(--oro-chiaro);
+      text-decoration: none;
+      letter-spacing: 1px;
+    }
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+    .nav-links a {
+      color: rgba(255,255,255,0.75);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: white; }
+    .nav-logout {
+      color: #e88080 !important;
+      border: 1px solid rgba(232,128,128,0.3);
+      padding: 6px 14px;
+      border-radius: 6px;
+    }
+    .nav-logout:hover { background: rgba(232,128,128,0.1) !important; }
 
-        .azienda-loc { font-size: 12px; color: #7f8c8d; margin: 5px 0 15px 0;}
+    /* ── HERO BANNER ── */
+    .page-hero {
+      background: linear-gradient(135deg, var(--scuro) 0%, #0d1f0d 100%);
+      padding: 50px 5% 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-hero::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(82,183,136,0.12), transparent 70%);
+      border-radius: 50%;
+    }
+    .page-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -40px; left: 10%;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(201,168,76,0.08), transparent 70%);
+      border-radius: 50%;
+    }
+    .hero-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-tag {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--verde-accento);
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: block;
+    }
+    .page-hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      color: white;
+      margin-bottom: 10px;
+      line-height: 1.1;
+    }
+    .page-hero h1 em { color: var(--oro-chiaro); font-style: normal; }
+    .page-hero p {
+      color: rgba(255,255,255,0.5);
+      font-size: 15px;
+      max-width: 500px;
+    }
 
-        .btn-dettaglio { 
-            display: block; 
-            width: 100%; 
-            background: var(--verde); 
-            color: white; 
-            border: none; 
-            padding: 10px; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            font-size: 13px; 
-            cursor: pointer; 
-            text-align: center; 
-            text-decoration: none; 
-            box-sizing: border-box;
-        }
-        .btn-dettaglio:hover { background: #2ecc71; }
+    /* ── SEARCH BAR ── */
+    .search-section {
+      max-width: 1100px;
+      margin: -24px auto 0;
+      padding: 0 5%;
+      position: relative;
+      z-index: 10;
+    }
+    .search-box {
+      background: white;
+      border-radius: 16px;
+      padding: 6px 6px 6px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+    .search-icon { font-size: 18px; opacity: 0.4; flex-shrink: 0; }
+    .search-box input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      color: var(--testo);
+      background: transparent;
+      padding: 10px 0;
+    }
+    .search-box input::placeholder { color: #aaa; }
+    .search-btn {
+      background: linear-gradient(135deg, var(--verde), var(--verde-chiaro));
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+    .search-btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
-        .info-panel { background: white; padding: 15px; border-radius: 12px; border-left: 4px solid var(--oro); margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); display: flex; gap: 10px; align-items: center; }
-    </style>
+    /* ── CONTAINER ── */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 5%;
+    }
+
+    /* Risultati header */
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .results-count {
+      font-size: 13px;
+      color: var(--pietra);
+      font-weight: 500;
+    }
+    .results-count strong { color: var(--testo); }
+
+    /* ── GRIGLIA CARD ── */
+    #lista-aziende {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    /* ── CARD AZIENDA ── */
+    .azienda-card {
+      background: white;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.05);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      animation: cardIn 0.4s ease both;
+    }
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .azienda-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 16px 40px rgba(45,106,79,0.12);
+      border-color: rgba(82,183,136,0.2);
+    }
+
+    /* Card top colorata */
+    .card-top-bar {
+      height: 5px;
+      background: linear-gradient(to right, var(--verde), var(--verde-chiaro));
+    }
+    .card-top-bar.locked {
+      background: linear-gradient(to right, #94a3b8, #cbd5e1);
+    }
+
+    .card-body { padding: 22px 22px 18px; flex: 1; display: flex; flex-direction: column; }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .azienda-nome {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--scuro);
+      flex: 1;
+      padding-right: 10px;
+      line-height: 1.3;
+    }
+
+    /* Voto badge con colore dinamico */
+    .voto-badge {
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 13px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .voto-alto  { background: #e8f5e9; color: #2d6a4f; }
+    .voto-medio { background: #fff8e1; color: #b7791f; }
+    .voto-basso { background: #fde8e8; color: #9b2c2c; }
+    .voto-nd    { background: #f1f5f9; color: #94a3b8; }
+
+    .azienda-loc {
+      font-size: 12px;
+      color: var(--pietra);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Mini stats */
+    .card-stats {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .mini-stat {
+      background: var(--grigio);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      color: var(--pietra);
+      font-weight: 500;
+    }
+    .mini-stat strong { color: var(--testo); }
+
+    /* Bottone */
+    .btn-dettaglio {
+      display: block;
+      width: 100%;
+      padding: 11px;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      border: none;
+      transition: all 0.3s;
+      margin-top: auto;
+    }
+    .btn-verde {
+      background: linear-gradient(135deg, var(--verde), var(--verde-chiaro));
+      color: white;
+    }
+    .btn-verde:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(82,183,136,0.3); }
+    .btn-locked {
+      background: var(--grigio);
+      color: #94a3b8;
+      cursor: default;
+      border: 1px solid #e2e8f0;
+    }
+
+    /* Loading skeleton */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 8px;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .skeleton-card {
+      background: white;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    .sk-bar { height: 5px; }
+    .sk-body { padding: 22px; }
+    .sk-title { height: 20px; width: 70%; margin-bottom: 10px; }
+    .sk-sub { height: 14px; width: 40%; margin-bottom: 20px; }
+    .sk-btn { height: 40px; width: 100%; }
+
+    /* Empty state */
+    .empty-state {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--pietra);
+    }
+    .empty-state span { font-size: 48px; display: block; margin-bottom: 16px; }
+    .empty-state h3 { font-family: 'Playfair Display', serif; color: var(--scuro); margin-bottom: 8px; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      .page-hero { padding: 40px 5% 50px; }
+      #lista-aziende { grid-template-columns: 1fr; }
+      .search-box { flex-wrap: wrap; }
+      .search-btn { width: 100%; }
+      .results-header { flex-direction: column; gap: 10px; align-items: flex-start; }
+    }
+  </style>
 </head>
 <body>
 
-    <nav id="dynamic-nav" class="main-nav">
-        <a href="index.html" class="nav-logo">StaffAlpine</a>
-        <div id="nav-elements" class="nav-links"></div>
-    </nav>
+  <!-- NAVBAR -->
+  <nav id="dynamic-nav" class="main-nav">
+    <a href="index.html" class="nav-logo">StaffAlpine</a>
+    <div id="nav-elements" class="nav-links"></div>
+  </nav>
 
-    <div class="container">
-        
-        <div class="header-esplora" style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: var(--scuro); margin: 0; font-size: 28px;">Esplora le Aziende</h1>
-            <p style="color: #7f8c8d; margin-top: 5px;">Trova le migliori attività in Valle d'Aosta.</p>
-        </div>
-
-        <div style="background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); position: relative;">
-            <input type="text" id="input-cerca-hotel" 
-                   placeholder="Scrivi il nome e premi Invio per cercare..." 
-                   onkeypress="handleSearch(event)"
-                   style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-size:14px; box-sizing: border-box;">
-            <span style="position: absolute; right: 25px; top: 28px; color: #ccc;">🔍</span>
-        </div>
-
-        <div id="lista-aziende">
-            <p style="text-align: center; grid-column: 1/-1;">Recupero attività...</p>
-        </div>
+  <!-- HERO -->
+  <div class="page-hero">
+    <div class="hero-inner">
+      <span class="hero-tag">⛰️ Valle d'Aosta · Hospitality</span>
+      <h1>Esplora le <em>Aziende</em></h1>
+      <p>Consulta le valutazioni reali lasciate dai lavoratori stagionali.</p>
     </div>
+  </div>
 
-    <script>
-        const SUPABASE_URL = "https://maeoqoxzjzusjwrdrkbd.supabase.co";
-        const SUPABASE_KEY = "sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX"; 
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  <!-- SEARCH -->
+  <div class="search-section">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="input-cerca-hotel"
+             placeholder="Cerca per nome hotel, ristorante..."
+             onkeypress="handleSearch(event)">
+      <button class="search-btn" onclick="cercaManuale()">Cerca</button>
+    </div>
+  </div>
 
-        // MODIFICA: GESTIONE TASTO INVIO
-        function handleSearch(e) {
-            if (e.key === 'Enter') {
-                const termine = document.getElementById('input-cerca-hotel').value;
-                caricaAziende(termine);
-            }
-        }
+  <!-- CONTENUTO -->
+  <div class="container">
+    <div class="results-header">
+      <p class="results-count" id="results-count">Caricamento attività...</p>
+    </div>
+    <div id="lista-aziende">
+      <div class="skeleton-card"><div class="skeleton sk-bar"></div><div class="sk-body"><div class="skeleton sk-title"></div><div class="skeleton sk-sub"></div><div class="skeleton sk-btn"></div></div></div>
+      <div class="skeleton-card"><div class="skeleton sk-bar"></div><div class="sk-body"><div class="skeleton sk-title"></div><div class="skeleton sk-sub"></div><div class="skeleton sk-btn"></div></div></div>
+      <div class="skeleton-card"><div class="skeleton sk-bar"></div><div class="sk-body"><div class="skeleton sk-title"></div><div class="skeleton sk-sub"></div><div class="skeleton sk-btn"></div></div></div>
+      <div class="skeleton-card"><div class="skeleton sk-bar"></div><div class="sk-body"><div class="skeleton sk-title"></div><div class="skeleton sk-sub"></div><div class="skeleton sk-btn"></div></div></div>
+      <div class="skeleton-card"><div class="skeleton sk-bar"></div><div class="sk-body"><div class="skeleton sk-title"></div><div class="skeleton sk-sub"></div><div class="skeleton sk-btn"></div></div></div>
+      <div class="skeleton-card"><div class="skeleton sk-bar"></div><div class="sk-body"><div class="skeleton sk-title"></div><div class="skeleton sk-sub"></div><div class="skeleton sk-btn"></div></div></div>
+    </div>
+  </div>
 
-  async function caricaAziende(filtro = "") {
-    const container = document.getElementById('lista-aziende');
-    container.innerHTML = "<p style='text-align: center; grid-column: 1/-1;'>Caricamento...</p>";
-    
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    let isPremium = false;
-    let isLavoratore = true;
-    let mioIdAzienda = null;
+  <script>
+    const SUPABASE_URL = "https://maeoqoxzjzusjwrdrkbd.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX";
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    if (user) {
+    // PROTEZIONE PAGINA
+    async function checkAccess() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) window.location.replace('login.html');
+    }
+    checkAccess();
+
+    function handleSearch(e) {
+      if (e.key === 'Enter') cercaManuale();
+    }
+    function cercaManuale() {
+      const termine = document.getElementById('input-cerca-hotel').value;
+      caricaAziende(termine);
+    }
+
+    async function caricaAziende(filtro = "") {
+      const container = document.getElementById('lista-aziende');
+
+      // Skeleton
+      container.innerHTML = [1,2,3,4,5,6].map(() => `
+        <div class="skeleton-card">
+          <div class="skeleton sk-bar"></div>
+          <div class="sk-body">
+            <div class="skeleton sk-title"></div>
+            <div class="skeleton sk-sub"></div>
+            <div class="skeleton sk-btn"></div>
+          </div>
+        </div>
+      `).join('');
+
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      let isPremium = false, isLavoratore = true, mioIdAzienda = null;
+
+      if (user) {
         const { data: mioProfilo } = await supabaseClient.from('profili_aziende').select('id, is_premium').eq('id', user.id).maybeSingle();
         if (mioProfilo) { isLavoratore = false; isPremium = mioProfilo.is_premium === true; mioIdAzienda = mioProfilo.id; }
-    }
+      }
 
-    // 1. Recuperiamo le Aziende Approvare
-    let query = supabaseClient.from('profili_aziende').select('*').eq('is_approvata', true);
-    if (filtro) query = query.ilike('nome_azienda', `%${filtro}%`);
-    const { data: aziende } = await query;
+      let query = supabaseClient.from('profili_aziende').select('*').eq('is_approvata', true);
+      if (filtro) query = query.ilike('nome_azienda', `%${filtro}%`);
+      const { data: aziende } = await query;
+      const { data: tutteLeRecs } = await supabaseClient.from('RECENSIONI').select('*').eq('VERIFICATA', true);
 
-    // 2. Recuperiamo TUTTE le recensioni verificate
-    const { data: tutteLeRecs } = await supabaseClient.from('RECENSIONI').select('*').eq('VERIFICATA', true);
+      container.innerHTML = "";
+      const aziendeMostrate = new Set();
 
-    container.innerHTML = "";
-
-    // Mappa per tenere traccia di quali aziende abbiamo già mostrato
-    const aziendeMostrate = new Set();
-
-    // Ciclo 1: Mostriamo le aziende che hanno un profilo ufficiale
-    if (aziende) {
+      if (aziende) {
         aziende.forEach(az => {
-            const nomePulitoProfilo = az.nome_azienda.toLowerCase().trim();
-            aziendeMostrate.add(nomePulitoProfilo);
-
-            const recs = tutteLeRecs ? tutteLeRecs.filter(r => 
-                r.AZIENDA && r.AZIENDA.toLowerCase().trim().includes(nomePulitoProfilo)
-            ) : [];
-
-            renderizzaCard(container, az.nome_azienda, az.localita, recs, isLavoratore, isPremium, mioIdAzienda === az.id);
+          const nomePulito = az.nome_azienda.toLowerCase().trim();
+          aziendeMostrate.add(nomePulito);
+          const recs = tutteLeRecs ? tutteLeRecs.filter(r => r.AZIENDA && r.AZIENDA.toLowerCase().trim().includes(nomePulito)) : [];
+          renderizzaCard(container, az.nome_azienda, az.localita, recs, isLavoratore, isPremium, mioIdAzienda === az.id);
         });
+      }
+
+      if (tutteLeRecs) {
+        const nomiDaRecs = [...new Set(tutteLeRecs.map(r => r.AZIENDA))];
+        nomiDaRecs.forEach(nomeRec => {
+          if (!nomeRec) return;
+          const nomePulitoRec = nomeRec.toLowerCase().trim();
+          if (![...aziendeMostrate].some(n => nomePulitoRec.includes(n) || n.includes(nomePulitoRec))) {
+            const recs = tutteLeRecs.filter(r => r.AZIENDA && r.AZIENDA.toLowerCase().trim() === nomePulitoRec);
+            renderizzaCard(container, nomeRec, "Valle d'Aosta", recs, isLavoratore, isPremium, false);
+            aziendeMostrate.add(nomePulitoRec);
+          }
+        });
+      }
+
+      // Aggiorna contatore
+      const totale = container.querySelectorAll('.azienda-card').length;
+      document.getElementById('results-count').innerHTML = filtro
+        ? `<strong>${totale}</strong> risultati per "${filtro}"`
+        : `<strong>${totale}</strong> attività trovate in Valle d'Aosta`;
+
+      if (totale === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <span>🏔️</span>
+            <h3>Nessuna attività trovata</h3>
+            <p>Prova con un termine di ricerca diverso.</p>
+          </div>`;
+      }
     }
 
-    // Ciclo 2: Mostriamo le aziende che hanno recensioni ma NON hanno ancora un profilo (COSI VEDI LE 3 RECENSIONI!)
-    if (tutteLeRecs) {
-        const nomiAziendeDaRecensioni = [...new Set(tutteLeRecs.map(r => r.AZIENDA))];
-        
-        nomiAziendeDaRecensioni.forEach(nomeRec => {
-            if (!nomeRec) return;
-            const nomePulitoRec = nomeRec.toLowerCase().trim();
-            
-            // Se non l'abbiamo già mostrata nel ciclo precedente, la aggiungiamo ora
-            if (![...aziendeMostrate].some(n => nomePulitoRec.includes(n) || n.includes(nomePulitoRec))) {
-                const recs = tutteLeRecs.filter(r => r.AZIENDA && r.AZIENDA.toLowerCase().trim() === nomePulitoRec);
-                renderizzaCard(container, nomeRec, "Valle d'Aosta", recs, isLavoratore, isPremium, false);
-                aziendeMostrate.add(nomePulitoRec);
-            }
-        });
-    }
-}
-
-// Funzione di supporto per creare graficamente la card
-function renderizzaCard(container, nome, localita, recs, isLavoratore, isPremium, eMiaAzienda) {
-    let media = "--";
-    if (recs.length > 0) {
+    function renderizzaCard(container, nome, localita, recs, isLavoratore, isPremium, eMiaAzienda) {
+      let media = null;
+      if (recs.length > 0) {
         const somma = recs.reduce((acc, r) => acc + (parseFloat(r.VOTO_PAGA) || 0) + (parseFloat(r.RISPETTO_TITOLARE) || 0), 0);
         media = (somma / (recs.length * 2)).toFixed(1);
+      }
+
+      // Colore voto
+      let votoBadgeClass = 'voto-nd';
+      let votoLabel = '⭐ N/D';
+      if (media !== null) {
+        const m = parseFloat(media);
+        votoLabel = `⭐ ${media}`;
+        if (m >= 4)      votoBadgeClass = 'voto-alto';
+        else if (m >= 3) votoBadgeClass = 'voto-medio';
+        else             votoBadgeClass = 'voto-basso';
+      }
+
+      const puoCliccare = isLavoratore || isPremium || eMiaAzienda;
+
+      const htmlBottone = puoCliccare
+        ? `<a href="dettaglio-azienda.html?nome=${encodeURIComponent(nome)}" class="btn-dettaglio btn-verde">Vedi Analisi Completa →</a>`
+        : `<div class="btn-dettaglio btn-locked" onclick="alert('Abbonati a Premium per vedere i dettagli della concorrenza!')">🔒 Solo Premium</div>`;
+
+      const miniStats = recs.length > 0
+        ? `<div class="card-stats">
+             <span class="mini-stat"><strong>${recs.length}</strong> rec.</span>
+           </div>`
+        : `<div class="card-stats"><span class="mini-stat">Nessuna recensione</span></div>`;
+
+      const div = document.createElement('div');
+      div.className = 'azienda-card';
+      div.style.animationDelay = `${container.children.length * 60}ms`;
+      div.innerHTML = `
+        <div class="card-top-bar ${puoCliccare ? '' : 'locked'}"></div>
+        <div class="card-body">
+          <div class="card-header">
+            <h3 class="azienda-nome">${nome}</h3>
+            <span class="voto-badge ${votoBadgeClass}">${votoLabel}</span>
+          </div>
+          <p class="azienda-loc">📍 ${localita || "Valle d'Aosta"}</p>
+          ${miniStats}
+          ${htmlBottone}
+        </div>
+      `;
+      container.appendChild(div);
     }
 
-    // Recuperiamo l'utente attuale per il controllo sicurezza
-    const user = supabaseClient.auth.user ? supabaseClient.auth.user() : null;
+    async function aggiornaNavbar() {
+      const navElements = document.getElementById('nav-elements');
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (!user) {
+        navElements.innerHTML = `<a href="login.html" style="color:var(--oro-chiaro);">Accedi</a>`;
+        return;
+      }
+      const { data: azienda } = await supabaseClient.from('profili_aziende').select('id').eq('id', user.id).maybeSingle();
+      navElements.innerHTML = `
+        <a href="${azienda ? 'dashboard-azienda.html' : 'dashboard-lavoratore.html'}">👤 Area Personale</a>
+        <a onclick="logout()" class="nav-logout">Esci</a>
+      `;
+    }
 
-    // LOGICA DI ACCESSO:
-    // Entra se: è un lavoratore OPPURE è Premium OPPURE sta guardando la sua stessa azienda
-    const puoCliccare = isLavoratore || isPremium || eMiaAzienda;
+    async function logout() {
+      await supabaseClient.auth.signOut();
+      window.location.replace('index.html');
+    }
 
-    // Definiamo il tasto in base ai permessi
-    const htmlBottone = puoCliccare 
-        ? `<a href="dettaglio-azienda.html?nome=${encodeURIComponent(nome)}" class="btn-dettaglio">Vedi Analisi</a>`
-        : `<a onclick="alert('Abbonati a Premium per vedere i dettagli e i commenti della concorrenza!')" class="btn-dettaglio" style="background:#94a3b8; cursor:pointer;">🔒 Solo Premium</a>`;
-
-    const div = document.createElement('div');
-    div.className = 'azienda-card';
-    div.innerHTML = `
-        <div class="azienda-card-header">
-            <h3 class="azienda-nome">${nome}</h3>
-            <span class="voto-badge">⭐ ${media}</span> 
-        </div>
-        <p class="azienda-loc">📍 ${localita || 'Valle d\'Aosta'}</p>
-        ${htmlBottone}
-    `;
-    container.appendChild(div);
-}
-        async function aggiornaNavbar() {
-            const navElements = document.getElementById('nav-elements');
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (!user) {
-                navElements.innerHTML = `<a href="login.html" style="color:var(--oro);">Accedi</a>`;
-                return;
-            }
-            const { data: azienda } = await supabaseClient.from('profili_aziende').select('id').eq('id', user.id).maybeSingle();
-            navElements.innerHTML = `
-                <a href="${azienda ? 'dashboard-azienda.html' : 'dashboard-lavoratore.html'}" style="font-weight:bold;">👤 Area Personale</a>
-                <a onclick="logout()" style="cursor:pointer; color:var(--rosso); margin-left:15px;">Esci</a>
-            `;
-        }
-
-        async function logout() {
-            await supabaseClient.auth.signOut();
-            window.location.replace('index.html');
-        }
-
-        aggiornaNavbar();
-        caricaAziende();
-    </script>
+    aggiornaNavbar();
+    caricaAziende();
+  </script>
 </body>
 </html>

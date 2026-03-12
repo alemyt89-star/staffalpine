@@ -1,254 +1,270 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2c3e50">
-<link rel="apple-touch-icon" href="icona-192.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a2e1a">
+  <link rel="apple-touch-icon" href="icona-192.png">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then(() => console.log("PWA StaffAlpine Attiva!"))
+        .catch(err => console.log("Errore PWA:", err));
+    }
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dettaglio Azienda — StaffAlpine</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --verde:#2d6a4f;--verde-chiaro:#52b788;--verde-accento:#74c69d;
+      --oro:#c9a84c;--oro-chiaro:#e9c46a;--scuro:#1a2e1a;
+      --pietra:#6b705c;--grigio:#f0f2ee;--testo:#2c3e2d;
+      --rosso:#c0392b;--giallo:#e9c46a;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--grigio);color:var(--testo);min-height:100vh;}
 
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js')
-      .then(() => console.log("PWA StaffAlpine Attiva!"))
-      .catch(err => console.log("Errore PWA:", err));
-  }
-</script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dettagli Azienda - StaffAlpine</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        :root { --verde: #27ae60; --scuro: #2c3e50; --oro: #d4af37; --rosso: #e74c3c; --giallo: #f1c40f; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; margin: 0; padding: 0; }
-        
-        .main-nav { background: var(--scuro); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; color: white; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .nav-logo { font-size: 22px; font-weight: 800; color: var(--oro); text-decoration: none; }
-        .nav-links { display: flex; gap: 20px; align-items: center; }
-        .nav-links a { color: white; text-decoration: none; font-size: 14px; font-weight: bold; cursor: pointer; }
+    /* NAVBAR */
+    .main-nav{background:var(--scuro);padding:14px 5%;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1000;box-shadow:0 2px 20px rgba(0,0,0,0.2);}
+    .nav-logo{font-family:'Playfair Display',serif;font-size:20px;color:var(--oro-chiaro);letter-spacing:1px;text-decoration:none;}
+    .nav-links{display:flex;gap:20px;align-items:center;}
+    .nav-links a{color:rgba(255,255,255,0.7);text-decoration:none;font-size:13px;font-weight:500;cursor:pointer;transition:color 0.2s;}
+    .nav-links a:hover{color:white;}
+    .nav-logout{color:#e88080 !important;border:1px solid rgba(232,128,128,0.3);padding:5px 12px;border-radius:8px;}
 
-        .container { max-width: 900px; margin: 40px auto; padding: 20px; }
-        .header-azienda { background: white; padding: 30px; border-radius: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; margin-bottom: 30px; border-bottom: 5px solid var(--oro); }
-        
-        /* Contenitore che verrà sfocato */
-        #contenuto-protetto { position: relative; transition: 0.3s; }
-        .blur-lock { filter: blur(8px); pointer-events: none; user-select: none; }
+    /* HERO HEADER */
+    .azienda-hero{
+      background:linear-gradient(135deg,var(--scuro) 0%,#0d1f0d 100%);
+      padding:40px 5% 50px;
+      position:relative;
+      overflow:hidden;
+    }
+    .azienda-hero::before{
+      content:'';position:absolute;top:-80px;right:-80px;
+      width:350px;height:350px;
+      background:radial-gradient(circle,rgba(82,183,136,0.1),transparent 70%);
+      border-radius:50%;
+    }
+    .hero-inner{max-width:900px;margin:0 auto;position:relative;z-index:1;}
+    .btn-back{
+      display:inline-flex;align-items:center;gap:6px;
+      color:rgba(255,255,255,0.5);font-size:13px;cursor:pointer;
+      margin-bottom:20px;transition:color 0.2s;background:none;border:none;
+      font-family:'DM Sans',sans-serif;padding:0;
+    }
+    .btn-back:hover{color:white;}
+    .hero-nome{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);color:white;margin-bottom:8px;line-height:1.1;}
+    .hero-sub{color:rgba(255,255,255,0.45);font-size:14px;margin-bottom:24px;}
+    .hero-score-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+    .score-big{font-family:'Playfair Display',serif;font-size:3.5rem;font-weight:900;line-height:1;}
+    .score-verde{color:var(--verde-accento);}
+    .score-giallo{color:var(--oro-chiaro);}
+    .score-rosso{color:#e88080;}
+    .score-nd{color:rgba(255,255,255,0.3);}
+    .score-info{display:flex;flex-direction:column;gap:4px;}
+    .score-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);}
+    .score-recs{font-size:13px;color:rgba(255,255,255,0.6);}
 
-        /* Messaggio di blocco Premium */
-        #premium-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.6); z-index: 100;
-            display: none; flex-direction: column; align-items: center; justify-content: center;
-            border-radius: 20px; text-align: center; padding: 20px;
-        }
+    /* CONTAINER */
+    .container{max-width:900px;margin:-24px auto 0;padding:0 5% 40px;position:relative;z-index:10;}
 
-        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .stat-card { background: white; padding: 20px; border-radius: 18px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.04); border: 1px solid #eee; }
-        .stat-voto { font-size: 32px; font-weight: bold; color: var(--verde); display: block; }
-        .stat-label { font-size: 11px; color: #7f8c8d; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+    /* CARDS */
+    .card{background:white;border-radius:16px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.05);margin-bottom:20px;position:relative;}
+    .card-title{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--scuro);margin-bottom:18px;}
 
-        .info-gestione { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 20px; }
-        .info-item { background: #fff; padding: 15px 20px; border-radius: 12px; border-left: 4px solid var(--oro); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .info-item b { font-size: 13px; color: var(--scuro); }
-        .info-val { font-size: 14px; color: #2c3e50; font-weight: 500; }
+    /* STATS GRID */
+    .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px;}
+    @media(min-width:600px){.stats-grid{grid-template-columns:repeat(4,1fr);}}
+    .stat-card{background:var(--grigio);padding:16px;border-radius:12px;text-align:center;}
+    .stat-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pietra);display:block;margin-bottom:6px;}
+    .stat-voto{font-size:1.5rem;font-weight:700;color:var(--verde);display:block;font-family:'Playfair Display',serif;}
 
-        .btn-back { display: inline-block; margin-bottom: 20px; color: var(--scuro); text-decoration: none; font-weight: bold; font-size: 14px; cursor: pointer; }
-        .btn-upgrade { background: var(--oro); color: var(--scuro); padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 15px; display: inline-block; }
-    </style>
+    /* GESTIONE OPERATIVA */
+    .ops-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;}
+    .ops-item{background:var(--grigio);padding:12px 16px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;font-size:13px;}
+    .ops-item-label{color:var(--pietra);font-weight:500;}
+    .ops-item-val{font-weight:700;color:var(--scuro);}
+
+    /* PREMIUM LOCK */
+    .lock-overlay{
+      position:absolute;inset:0;
+      background:rgba(255,255,255,0.92);
+      backdrop-filter:blur(4px);
+      border-radius:16px;
+      z-index:10;
+      display:none;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:30px;
+      gap:12px;
+    }
+    .lock-icon{font-size:32px;}
+    .lock-title{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--scuro);}
+    .lock-sub{font-size:13px;color:var(--pietra);max-width:280px;}
+    .btn-oro{background:linear-gradient(135deg,var(--oro),var(--oro-chiaro));color:var(--scuro);border:none;padding:10px 24px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block;margin-top:4px;}
+
+    /* EMPTY */
+    .empty-state{text-align:center;padding:40px 20px;color:var(--pietra);}
+    .empty-state .empty-icon{font-size:36px;display:block;margin-bottom:12px;}
+    .empty-state p{font-size:14px;}
+  </style>
 </head>
 <body>
 
-    <nav id="dynamic-nav" class="main-nav">
-        <a href="index.html" class="nav-logo">StaffAlpine</a>
-        <div id="nav-elements" class="nav-links"></div>
-    </nav>
+  <!-- NAVBAR -->
+  <nav class="main-nav">
+    <a href="index.html" class="nav-logo">StaffAlpine</a>
+    <div class="nav-links" id="nav-elements"></div>
+  </nav>
 
-    <div class="container">
-        <div class="btn-back" onclick="window.history.back()">⬅ Torna indietro</div>
-        
-        <div class="header-azienda">
-            <h1 id="nome-hotel" style="margin:0 0 10px 0;">Caricamento...</h1>
-            <div id="media-generale" style="font-size: 48px; font-weight: bold; color: var(--verde);">--</div>
-            <p id="tot-recensioni" style="color: #7f8c8d; font-weight: 500;">Recupero esperienze...</p>
-            <small style="color: #94a3b8; font-style: italic;">Valutazione basata su recensioni verificate (1-5)</small>
+  <!-- HERO -->
+  <div class="azienda-hero">
+    <div class="hero-inner">
+      <button class="btn-back" onclick="window.history.back()">← Torna indietro</button>
+      <h1 class="hero-nome" id="nome-hotel">Caricamento...</h1>
+      <p class="hero-sub" id="hero-sub">Recupero informazioni...</p>
+      <div class="hero-score-row">
+        <span class="score-big score-nd" id="media-generale">--</span>
+        <div class="score-info">
+          <span class="score-label">Valutazione media</span>
+          <span class="score-recs" id="tot-recensioni">su recensioni verificate</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="container">
+
+    <!-- STATISTICHE -->
+    <div class="card" id="card-stats">
+      <div class="lock-overlay" id="premium-overlay">
+        <span class="lock-icon">🔒</span>
+        <div class="lock-title">Funzione Business</div>
+        <div class="lock-sub">I dettagli analitici sono visibili solo alle aziende con profilo Premium.</div>
+        <a href="dashboard-azienda.html" class="btn-oro">💎 Attiva Premium</a>
+      </div>
+      <div id="contenuto-protetto">
+        <div class="card-title">📊 Medie Valutazioni</div>
+        <div class="stats-grid">
+          <div class="stat-card"><span class="stat-label">Soddisfazione Paga</span><span class="stat-voto" id="voto-paga">--</span></div>
+          <div class="stat-card"><span class="stat-label">Rispetto Titolare</span><span class="stat-voto" id="voto-rispetto">--</span></div>
+          <div class="stat-card"><span class="stat-label">Qualità Alloggio</span><span class="stat-voto" id="voto-alloggio">--</span></div>
+          <div class="stat-card"><span class="stat-label">Qualità Vitto</span><span class="stat-voto" id="voto-vitto">--</span></div>
         </div>
 
-        <div id="contenitore-totale" style="position: relative;">
-            
-            <div id="premium-overlay">
-                <div style="background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 400px;">
-                    <h2 style="color: var(--scuro); margin-top: 0;">⭐ Funzionalità Business</h2>
-                    <p>Le aziende possono consultare i dettagli analitici e la gestione operativa solo con il profilo <b>Premium</b>.</p>
-                    <a href="dashboard-azienda.html" class="btn-upgrade">Attiva Premium Ora</a>
-                </div>
-            </div>
-
-            <div id="contenuto-protetto">
-                <h3 style="color: var(--scuro); margin-bottom: 15px;">📊 Medie Valutazioni</h3>
-                <div class="grid-stats">
-                    <div class="stat-card">
-                        <span class="stat-label">Soddisfazione Paga</span>
-                        <span id="voto-paga" class="stat-voto">--</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-label">Rispetto Titolare</span>
-                        <span id="voto-rispetto" class="stat-voto">--</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-label">Qualità Alloggio</span>
-                        <span id="voto-alloggio" class="stat-voto">--</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-label">Qualità Vitto</span>
-                        <span id="voto-vitto" class="stat-voto">--</span>
-                    </div>
-                </div>
-
-                <h3 style="color: var(--scuro); margin-top: 40px; margin-bottom: 15px;">🛠️ Dettagli Gestione Operativa</h3>
-                <div id="info-gestione" class="info-gestione"></div>
-            </div>
+        <div class="card-title" style="margin-top:8px;">🛠️ Gestione Operativa</div>
+        <div class="ops-grid" id="info-gestione">
+          <div class="empty-state"><span class="empty-icon">⏳</span><p>Caricamento...</p></div>
         </div>
-        </div>
+      </div>
+    </div>
+
+  </div>
 
   <script>
-    async function verificaPermessiAccesso() {
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    if (!user) return; // Se non è loggato, lasciamo che veda come visitatore (o gestisci tu)
+    const SUPABASE_URL="https://maeoqoxzjzusjwrdrkbd.supabase.co";
+    const SUPABASE_KEY="sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX";
+    const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-    // 1. Capiamo chi è l'utente
-    const { data: mioProfilo } = await supabaseClient.from('profili_aziende').select('id, is_premium').eq('id', user.id).maybeSingle();
-    
-    // 2. Capiamo se sta guardando la sua stessa azienda
-    const urlParams = new URLSearchParams(window.location.search);
-    const idProfiloPagina = urlParams.get('id_profilo'); 
+    const urlParams=new URLSearchParams(window.location.search);
+    const nomeAzienda=urlParams.get('nome');
 
-    // Se è un'azienda (ha un profilo) MA non è Premium E non è la sua azienda...
-    if (mioProfilo && mioProfilo.is_premium === false && mioProfilo.id !== idProfiloPagina) {
-        alert("Accesso limitato: I dettagli della concorrenza sono riservati agli utenti Premium.");
-        window.location.href = 'esplora-aziende.html';
+    async function caricaDettagli(){
+      if(!nomeAzienda)return;
+      document.getElementById('nome-hotel').innerText=nomeAzienda;
+
+      // Controllo permessi
+      const{data:{user}}=await supabaseClient.auth.getUser();
+      if(user){
+        const{data:profiloAz}=await supabaseClient.from('profili_aziende').select('is_premium').eq('id',user.id).maybeSingle();
+        if(profiloAz&&profiloAz.is_premium===false){
+          document.getElementById('premium-overlay').style.display='flex';
+        }
+      }
+
+      // Recupero recensioni
+      const{data:recs,error}=await supabaseClient.from('RECENSIONI').select('*').ilike('AZIENDA',`%${nomeAzienda.trim()}%`).eq('VERIFICATA',true);
+
+      if(error||!recs||recs.length===0){
+        document.getElementById('hero-sub').innerText='Nessuna recensione verificata disponibile';
+        document.getElementById('media-generale').innerText='--';
+        document.getElementById('tot-recensioni').innerText='0 recensioni';
+        document.getElementById('info-gestione').innerHTML=`<div class="empty-state"><span class="empty-icon">📭</span><p>Nessuna recensione verificata per questa azienda.</p></div>`;
+        return;
+      }
+
+      // Calcoli
+      const calcolaMedia=(col)=>{
+        const validi=recs.map(r=>parseFloat(r[col])).filter(v=>!isNaN(v));
+        if(!validi.length)return null;
+        return(validi.reduce((a,b)=>a+b,0)/validi.length).toFixed(1);
+      };
+      const calcolaPrevalenza=(col)=>{
+        const counts={};
+        recs.forEach(r=>{const v=r[col]?r[col].toString().trim():null;if(v)counts[v]=(counts[v]||0)+1;});
+        const keys=Object.keys(counts);
+        return keys.length?keys.reduce((a,b)=>counts[a]>counts[b]?a:b):'N/D';
+      };
+
+      const mp=calcolaMedia('VOTO_PAGA');
+      const mr=calcolaMedia('RISPETTO_TITOLARE');
+      const ma=calcolaMedia('QUALITA_ALLOGGIO');
+      const mv=calcolaMedia('QUALITA_VITTO');
+
+      document.getElementById('voto-paga').innerText=mp?mp+'/5':'N/D';
+      document.getElementById('voto-rispetto').innerText=mr?mr+'/5':'N/D';
+      document.getElementById('voto-alloggio').innerText=ma?ma+'/5':'N/D';
+      document.getElementById('voto-vitto').innerText=mv?mv+'/5':'N/D';
+
+      // Media generale
+      const vals=[mp,mr].map(v=>parseFloat(v)).filter(v=>!isNaN(v));
+      const mediaGen=vals.length?(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1):null;
+      const elMedia=document.getElementById('media-generale');
+      if(mediaGen){
+        elMedia.innerText=mediaGen;
+        elMedia.className='score-big '+(mediaGen>=4?'score-verde':mediaGen>=3?'score-giallo':'score-rosso');
+      }
+
+      document.getElementById('tot-recensioni').innerText=`su ${recs.length} esperienza${recs.length===1?'':'e'} verificata${recs.length===1?'':'e'}`;
+      document.getElementById('hero-sub').innerText='Valle d\'Aosta · Hospitality';
+
+      // Gestione operativa
+      document.getElementById('info-gestione').innerHTML=`
+        <div class="ops-item"><span class="ops-item-label">Puntualità Pagamenti</span><span class="ops-item-val">${calcolaPrevalenza('PAGA_PUNTUALITA')}</span></div>
+        <div class="ops-item"><span class="ops-item-label">Straordinari</span><span class="ops-item-val">${calcolaPrevalenza('STRAORDINARI')}</span></div>
+        <div class="ops-item"><span class="ops-item-label">Gestione Mance</span><span class="ops-item-val">${calcolaPrevalenza('MANCE')}</span></div>
+        <div class="ops-item"><span class="ops-item-label">Giorno di Riposo</span><span class="ops-item-val">${calcolaPrevalenza('RIPOSO')}</span></div>
+      `;
     }
-}
 
-// Chiama la funzione subito
-verificaPermessiAccesso();
-        const SUPABASE_URL = "https://maeoqoxzjzusjwrdrkbd.supabase.co";
-        const SUPABASE_KEY = "sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX"; 
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    async function aggiornaNavbar(){
+      const nav=document.getElementById('nav-elements');
+      const{data:{user}}=await supabaseClient.auth.getUser();
+      if(!user){
+        nav.innerHTML=`<a href="login.html" style="color:var(--oro-chiaro);">Accedi</a>`;
+        return;
+      }
+      const{data:azienda}=await supabaseClient.from('profili_aziende').select('id').eq('id',user.id).maybeSingle();
+      nav.innerHTML=`
+        <a href="esplora-aziende.html">Esplora</a>
+        <a href="${azienda?'dashboard-azienda.html':'dashboard-lavoratore.html'}">👤 Area Personale</a>
+        <a onclick="logout()" class="nav-logout">Esci</a>
+      `;
+    }
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const nomeAzienda = urlParams.get('nome');
+    async function logout(){
+      await supabaseClient.auth.signOut();
+      window.location.replace('index.html');
+    }
 
-        async function caricaDettagli() {
-            if(!nomeAzienda) return;
-            document.getElementById('nome-hotel').innerText = nomeAzienda;
-
-            // 1. CONTROLLO PERMESSI
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (user) {
-                const { data: profiloLoggato } = await supabaseClient
-                    .from('profili_aziende')
-                    .select('is_premium')
-                    .eq('id', user.id)
-                    .maybeSingle();
-                
-                if (profiloLoggato && profiloLoggato.is_premium === false) {
-                    document.getElementById('contenuto-protetto').classList.add('blur-lock');
-                    document.getElementById('premium-overlay').style.display = 'flex';
-                } else {
-                    document.getElementById('contenuto-protetto').classList.remove('blur-lock');
-                    document.getElementById('premium-overlay').style.display = 'none';
-                }
-            }
-
-            // 2. RECUPERO DATI RECENSIONI (MODIFICATA CON % PER TROVARE TUTTO)
-            const nomeRicerca = nomeAzienda.trim();
-            
-            const { data: recs, error } = await supabaseClient
-                .from('RECENSIONI')
-                .select('*')
-                // Usiamo % prima e dopo per trovare il nome anche se ci sono spazi extra nel DB
-                .ilike('AZIENDA', `%${nomeRicerca}%`) 
-                .eq('VERIFICATA', true);
-            
-            // --- SENSORI DI DEBUG (Controlla la console F12) ---
-            console.log("Azienda cercata:", nomeRicerca);
-            console.log("Recensioni verificate trovate:", recs ? recs.length : 0);
-            if(recs) console.log("Dettaglio recs:", recs);
-
-            if (error || !recs || recs.length === 0) {
-                document.getElementById('tot-recensioni').innerText = "Nessuna recensione verificata disponibile.";
-                document.getElementById('media-generale').innerText = "--";
-                return;
-            }
-
-            // FUNZIONI CALCOLO (Migliorate per gestire i numeri correttamente)
-            const calcolaMedia = (col) => {
-                const validi = recs.map(r => parseFloat(r[col])).filter(v => !isNaN(v));
-                if (validi.length === 0) return "N/D";
-                const somma = validi.reduce((a, b) => a + b, 0);
-                return (somma / validi.length).toFixed(1);
-            };
-
-            const calcolaPrevalenza = (col) => {
-                const conteggio = {};
-                recs.forEach(r => { 
-                    const val = r[col] ? r[col].toString().trim() : null;
-                    if(val) conteggio[val] = (conteggio[val] || 0) + 1; 
-                });
-                const chiavi = Object.keys(conteggio);
-                return chiavi.length ? chiavi.reduce((a, b) => conteggio[a] > conteggio[b] ? a : b) : "N/D";
-            };
-
-            // RIEMPIMENTO DATI
-            const mp = calcolaMedia('VOTO_PAGA');
-            const mr = calcolaMedia('RISPETTO_TITOLARE');
-            const ma = calcolaMedia('QUALITA_ALLOGGIO');
-            const mv = calcolaMedia('QUALITA_VITTO');
-
-            document.getElementById('voto-paga').innerText = mp !== "N/D" ? mp + "/5" : mp;
-            document.getElementById('voto-rispetto').innerText = mr !== "N/D" ? mr + "/5" : mr;
-            document.getElementById('voto-alloggio').innerText = ma !== "N/D" ? ma + "/5" : ma;
-            document.getElementById('voto-vitto').innerText = mv !== "N/D" ? mv + "/5" : mv;
-
-            // Media Generale
-            const numPaga = parseFloat(mp) || 0;
-            const numRisp = parseFloat(mr) || 0;
-            let mediaGen = 0;
-            
-            if(numPaga > 0 && numRisp > 0) mediaGen = ((numPaga + numRisp) / 2).toFixed(1);
-            else mediaGen = Math.max(numPaga, numRisp).toFixed(1);
-
-            const mediaElem = document.getElementById('media-generale');
-            mediaElem.innerText = mediaGen > 0 ? mediaGen : "--";
-            mediaElem.style.color = mediaGen >= 4 ? "var(--verde)" : (mediaGen >= 3 ? "var(--giallo)" : "var(--rosso)");
-
-            document.getElementById('tot-recensioni').innerText = `Analisi basata su ${recs.length} esperienze verificate`;
-
-            document.getElementById('info-gestione').innerHTML = `
-                <div class="info-item"><b>Puntualità Pagamenti</b> <span class="info-val">${calcolaPrevalenza('PAGA_PUNTUALITA')}</span></div>
-                <div class="info-item"><b>Straordinari</b> <span class="info-val">${calcolaPrevalenza('STRAORDINARI')}</span></div>
-                <div class="info-item"><b>Gestione Mance</b> <span class="info-val">${calcolaPrevalenza('MANCE')}</span></div>
-                <div class="info-item"><b>Giorno di Riposo</b> <span class="info-val">${calcolaPrevalenza('RIPOSO')}</span></div>
-            `;
-        }
-
-        async function aggiornaNavbar() {
-            const navElements = document.getElementById('nav-elements');
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (!user) {
-                navElements.innerHTML = `<a href="login.html" style="color:var(--oro);">Accedi</a>`;
-                return;
-            }
-            const { data: azienda } = await supabaseClient.from('profili_aziende').select('id').eq('id', user.id).maybeSingle();
-            navElements.innerHTML = `
-                <a href="esplora-aziende.html">Esplora</a>
-                <a href="${azienda ? 'dashboard-azienda.html' : 'dashboard-lavoratore.html'}" style="font-weight:bold;">👤 Area Personale</a>
-                <a onclick="logout()" style="cursor:pointer; color:var(--rosso); margin-left:15px;">Esci</a>
-            `;
-        }
-
-        async function logout() { await supabaseClient.auth.signOut(); window.location.replace('index.html'); }
-
-        aggiornaNavbar();
-        caricaDettagli();
-    </script>
+    aggiornaNavbar();
+    caricaDettagli();
+  </script>
 </body>
 </html>

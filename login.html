@@ -1,198 +1,490 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2c3e50">
-<link rel="apple-touch-icon" href="icona-192.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accedi — StaffAlpine</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --verde:         #2d6a4f;
+      --verde-chiaro:  #52b788;
+      --verde-accento: #74c69d;
+      --oro:           #c9a84c;
+      --oro-chiaro:    #e9c46a;
+      --scuro:         #1a2e1a;
+      --bianco:        #fafaf8;
+    }
 
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js')
-      .then(() => console.log("PWA StaffAlpine Attiva!"))
-      .catch(err => console.log("Errore PWA:", err));
-  }
-</script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StaffAlpine - Login Sicuro</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        /* RESET E BASE */
-        body, html { height: 100%; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background-color: #1a2a3a; overflow: hidden; }
-        .bg-image { background-image: url('sfondo.jpg'); background-position: center; background-repeat: no-repeat; background-size: cover; height: 100vh; width: 100vw; position: fixed; top: 0; left: 0; z-index: -2; filter: brightness(0.5); }
-        .bg-overlay { height: 100vh; width: 100vw; position: fixed; top: 0; left: 0; z-index: -1; background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.6)); }
-        nav { background: rgba(44, 62, 80, 0.8); padding: 15px; text-align: center; position: fixed; top: 0; width: 100%; z-index: 1000; backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.1); }
-        nav a { color: white; margin: 0 20px; text-decoration: none; font-weight: 600; }
-        .wrapper { height: 100vh; display: flex; justify-content: center; align-items: center; }
-        .login-card { background: rgba(255, 255, 255, 0.1); padding: 45px; border-radius: 24px; backdrop-filter: blur(18px); border: 1px solid rgba(255, 255, 255, 0.2); text-align: center; max-width: 400px; width: 90%; color: white; }
-        h1 { margin: 0 0 10px 0; font-size: 2.5rem; font-weight: 800; }
-        input { width: 100%; padding: 15px; margin-bottom: 18px; border-radius: 12px; border: none; font-size: 16px; }
-        button { width: 100%; padding: 16px; background: #27ae60; color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer; }
-        button:hover { background: #2ecc71; transform: translateY(-2px); }
-        .secondary-link { margin-top: 15px; font-size: 13px; cursor: pointer; text-decoration: underline; opacity: 0.8; }
-    </style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body, html {
+      height: 100%;
+      font-family: 'DM Sans', sans-serif;
+      overflow: hidden;
+    }
+
+    /* ── BACKGROUND ── */
+    .bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-image:
+        linear-gradient(135deg, rgba(10,25,10,0.75) 0%, rgba(26,46,26,0.65) 50%, rgba(10,20,10,0.85) 100%),
+        url('sfondo-home.jpg');
+      background-size: cover;
+      background-position: center 35%;
+      animation: slowDrift 25s ease-in-out infinite alternate;
+    }
+    @keyframes slowDrift {
+      from { background-position: center 35%; }
+      to   { background-position: center 42%; }
+    }
+
+    /* Grain overlay */
+    .bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 20px 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      color: var(--oro-chiaro);
+      text-decoration: none;
+      letter-spacing: 1px;
+    }
+    .nav-back {
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.3s;
+    }
+    .nav-back:hover { color: white; }
+
+    /* ── LAYOUT ── */
+    .page {
+      position: relative;
+      z-index: 10;
+      height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* ── LATO SINISTRO — testo ── */
+    .left-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 120px 8% 60px;
+      color: white;
+      opacity: 0;
+      animation: fadeLeft 0.8s ease 0.2s forwards;
+    }
+    .left-tag {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--verde-accento);
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .left-panel h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 4vw, 4rem);
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+    .left-panel h1 em { color: var(--oro-chiaro); font-style: normal; }
+    .left-panel p {
+      color: rgba(255,255,255,0.6);
+      font-size: 15px;
+      line-height: 1.7;
+      max-width: 340px;
+      margin-bottom: 40px;
+    }
+
+    .trust-items { display: flex; flex-direction: column; gap: 14px; }
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: rgba(255,255,255,0.7);
+      font-size: 13px;
+    }
+    .trust-dot {
+      width: 8px; height: 8px;
+      background: var(--verde-chiaro);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ── LATO DESTRO — form ── */
+    .right-panel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 100px 8% 60px;
+      opacity: 0;
+      animation: fadeRight 0.8s ease 0.4s forwards;
+    }
+
+    .login-card {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 24px;
+      padding: 48px 44px;
+      width: 100%;
+      max-width: 420px;
+      color: white;
+    }
+
+    /* Indicatore step */
+    .step-indicator {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 36px;
+      align-items: center;
+    }
+    .step-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      transition: all 0.4s ease;
+    }
+    .step-dot.active {
+      background: var(--verde-chiaro);
+      width: 24px;
+      border-radius: 4px;
+    }
+
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.9rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+    .card-title em { color: var(--oro-chiaro); font-style: normal; }
+
+    #instruction-text {
+      color: rgba(255,255,255,0.55);
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    /* Input */
+    .input-wrap {
+      position: relative;
+      margin-bottom: 16px;
+    }
+    .input-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 16px;
+      opacity: 0.5;
+    }
+    input {
+      width: 100%;
+      padding: 15px 15px 15px 44px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      color: white;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      transition: all 0.3s;
+      outline: none;
+    }
+    input::placeholder { color: rgba(255,255,255,0.35); }
+    input:focus {
+      border-color: var(--verde-chiaro);
+      background: rgba(82,183,136,0.08);
+      box-shadow: 0 0 0 3px rgba(82,183,136,0.15);
+    }
+
+    /* OTP input speciale */
+    #otp-code {
+      text-align: center;
+      font-size: 28px;
+      letter-spacing: 10px;
+      padding: 18px 15px;
+      font-weight: 700;
+      font-family: 'Playfair Display', serif;
+    }
+
+    /* Bottone */
+    .btn-login {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--verde) 0%, var(--verde-chiaro) 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-login::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--verde-chiaro), var(--verde-accento));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .btn-login:hover::after { opacity: 1; }
+    .btn-login:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(82,183,136,0.35); }
+    .btn-login span { position: relative; z-index: 1; }
+    .btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .secondary-link {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.45);
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    .secondary-link:hover { color: rgba(255,255,255,0.8); }
+    .secondary-link span { text-decoration: underline; }
+
+    .card-footer {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      text-align: center;
+      font-size: 11px;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.5px;
+    }
+
+    /* Role badge — mostra se arrivato da business */
+    .role-badge {
+      display: none;
+      background: rgba(201,168,76,0.15);
+      border: 1px solid rgba(201,168,76,0.3);
+      color: var(--oro-chiaro);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    /* ── ANIMAZIONI ── */
+    @keyframes fadeLeft {
+      from { opacity: 0; transform: translateX(-30px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes fadeRight {
+      from { opacity: 0; transform: translateX(30px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      .page { grid-template-columns: 1fr; }
+      .left-panel { display: none; }
+      .right-panel {
+        padding: 100px 6% 40px;
+        align-items: flex-start;
+      }
+      .login-card { padding: 36px 28px; }
+    }
+  </style>
 </head>
 <body>
 
-    <div class="bg-image"></div>
-    <div class="bg-overlay"></div>
+  <div class="bg"></div>
 
-    <nav id="main-nav">
-        <a href="index.html">Torna alla Home</a> 
-        <a href="esplora-aziende.html">Esplora Hotel</a>
-        <span id="admin-link-container"></span>
-    </nav>
+  <nav>
+    <a href="index.html" class="nav-logo">StaffAlpine</a>
+    <a href="index.html" class="nav-back">← Torna alla Home</a>
+  </nav>
 
-    <div class="wrapper">
-        <div class="login-card">
-            <h1>StaffAlpine</h1>
-            <p id="instruction-text">Inserisci l'email per accedere al tuo profilo professionale o aziendale.</p>
-            
-            <div id="step-1">
-                <input type="email" id="email" placeholder="Indirizzo Email">
-                <button onclick="inviaCodice()">Invia Codice Accesso</button>
-            </div>
+  <div class="page">
 
-            <div id="step-2" style="display:none;">
-                <input type="text" id="otp-code" placeholder="Codice OTP" maxlength="6" style="text-align:center; font-size: 24px; letter-spacing: 4px;">
-                <button onclick="verificaCodice()">Verifica e Accedi</button>
-                <div class="secondary-link" onclick="location.reload()">Torna indietro</div>
-            </div>
-            
-            <div style="margin-top:25px; font-size: 11px; opacity: 0.6;">
-                © 2026 StaffAlpine - Sicuro, Anonimo, Trasparente
-            </div>
-        </div>
+    <!-- SINISTRA -->
+    <div class="left-panel">
+      <p class="left-tag">⛰️ Valle d'Aosta · Hospitality</p>
+      <h1>Bentornato<br>su <em>StaffAlpine</em></h1>
+      <p>Accedi al tuo profilo per consultare recensioni, gestire la tua esperienza e contribuire alla community.</p>
+      <div class="trust-items">
+        <div class="trust-item"><div class="trust-dot"></div>Accesso sicuro senza password</div>
+        <div class="trust-item"><div class="trust-dot"></div>Identità protetta e anonima</div>
+        <div class="trust-item"><div class="trust-dot"></div>Dati verificati dalla community</div>
+        <div class="trust-item"><div class="trust-dot"></div>100% dedicato alla Valle d'Aosta</div>
+      </div>
     </div>
 
-    <script>
-        // 1. CONFIGURAZIONE SUPABASE (Sempre per prima!)
-        const SUPABASE_URL = "https://maeoqoxzjzusjwrdrkbd.supabase.co"; 
-        const SUPABASE_KEY = "sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX";
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    <!-- DESTRA -->
+    <div class="right-panel">
+      <div class="login-card">
 
-        // 2. FUNZIONI DI ACCESSO
-       async function inviaCodice() {
-    const email = document.getElementById('email').value;
-    const btn = document.querySelector('#step-1 button');
-    
-    if(!email) return alert("Inserisci un indirizzo email!");
+        <div class="step-indicator">
+          <div class="step-dot active" id="dot-1"></div>
+          <div class="step-dot" id="dot-2"></div>
+        </div>
 
-    // 1. AZIONE IMMEDIATA: Cambia l'interfaccia subito
-    document.getElementById('step-1').style.display = 'none';
-    document.getElementById('step-2').style.display = 'block';
-    document.getElementById('instruction-text').innerText = "Abbiamo inviato un codice a " + email;
-    
-    // Metti il focus automatico sul campo OTP per far scrivere subito l'utente
-    document.getElementById('otp-code').focus();
+        <div id="role-badge" class="role-badge">💼 Stai accedendo come Azienda</div>
 
-    // 2. AZIONE IN BACKGROUND: Chiama Supabase
-    const { error } = await supabaseClient.auth.signInWithOtp({
-        email: email,
+        <h2 class="card-title">Accedi con<br><em>la tua email</em></h2>
+        <p id="instruction-text">Nessuna password. Ti mandiamo un codice sicuro via email.</p>
+
+        <!-- STEP 1 -->
+        <div id="step-1">
+          <div class="input-wrap">
+            <span class="input-icon">✉️</span>
+            <input type="email" id="email" placeholder="la-tua@email.com" autocomplete="email">
+          </div>
+          <button class="btn-login" onclick="inviaCodice()">
+            <span>Invia Codice Accesso →</span>
+          </button>
+        </div>
+
+        <!-- STEP 2 -->
+        <div id="step-2" style="display:none;">
+          <input type="text" id="otp-code" placeholder="· · · · · ·" maxlength="6" autocomplete="one-time-code">
+          <button class="btn-login" onclick="verificaCodice()" style="margin-top:16px;">
+            <span>Verifica e Accedi →</span>
+          </button>
+          <div class="secondary-link" onclick="location.reload()"><span>← Cambia email</span></div>
+        </div>
+
+        <div class="card-footer">
+          © 2026 StaffAlpine · Sicuro · Anonimo · Trasparente
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://maeoqoxzjzusjwrdrkbd.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX";
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Mostra badge se arriva da Area Business
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('role') === 'business') {
+      document.getElementById('role-badge').style.display = 'block';
+    }
+
+    async function inviaCodice() {
+      const email = document.getElementById('email').value;
+      const btn = document.querySelector('#step-1 .btn-login');
+      if (!email) return alert("Inserisci un indirizzo email!");
+
+      btn.disabled = true;
+      btn.querySelector('span').innerText = 'Invio in corso...';
+
+      document.getElementById('step-1').style.display = 'none';
+      document.getElementById('step-2').style.display = 'block';
+      document.getElementById('instruction-text').innerText = `Abbiamo inviato un codice a ${email}. Controlla la posta.`;
+      document.getElementById('dot-1').classList.remove('active');
+      document.getElementById('dot-2').classList.add('active');
+      document.getElementById('otp-code').focus();
+
+      const { error } = await supabaseClient.auth.signInWithOtp({
+        email,
         options: { shouldCreateUser: true }
-    });
+      });
 
-    if (error) {
-        // Se c'è un errore, torna indietro e avvisa l'utente
+      if (error) {
         alert("Errore nell'invio: " + error.message);
         document.getElementById('step-1').style.display = 'block';
         document.getElementById('step-2').style.display = 'none';
         document.getElementById('instruction-text').innerText = "Inserisci l'email per accedere al tuo profilo.";
+        document.getElementById('dot-1').classList.add('active');
+        document.getElementById('dot-2').classList.remove('active');
+        btn.disabled = false;
+        btn.querySelector('span').innerText = 'Invia Codice Accesso →';
+      }
     }
-}
 
-       async function verificaCodice() {
-    const email = document.getElementById('email').value;
-    const token = document.getElementById('otp-code').value;
+    async function verificaCodice() {
+      const email = document.getElementById('email').value;
+      const token = document.getElementById('otp-code').value;
+      const btn = document.querySelector('#step-2 .btn-login');
 
-    const { data, error } = await supabaseClient.auth.verifyOtp({
-        email: email,
-        token: token,
-        type: 'email'
-    });
+      btn.disabled = true;
+      btn.querySelector('span').innerText = 'Verifica in corso...';
 
-    if (error) {
+      const { data, error } = await supabaseClient.auth.verifyOtp({ email, token, type: 'email' });
+
+      if (error) {
         alert("Codice errato o scaduto.");
-    } else if (data.user) {
-        // Usiamo solo smistaUtente: gestisce lei Admin, Aziende e Lavoratori
+        btn.disabled = false;
+        btn.querySelector('span').innerText = 'Verifica e Accedi →';
+      } else if (data.user) {
         smistaUtente(data.user);
-    }
-}
-
-// Crea questa funzione separata per i lavoratori per non fare confusione
-async function controlloLavoratore(user) {
-    const { data: lavoratore } = await supabaseClient
-        .from('esperienze_lavoratori')
-        .select('nome_reale')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-    if (lavoratore && lavoratore.nome_reale) {
-        window.location.href = 'dashboard-lavoratore.html';
-    } else {
-        window.location.href = 'index.html';
-    }
-}
-
-       async function smistaUtente(user) {
-    console.log("Inizio smistamento per:", user.email);
-
-    // 1. PRIORITÀ ASSOLUTA: ADMIN
-    if (user.email === 'mititelu.alexandra@tiscali.it') {
-        console.log("Riconosciuto come Admin");
-        window.location.href = 'admin.html';
-        return;
+      }
     }
 
-    // 2. CONTROLLO AZIENDA
-    const { data: azienda } = await supabaseClient
-        .from('profili_aziende')
-        .select('id')
-        .eq('id', user.id)
-        .maybeSingle();
+    async function smistaUtente(user) {
+      if (user.email === 'mititelu.alexandra@tiscali.it') {
+        window.location.href = 'admin.html'; return;
+      }
+      const { data: azienda } = await supabaseClient.from('profili_aziende').select('id').eq('id', user.id).maybeSingle();
+      if (azienda) { window.location.href = 'dashboard-azienda.html'; return; }
 
-    if (azienda) {
-        console.log("Riconosciuto come Azienda");
-        window.location.href = 'dashboard-azienda.html';
-        return;
-    }
+      const { data: lavoratore } = await supabaseClient.from('esperienze_lavoratori').select('nome_reale').eq('user_id', user.id).maybeSingle();
+      if (lavoratore && lavoratore.nome_reale) { window.location.href = 'dashboard-lavoratore.html'; return; }
 
-    // 3. CONTROLLO LAVORATORE ESISTENTE
-    const { data: lavoratore } = await supabaseClient
-        .from('esperienze_lavoratori')
-        .select('nome_reale')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-    if (lavoratore && lavoratore.nome_reale) {
-        console.log("Riconosciuto come Lavoratore esistente");
-        window.location.href = 'dashboard-lavoratore.html';
-        return;
-    }
-
-    // 4. NUOVO UTENTE (Se non è admin, non è azienda e non ha profilo lavoratore)
-    // Se è arrivato qui dal tasto "Area Business", lo mandiamo a registrarsi come azienda
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('role') === 'business') {
-        console.log("Nuovo utente Business -> Registrazione");
+      if (urlParams.get('role') === 'business') {
         window.location.href = 'registrazione_aziende.html';
-    } else {
-        console.log("Nuovo utente Lavoratore -> Index");
+      } else {
         window.location.href = 'recensione.html';
+      }
     }
-}
 
-        async function mostraTastoAdminSeAutorizzato() {
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (user && user.email === 'mititelu.alexandra@tiscali.it') {
-                const container = document.getElementById('admin-link-container');
-                if (container) container.innerHTML = `<a href="admin.html" style="color: #e74c3c; border: 1px solid #e74c3c; padding: 5px 10px; border-radius: 5px;">Admin 🛡️</a>`;
-            }
-        }
+    async function mostraTastoAdminSeAutorizzato() {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (user && user.email === 'mititelu.alexandra@tiscali.it') {
+        const container = document.getElementById('admin-link-container');
+        if (container) container.innerHTML = `<a href="admin.html" style="color:#e74c3c;">Admin 🛡️</a>`;
+      }
+    }
+    mostraTastoAdminSeAutorizzato();
 
-        // 3. ESECUZIONE AL CARICAMENTO
-        // NOTA: Ho tolto checkSession() così non ti sbatte fuori dalla pagina se sei già loggata
-        mostraTastoAdminSeAutorizzato();
-    </script>
+    // Auto-submit OTP quando raggiunge 6 cifre
+    document.getElementById('otp-code').addEventListener('input', function() {
+      if (this.value.length === 6) verificaCodice();
+    });
+  </script>
 </body>
 </html>
