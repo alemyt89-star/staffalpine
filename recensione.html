@@ -295,19 +295,54 @@
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">Disponibilità</label>
+            <label class="form-label">Mansione Principale</label>
+            <input type="text" id="mansione" class="form-control" placeholder="es. Capo Partita, Sommelier...">
+          </div>
+        </div>
+      </div>
+
+      <!-- DISPONIBILITÀ -->
+      <div class="form-card">
+        <div class="form-card-title">📅 Disponibilità</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Tipo contratto</label>
             <select id="tipo_disponibilita" class="form-control">
               <option value="Stagionale Invernale">Stagionale Invernale</option>
               <option value="Stagionale Estiva">Stagionale Estiva</option>
               <option value="Extra">Extra / Weekend</option>
-              <option value="Fisso">Fisso</option>
+              <option value="Fisso">Fisso tutto l'anno</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Disponibile dal</label>
+            <input type="date" id="disponibile_dal" class="form-control">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Località preferita</label>
+            <select id="localita_pref" class="form-control">
+              <option value="Alta Valle">Alta Valle</option>
+              <option value="Aosta">Aosta e dintorni</option>
+              <option value="Bassa Valle">Bassa Valle</option>
+              <option value="Ayas-Gressoney">Val d'Ayas / Gressoney</option>
+              <option value="Tutta la Valle">Tutta la Valle</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Alloggio</label>
+            <select id="vitto_alloggio_check" class="form-control">
+              <option value="false">Non richiedo alloggio</option>
+              <option value="true">Richiedo vitto/alloggio</option>
             </select>
           </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Mansione Principale</label>
-          <input type="text" id="mansione" class="form-control" placeholder="es. Capo Partita, Sommelier, Receptionist...">
-        </div>
+      </div>
+
+      <!-- LINGUE -->
+      <div class="form-card">
+        <div class="form-card-title">🗣️ Lingue Parlate</div>
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Francese</label>
@@ -324,30 +359,101 @@
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Località preferita</label>
-            <select id="localita_pref" class="form-control">
-              <option value="Alta Valle">Alta Valle</option>
-              <option value="Aosta">Aosta e dintorni</option>
-              <option value="Bassa Valle">Bassa Valle</option>
-              <option value="Ayas-Gressoney">Val d'Ayas / Gressoney</option>
+            <label class="form-label">Tedesco</label>
+            <select id="lingua_de" class="form-control">
+              <option value="Nessuno">Nessuno</option><option value="Base">Base</option><option value="Buono">Buono</option><option value="Ottimo">Ottimo</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">Alloggio</label>
-            <select id="vitto_alloggio_check" class="form-control">
-              <option value="false">Non richiedo alloggio</option>
-              <option value="true">Richiedo vitto/alloggio</option>
+            <label class="form-label">Spagnolo</label>
+            <select id="lingua_es" class="form-control">
+              <option value="Nessuno">Nessuno</option><option value="Base">Base</option><option value="Buono">Buono</option><option value="Ottimo">Ottimo</option>
             </select>
           </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Certificazioni</label>
-          <div class="cert-grid">
-            <label class="cert-label"><input type="checkbox" id="haccp"> HACCP</label>
-            <label class="cert-label"><input type="checkbox" id="sicurezza"> Sicurezza</label>
-            <label class="cert-label"><input type="checkbox" id="sommelier"> Sommelier</label>
-            <label class="cert-label"><input type="checkbox" id="barman"> Barman Cert.</label>
+        <!-- LINGUE AGGIUNTIVE -->
+        <div id="lingue-extra"></div>
+        <button type="button" class="btn-secondary" style="margin-top:10px;padding:8px 16px;font-size:13px;" onclick="aggiungiLingua()">+ Aggiungi lingua</button>
+      </div>
+
+      <!-- STORICO ESPERIENZE -->
+      <div class="form-card">
+        <div class="form-card-title">📋 Storico Esperienze (ultime 2)</div>
+        <p style="font-size:12px;color:var(--pietra);margin-bottom:16px;">Visibile alle aziende in forma anonima — senza il tuo nome.</p>
+
+        <!-- Esperienza 1 -->
+        <div style="background:var(--grigio);border-radius:10px;padding:14px;margin-bottom:12px;">
+          <div style="font-size:11px;font-weight:700;color:var(--pietra);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Esperienza 1</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Mansione</label>
+              <input type="text" id="exp1_mansione" class="form-control" placeholder="es. Cameriere, Chef de Rang...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Zona</label>
+              <select id="exp1_zona" class="form-control">
+                <option value="">— Seleziona —</option>
+                <option value="Alta Valle">Alta Valle</option>
+                <option value="Aosta">Aosta e dintorni</option>
+                <option value="Bassa Valle">Bassa Valle</option>
+                <option value="Ayas-Gressoney">Val d'Ayas / Gressoney</option>
+                <option value="Fuori Valle d'Aosta">Fuori Valle d'Aosta</option>
+              </select>
+            </div>
           </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Da</label>
+              <input type="month" id="exp1_dal" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label">A</label>
+              <input type="month" id="exp1_al" class="form-control">
+            </div>
+          </div>
+        </div>
+
+        <!-- Esperienza 2 -->
+        <div style="background:var(--grigio);border-radius:10px;padding:14px;">
+          <div style="font-size:11px;font-weight:700;color:var(--pietra);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Esperienza 2</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Mansione</label>
+              <input type="text" id="exp2_mansione" class="form-control" placeholder="es. Barista, Receptionist...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Zona</label>
+              <select id="exp2_zona" class="form-control">
+                <option value="">— Seleziona —</option>
+                <option value="Alta Valle">Alta Valle</option>
+                <option value="Aosta">Aosta e dintorni</option>
+                <option value="Bassa Valle">Bassa Valle</option>
+                <option value="Ayas-Gressoney">Val d'Ayas / Gressoney</option>
+                <option value="Fuori Valle d'Aosta">Fuori Valle d'Aosta</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Da</label>
+              <input type="month" id="exp2_dal" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label">A</label>
+              <input type="month" id="exp2_al" class="form-control">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CERTIFICAZIONI -->
+      <div class="form-card">
+        <div class="form-card-title">🏅 Certificazioni</div>
+        <div class="cert-grid">
+          <label class="cert-label"><input type="checkbox" id="haccp"> HACCP</label>
+          <label class="cert-label"><input type="checkbox" id="sicurezza"> Sicurezza</label>
+          <label class="cert-label"><input type="checkbox" id="sommelier"> Sommelier</label>
+          <label class="cert-label"><input type="checkbox" id="barman"> Barman Cert.</label>
         </div>
       </div>
 
@@ -513,9 +619,59 @@
       }
     }
 
+    let linguaCount = 0;
+    const LINGUE_DISPONIBILI = ['Arabo','Cinese','Giapponese','Olandese','Polacco','Portoghese','Rumeno','Russo','Turco','Altro'];
+
+    function aggiungiLingua(){
+      linguaCount++;
+      const id = `lingua_extra_${linguaCount}`;
+      const idLivello = `lingua_extra_livello_${linguaCount}`;
+      const div = document.createElement('div');
+      div.className = 'form-row';
+      div.id = `lingua_extra_row_${linguaCount}`;
+      div.style.marginTop = '10px';
+      div.innerHTML = `
+        <div class="form-group">
+          <label class="form-label">Lingua</label>
+          <select id="${id}" class="form-control">
+            <option value="">— Seleziona —</option>
+            ${LINGUE_DISPONIBILI.map(l=>`<option value="${l}">${l}</option>`).join('')}
+            <option value="__custom__">Altra (scrivi)</option>
+          </select>
+          <input type="text" id="${id}_custom" class="form-control" placeholder="Scrivi la lingua..." style="display:none;margin-top:6px;" oninput="this.value=this.value">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Livello</label>
+          <select id="${idLivello}" class="form-control">
+            <option value="Base">Base</option><option value="Buono">Buono</option><option value="Ottimo">Ottimo</option>
+          </select>
+        </div>
+        <button type="button" onclick="document.getElementById('lingua_extra_row_${linguaCount}').remove()" style="background:none;border:none;cursor:pointer;color:var(--rosso);font-size:18px;align-self:flex-end;padding-bottom:8px;">✕</button>
+      `;
+      // Mostra campo testo se seleziona "Altra"
+      div.querySelector(`#${id}`).addEventListener('change', function(){
+        div.querySelector(`#${id}_custom`).style.display = this.value === '__custom__' ? 'block' : 'none';
+      });
+      document.getElementById('lingue-extra').appendChild(div);
+    }
+
     async function salvaEsperienza(){
       const{data:{user}}=await supabaseClient.auth.getUser();
       if(!user)return alert("Accedi!");
+
+      // Raccoglie lingue extra
+      const lingueExtra = [];
+      for(let i=1; i<=linguaCount; i++){
+        const el = document.getElementById(`lingua_extra_${i}`);
+        if(!el)continue;
+        const livEl = document.getElementById(`lingua_extra_livello_${i}`);
+        let nome = el.value;
+        if(nome === '__custom__'){
+          nome = document.getElementById(`lingua_extra_${i}_custom`)?.value?.trim() || '';
+        }
+        if(nome) lingueExtra.push({ lingua: nome, livello: livEl?.value || 'Base' });
+      }
+
       const dati={
         user_id:user.id,
         nome_reale:document.getElementById('nome_lav').value,
@@ -525,13 +681,25 @@
         mansione_principale:document.getElementById('mansione').value,
         lingua_francese:document.getElementById('lingua_fr').value,
         lingua_inglese:document.getElementById('lingua_en').value,
+        lingua_tedesco:document.getElementById('lingua_de').value,
+        lingua_spagnolo:document.getElementById('lingua_es').value,
+        lingue_extra: lingueExtra.length > 0 ? JSON.stringify(lingueExtra) : null,
         tipo_disponibilita:document.getElementById('tipo_disponibilita').value,
+        disponibile_dal:document.getElementById('disponibile_dal').value||null,
         bisogno_vitto_alloggio:document.getElementById('vitto_alloggio_check').value==='true',
         localita_preferita:document.getElementById('localita_pref').value,
         cert_haccp:document.getElementById('haccp').checked,
         cert_sicurezza:document.getElementById('sicurezza').checked,
         cert_sommelier:document.getElementById('sommelier').checked,
-        cert_barman:document.getElementById('barman').checked
+        cert_barman:document.getElementById('barman').checked,
+        exp1_mansione:document.getElementById('exp1_mansione').value||null,
+        exp1_zona:document.getElementById('exp1_zona').value||null,
+        exp1_dal:document.getElementById('exp1_dal').value||null,
+        exp1_al:document.getElementById('exp1_al').value||null,
+        exp2_mansione:document.getElementById('exp2_mansione').value||null,
+        exp2_zona:document.getElementById('exp2_zona').value||null,
+        exp2_dal:document.getElementById('exp2_dal').value||null,
+        exp2_al:document.getElementById('exp2_al').value||null,
       };
       const{error}=await supabaseClient.from('esperienze_lavoratori').upsert(dati);
       if(error)alert("Errore: "+error.message);
