@@ -10,34 +10,39 @@ module.exports = async function handler(req, res) {
     const supabaseUrl = 'https://maeoqoxzjzusjwrdrkbd.supabase.co';
     const supabaseKey = 'sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX';
 
-    // 1. Trova offerte attive con ruolo simile alla mansione del lavoratore
+    // 1. Recupera TUTTE le offerte attive
     const offerteRes = await fetch(
-      `${supabaseUrl}/rest/v1/offerte_lavoro?ruolo=eq.${mansione}&is_attiva=eq.true&select=azienda_id,nome_azienda,ruolo`,
+      `${supabaseUrl}/rest/v1/offerte_lavoro?is_attiva=eq.true&select=azienda_id,nome_azienda,ruolo`,
       { headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` } }
     );
-    const offerte = await offerteRes.json();
+    const tutteOfferte = await offerteRes.json();
+    console.log(`Tutte le offerte attive: ${tutteOfferte?.length || 0}`);
 
-    console.log(`Mansione: ${mansione}, Offerte trovate: ${offerte?.length || 0}`);
+    // 2. Filtra in JavaScript — case insensitive
+    const mansioneLC = mansione.toLowerCase().trim();
+    const offerte = (tutteOfferte || []).filter(o =>
+      o.ruolo && o.ruolo.toLowerCase().trim().includes(mansioneLC)
+    );
+    console.log(`Offerte compatibili con "${mansione}": ${offerte.length}`);
 
-    if (!offerte || offerte.length === 0) {
+    if (offerte.length === 0) {
       return res.status(200).json({ success: true, notifiche: 0, msg: 'Nessuna offerta compatibile' });
     }
 
-    // 2. Aziende uniche
+    // 3. Aziende uniche
     const aziendeUniche = [...new Map(offerte.map(o => [o.azienda_id, o])).values()];
 
-    // 3. Recupera email aziende da profili_aziende
+    // 4. Recupera profili aziende
     const ids = aziendeUniche.map(a => `id=eq.${a.azienda_id}`).join(',');
     const profiliRes = await fetch(
       `${supabaseUrl}/rest/v1/profili_aziende?or=(${ids})&select=id,nome_azienda,email,is_approvata`,
       { headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` } }
     );
     const profili = await profiliRes.json();
-
     console.log(`Profili trovati: ${profili?.length || 0}`);
 
-    // 4. Invia email solo alle aziende approvate con email valida
-    const aziendeDaNotificare = profili.filter(p => p.is_approvata && p.email);
+    // 5. Invia email solo alle aziende approvate con email valida
+    const aziendeDaNotificare = (profili || []).filter(p => p.is_approvata && p.email);
     console.log(`Aziende da notificare: ${aziendeDaNotificare.length}`);
 
     let inviate = 0;
@@ -84,14 +89,14 @@ module.exports = async function handler(req, res) {
         })
       });
       const emailData = await emailRes.json();
-      console.log(`Email inviata a ${azienda.email}:`, emailData);
+      console.log(`Email a ${azienda.email}:`, JSON.stringify(emailData));
       inviate++;
     }
 
     return res.status(200).json({ success: true, notifiche: inviate });
 
   } catch (error) {
-    console.error('Errore notifica lavoratore:', error);
+    console.error('Errore:', error);
     return res.status(500).json({ error: error.message });
   }
 }
