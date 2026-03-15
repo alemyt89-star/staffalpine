@@ -245,6 +245,7 @@
           <div class="form-group">
             <label class="form-label">Descrizione Offerta</label>
             <textarea id="j-desc" class="form-control" placeholder="Descrivi il ruolo, la stagione, eventuali benefit..."></textarea>
+            <p style="font-size:11px;color:var(--pietra);margin-top:6px;">ℹ️ Verrà aggiunta automaticamente la dicitura di legge sulle pari opportunità (L. 903/77, D.Lgs. 198/2006, 215/03, 216/03).</p>
           </div>
           <!-- CALENDARIO DISPONIBILITÀ -->
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
@@ -547,13 +548,17 @@
       const al=document.getElementById('j-al').value;
       const tipo=document.getElementById('j-tipo').value;
       if(!ruolo||!desc||!contatti)return alert("Compila tutti i campi!");
+
+      const DISCLAIMER="\n\n---\nL'offerta è rivolta a candidati di entrambi i sessi (L. 903/77 e D.Lgs. 198/2006) e a persone di tutte le età e nazionalità (D.Lgs. 215/03 e 216/03).";
+      const descCompleta = desc + DISCLAIMER;
+
       const{data:{user}}=await supabaseClient.auth.getUser();
       const{data:profilo}=await supabaseClient.from('profili_aziende').select('*').eq('id',user.id).maybeSingle();
       const{error}=await supabaseClient.from('offerte_lavoro').insert([{
         azienda_id:user.id,
         nome_azienda:profilo?profilo.nome_azienda:'Azienda',
         localita:profilo?profilo.zona:"Valle d'Aosta",
-        ruolo,descrizione:desc,contatti,is_attiva:true,
+        ruolo,descrizione:descCompleta,contatti,is_attiva:true,
         settore:tipo,
         periodo_dal:dal||null,
         periodo_al:al||null
