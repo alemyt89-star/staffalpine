@@ -73,17 +73,13 @@
       padding: 12px 5%;
       box-shadow: 0 2px 20px rgba(0,0,0,0.3);
     }
-    .nav-logo {
+    .nav-logo { display:flex; align-items:center; gap:10px;
       font-family: 'Playfair Display', serif;
       font-size: 24px;
       color: var(--oro-chiaro);
       text-decoration: none;
       letter-spacing: 1px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
     }
-    .nav-logo img { width: 28px; height: 28px; flex-shrink: 0; }
     .nav-logo span { color: white; font-weight: 300; font-size: 14px; display: block; letter-spacing: 3px; font-family: 'DM Sans', sans-serif; }
     .nav-links { display: flex; gap: 30px; align-items: center; }
     .nav-links a { color: rgba(255,255,255,0.8); text-decoration: none; font-size: 13px; font-weight: 500; letter-spacing: 0.5px; transition: color 0.3s; }
@@ -566,7 +562,7 @@
   <!-- NAVBAR -->
   <nav class="navbar" id="navbar">
     <a href="index.html" class="nav-logo">
-      <img src="stella-alpina.svg" alt="">
+      <img src="stella-alpina.svg" alt="" style="width:28px;height:28px;">
       <div>StaffAlpine<span>Valle d'Aosta</span></div>
     </a>
     <div class="nav-links">
@@ -723,7 +719,7 @@
       <div style="overflow-y:auto; padding:28px; flex:1; font-size:13px; line-height:1.7; color:#2c3e2d;">
 
         <h3 style="font-family:'Playfair Display',serif; color:#1a2e1a; margin-bottom:8px;">1. Trattamento dei Dati Personali (GDPR)</h3>
-        <p style="margin-bottom:16px;">StaffAlpine raccoglie e tratta i dati personali degli utenti (nome, cognome, data di nascita, indirizzo email) esclusivamente per le finalità della piattaforma: verifica dell'identità, pubblicazione di recensioni e gestione del profilo professionale. I dati sono conservati in modo sicuro su Supabase (server EU) e non vengono ceduti a terzi a scopo commerciale. Il titolare del trattamento è <b>Alexandra Mititelu</b>. L'utente può richiedere la cancellazione dei propri dati in qualsiasi momento scrivendo a <b><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="412c28352835242d346f202d2439202f2533200135283222202d286f2835">[email&#160;protected]</a></b>.</p>
+        <p style="margin-bottom:16px;">StaffAlpine raccoglie e tratta i dati personali degli utenti (nome, cognome, data di nascita, indirizzo email) esclusivamente per le finalità della piattaforma: verifica dell'identità, pubblicazione di recensioni e gestione del profilo professionale. I dati sono conservati in modo sicuro su Supabase (server EU) e non vengono ceduti a terzi a scopo commerciale. Il titolare del trattamento è <b>Alexandra Mititelu</b>. L'utente può richiedere la cancellazione dei propri dati in qualsiasi momento scrivendo a <b><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d6bbbfa2bfa2b3baa3f8b7bab3aeb7b8b2a4b796a2bfa5b5b7babff8bfa2">[email&#160;protected]</a></b>.</p>
 
         <h3 style="font-family:'Playfair Display',serif; color:#1a2e1a; margin-bottom:8px;">2. Anonimato delle Recensioni</h3>
         <p style="margin-bottom:16px;">Le recensioni pubblicate su StaffAlpine sono <b>anonime</b> nei confronti delle aziende e degli altri utenti. I dati identificativi del recensore (nome, cognome, data di nascita) sono visibili <b>esclusivamente all'amministratore</b> per la verifica della veridicità delle esperienze. L'utente garantisce che le informazioni inserite nelle recensioni sono veritiere e basate su esperienze lavorative reali. La pubblicazione di informazioni false o diffamatorie è vietata.</p>
