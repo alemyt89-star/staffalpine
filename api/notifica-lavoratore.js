@@ -12,7 +12,7 @@ module.exports = async function handler(req, res) {
 
     // 1. Trova offerte attive con ruolo simile alla mansione del lavoratore
     const offerteRes = await fetch(
-      `${supabaseUrl}/rest/v1/offerte_lavoro?ruolo=ilike.%25${encodeURIComponent(mansione)}%25&is_attiva=eq.true&select=azienda_id,nome_azienda,ruolo`,
+      `${supabaseUrl}/rest/v1/offerte_lavoro?ruolo=ilike.*${mansione}*&is_attiva=eq.true&select=azienda_id,nome_azienda,ruolo`,
       { headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` } }
     );
     const offerte = await offerteRes.json();
