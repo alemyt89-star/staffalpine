@@ -175,12 +175,25 @@
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Disponibilità</label>
+          <label class="form-label">Tipo contratto</label>
           <select id="edit-dispo" class="form-control">
             <option value="Stagionale Invernale">Stagionale Invernale</option>
             <option value="Stagionale Estiva">Stagionale Estiva</option>
             <option value="Extra">Extra / Weekend</option>
-            <option value="Fisso">Fisso</option>
+            <option value="Fisso">Fisso tutto l'anno</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Disponibile dal</label>
+          <input type="date" id="edit-disponibile-dal" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Alloggio</label>
+          <select id="edit-alloggio" class="form-control">
+            <option value="true">Richiede vitto/alloggio</option>
+            <option value="false">Indipendente</option>
           </select>
         </div>
       </div>
@@ -192,16 +205,12 @@
             <option value="Aosta">Aosta e dintorni</option>
             <option value="Bassa Valle">Bassa Valle</option>
             <option value="Ayas-Gressoney">Val d'Ayas / Gressoney</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Alloggio</label>
-          <select id="edit-alloggio" class="form-control">
-            <option value="true">Richiede vitto/alloggio</option>
-            <option value="false">Indipendente</option>
+            <option value="Tutta la Valle">Tutta la Valle</option>
           </select>
         </div>
       </div>
+      <!-- LINGUE -->
+      <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pietra);margin-bottom:8px;font-weight:600;margin-top:4px;">Lingue</div>
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Francese</label>
@@ -216,6 +225,55 @@
           </select>
         </div>
       </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Tedesco</label>
+          <select id="edit-de" class="form-control">
+            <option value="Nessuno">Nessuno</option><option value="Base">Base</option><option value="Buono">Buono</option><option value="Ottimo">Ottimo</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Spagnolo</label>
+          <select id="edit-es" class="form-control">
+            <option value="Nessuno">Nessuno</option><option value="Base">Base</option><option value="Buono">Buono</option><option value="Ottimo">Ottimo</option>
+          </select>
+        </div>
+      </div>
+      <!-- STORICO ESPERIENZE -->
+      <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pietra);margin-bottom:8px;font-weight:600;margin-top:4px;">Esperienze (ultime 2)</div>
+      <div style="background:var(--grigio);border-radius:10px;padding:12px;margin-bottom:10px;">
+        <div style="font-size:11px;font-weight:700;color:var(--pietra);margin-bottom:8px;">Esperienza 1</div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Mansione</label><input type="text" id="edit-exp1-mansione" class="form-control" placeholder="es. Cameriere"></div>
+          <div class="form-group"><label class="form-label">Zona</label>
+            <select id="edit-exp1-zona" class="form-control">
+              <option value="">— Seleziona —</option>
+              <option value="Alta Valle">Alta Valle</option><option value="Aosta">Aosta</option><option value="Bassa Valle">Bassa Valle</option><option value="Ayas-Gressoney">Val d'Ayas / Gressoney</option><option value="Fuori Valle d'Aosta">Fuori Valle</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Dal</label><input type="month" id="edit-exp1-dal" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Al</label><input type="month" id="edit-exp1-al" class="form-control"></div>
+        </div>
+      </div>
+      <div style="background:var(--grigio);border-radius:10px;padding:12px;margin-bottom:10px;">
+        <div style="font-size:11px;font-weight:700;color:var(--pietra);margin-bottom:8px;">Esperienza 2</div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Mansione</label><input type="text" id="edit-exp2-mansione" class="form-control" placeholder="es. Barista"></div>
+          <div class="form-group"><label class="form-label">Zona</label>
+            <select id="edit-exp2-zona" class="form-control">
+              <option value="">— Seleziona —</option>
+              <option value="Alta Valle">Alta Valle</option><option value="Aosta">Aosta</option><option value="Bassa Valle">Bassa Valle</option><option value="Ayas-Gressoney">Val d'Ayas / Gressoney</option><option value="Fuori Valle d'Aosta">Fuori Valle</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Dal</label><input type="month" id="edit-exp2-dal" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Al</label><input type="month" id="edit-exp2-al" class="form-control"></div>
+        </div>
+      </div>
+      <!-- CERTIFICAZIONI -->
       <div class="form-group">
         <label class="form-label">Certificazioni</label>
         <div class="cert-grid">
@@ -271,10 +329,42 @@
         </div>
         <div class="profilo-grid">
           <div class="profilo-item"><div class="profilo-item-label">Zona</div><div class="profilo-item-val">${prof.localita_preferita||'N/D'}</div></div>
-          <div class="profilo-item"><div class="profilo-item-label">Disponibilità</div><div class="profilo-item-val">${prof.tipo_disponibilita||'N/D'}</div></div>
-          <div class="profilo-item"><div class="profilo-item-label">Francese</div><div class="profilo-item-val">🇫🇷 ${prof.lingua_francese||'N/D'}</div></div>
-          <div class="profilo-item"><div class="profilo-item-label">Inglese</div><div class="profilo-item-val">🇬🇧 ${prof.lingua_inglese||'N/D'}</div></div>
+          <div class="profilo-item"><div class="profilo-item-label">Contratto</div><div class="profilo-item-val">${prof.tipo_disponibilita||'N/D'}</div></div>
+          <div class="profilo-item"><div class="profilo-item-label">Disponibile dal</div><div class="profilo-item-val">${prof.disponibile_dal?new Date(prof.disponibile_dal).toLocaleDateString('it-IT',{month:'long',year:'numeric'}):'N/D'}</div></div>
+          <div class="profilo-item"><div class="profilo-item-label">Alloggio</div><div class="profilo-item-val">${prof.bisogno_vitto_alloggio?'Richiesto':'Non richiesto'}</div></div>
         </div>
+
+        <!-- LINGUE -->
+        <div style="margin-bottom:14px;">
+          <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pietra);margin-bottom:8px;font-weight:600;">Lingue</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            ${prof.lingua_francese&&prof.lingua_francese!=='Nessuno'?`<span class="badge-cert">🇫🇷 FR — ${prof.lingua_francese}</span>`:''}
+            ${prof.lingua_inglese&&prof.lingua_inglese!=='Nessuno'?`<span class="badge-cert">🇬🇧 EN — ${prof.lingua_inglese}</span>`:''}
+            ${prof.lingua_tedesco&&prof.lingua_tedesco!=='Nessuno'?`<span class="badge-cert">🇩🇪 DE — ${prof.lingua_tedesco}</span>`:''}
+            ${prof.lingua_spagnolo&&prof.lingua_spagnolo!=='Nessuno'?`<span class="badge-cert">🇪🇸 ES — ${prof.lingua_spagnolo}</span>`:''}
+            ${(()=>{try{const extra=JSON.parse(prof.lingue_extra||'[]');return extra.map(l=>`<span class="badge-cert">🌐 ${l.lingua} — ${l.livello}</span>`).join('');}catch{return '';}})()}
+          </div>
+        </div>
+
+        <!-- STORICO ESPERIENZE -->
+        ${(prof.exp1_mansione||prof.exp2_mansione)?`
+        <div style="margin-bottom:14px;">
+          <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pietra);margin-bottom:8px;font-weight:600;">Esperienze</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            ${prof.exp1_mansione?`
+            <div style="background:var(--grigio);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
+              <span style="font-weight:600;font-size:13px;">${prof.exp1_mansione}</span>
+              <span style="font-size:12px;color:var(--pietra);">${prof.exp1_zona||''} ${prof.exp1_dal?'· '+prof.exp1_dal.substring(0,7):''} ${prof.exp1_al?'→ '+prof.exp1_al.substring(0,7):''}</span>
+            </div>`:''}
+            ${prof.exp2_mansione?`
+            <div style="background:var(--grigio);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
+              <span style="font-weight:600;font-size:13px;">${prof.exp2_mansione}</span>
+              <span style="font-size:12px;color:var(--pietra);">${prof.exp2_zona||''} ${prof.exp2_dal?'· '+prof.exp2_dal.substring(0,7):''} ${prof.exp2_al?'→ '+prof.exp2_al.substring(0,7):''}</span>
+            </div>`:''}
+          </div>
+        </div>`:''}
+
+        <!-- CERTIFICAZIONI -->
         ${certs.length>0?`<div>${certs.map(c=>`<span class="badge-cert">${c}</span>`).join('')}</div>`:'<p style="font-size:12px;color:var(--pietra);">Nessuna certificazione</p>'}
       `;
     }
@@ -343,12 +433,23 @@
         document.getElementById('edit-localita').value=prof.localita_preferita||'';
         document.getElementById('edit-fr').value=prof.lingua_francese||'Nessuno';
         document.getElementById('edit-en').value=prof.lingua_inglese||'Nessuno';
+        document.getElementById('edit-de').value=prof.lingua_tedesco||'Nessuno';
+        document.getElementById('edit-es').value=prof.lingua_spagnolo||'Nessuno';
         document.getElementById('edit-dispo').value=prof.tipo_disponibilita||'';
+        document.getElementById('edit-disponibile-dal').value=prof.disponibile_dal||'';
         document.getElementById('edit-alloggio').value=prof.bisogno_vitto_alloggio?'true':'false';
         document.getElementById('edit-haccp').checked=prof.cert_haccp;
         document.getElementById('edit-sicurezza').checked=prof.cert_sicurezza;
         document.getElementById('edit-sommelier').checked=prof.cert_sommelier;
         document.getElementById('edit-barman').checked=prof.cert_barman;
+        document.getElementById('edit-exp1-mansione').value=prof.exp1_mansione||'';
+        document.getElementById('edit-exp1-zona').value=prof.exp1_zona||'';
+        document.getElementById('edit-exp1-dal').value=prof.exp1_dal||'';
+        document.getElementById('edit-exp1-al').value=prof.exp1_al||'';
+        document.getElementById('edit-exp2-mansione').value=prof.exp2_mansione||'';
+        document.getElementById('edit-exp2-zona').value=prof.exp2_zona||'';
+        document.getElementById('edit-exp2-dal').value=prof.exp2_dal||'';
+        document.getElementById('edit-exp2-al').value=prof.exp2_al||'';
         document.getElementById('modal-modifica').style.display='flex';
       }
     }
@@ -361,12 +462,23 @@
         localita_preferita:document.getElementById('edit-localita').value,
         lingua_francese:document.getElementById('edit-fr').value,
         lingua_inglese:document.getElementById('edit-en').value,
+        lingua_tedesco:document.getElementById('edit-de').value,
+        lingua_spagnolo:document.getElementById('edit-es').value,
         tipo_disponibilita:document.getElementById('edit-dispo').value,
+        disponibile_dal:document.getElementById('edit-disponibile-dal').value||null,
         bisogno_vitto_alloggio:document.getElementById('edit-alloggio').value==='true',
         cert_haccp:document.getElementById('edit-haccp').checked,
         cert_sicurezza:document.getElementById('edit-sicurezza').checked,
         cert_sommelier:document.getElementById('edit-sommelier').checked,
-        cert_barman:document.getElementById('edit-barman').checked
+        cert_barman:document.getElementById('edit-barman').checked,
+        exp1_mansione:document.getElementById('edit-exp1-mansione').value||null,
+        exp1_zona:document.getElementById('edit-exp1-zona').value||null,
+        exp1_dal:document.getElementById('edit-exp1-dal').value||null,
+        exp1_al:document.getElementById('edit-exp1-al').value||null,
+        exp2_mansione:document.getElementById('edit-exp2-mansione').value||null,
+        exp2_zona:document.getElementById('edit-exp2-zona').value||null,
+        exp2_dal:document.getElementById('edit-exp2-dal').value||null,
+        exp2_al:document.getElementById('edit-exp2-al').value||null,
       };
       const{error}=await supabaseClient.from('esperienze_lavoratori').update(aggiornamenti).eq('user_id',user.id);
       if(!error){alert("Profilo aggiornato!");document.getElementById('modal-modifica').style.display='none';caricaProfilo(user.id);}
