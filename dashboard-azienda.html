@@ -690,42 +690,37 @@
         lingue_richieste: JSON.stringify(lng)
       };
 
-      // Anteprima locale foto già in memoria
+      // Mostra subito la view con anteprima locale
       const fotoPreviewEl = document.getElementById('az-foto-preview').querySelector('img');
       const fotoLocale = fotoPreviewEl ? fotoPreviewEl.src : null;
-
-      // Salva dati subito senza aspettare la foto
-      const{error}=await supabaseClient.from('profili_aziende').update(aggiornamenti).eq('id',user.id);
-      if(error){ alert("Errore: "+error.message); return; }
-
-      // Mostra view immediatamente con anteprima locale
       const profiloLocale = {
         nome_azienda: _nomeAzienda,
-        descrizione: aggiornamenti.descrizione,
-        zona: aggiornamenti.zona,
-        sito_web: aggiornamenti.sito_web,
-        num_dipendenti: aggiornamenti.num_dipendenti,
-        tipi_contratto: aggiornamenti.tipi_contratto,
-        lingue_richieste: aggiornamenti.lingue_richieste,
+        ...aggiornamenti,
         foto_url: fotoLocale
       };
       aggiornaViewProfilo(profiloLocale);
       mostraViewProfilo();
 
-      // Upload foto in background — non blocca l'UI
+      // Upload foto se presente — salva URL nel DB
       const fileInput = document.getElementById('az-foto-input');
       if(fileInput.files.length > 0){
         const file = fileInput.files[0];
-        const fileName = `aziende/${user.id}/logo.${file.name.split('.').pop()}`;
-        supabaseClient.storage.from('foto-aziende').upload(fileName, file, {upsert:true}).then(({error:uploadError})=>{
-          if(uploadError){ console.log('Errore upload foto:', uploadError.message); return; }
+        const fileName = `aziende/${user.id}/logo`;
+        const{error:uploadError} = await supabaseClient.storage.from('foto-aziende').upload(fileName, file, {upsert:true, contentType: file.type});
+        if(!uploadError){
           const{data:urlData} = supabaseClient.storage.from('foto-aziende').getPublicUrl(fileName);
-          const url = urlData.publicUrl + '?t=' + Date.now();
-          supabaseClient.from('profili_aziende').update({foto_url: url}).eq('id',user.id);
+          aggiornamenti.foto_url = urlData.publicUrl;
+          // Aggiorna anche la view con URL definitivo
           const viewFoto = document.getElementById('view-foto');
-          if(viewFoto) viewFoto.innerHTML=`<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
-        });
+          if(viewFoto) viewFoto.innerHTML=`<img src="${aggiornamenti.foto_url}" style="width:100%;height:100%;object-fit:cover;">`;
+        } else {
+          console.log('Errore upload foto:', uploadError.message);
+        }
       }
+
+      // Salva tutto nel DB inclusa foto_url
+      const{error}=await supabaseClient.from('profili_aziende').update(aggiornamenti).eq('id',user.id);
+      if(error) alert("Errore salvataggio: "+error.message);
     }
 
     async function caricaTutteLeRecensioni(){
