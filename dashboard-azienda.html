@@ -114,7 +114,17 @@
     .upgrade-banner h3{font-family:'Playfair Display',serif;color:var(--oro-chiaro);font-size:1.2rem;margin-bottom:6px;}
     .upgrade-banner p{color:rgba(255,255,255,0.6);font-size:13px;}
 
-    @media(max-width:480px){.tab-btn{padding:12px 14px;font-size:12px;}.upgrade-banner{flex-direction:column;}}
+    .offerta-card{background:white;border-radius:12px;padding:16px;border:1px solid rgba(0,0,0,0.06);margin-bottom:10px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;}
+    .offerta-info h4{font-family:'Playfair Display',serif;font-size:1rem;color:var(--scuro);margin-bottom:4px;}
+    .offerta-info p{font-size:12px;color:var(--pietra);}
+    .offerta-badge{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;}
+    .badge-attiva{background:#d1f0e0;color:var(--verde);}
+    .badge-inattiva{background:#fde8e8;color:var(--rosso);}
+    .notifica-lav-card{background:var(--grigio);border-radius:12px;padding:16px;margin-bottom:10px;border-left:4px solid var(--verde-chiaro);}
+    .notifica-lav-card h4{font-family:'Playfair Display',serif;font-size:1rem;color:var(--scuro);margin-bottom:6px;}
+    .notifica-lav-card .lav-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+    .lav-tag{background:white;border:1px solid rgba(0,0,0,0.08);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--pietra);}
+    @media(max-width:480px){.tab-btn{padding:12px 14px;font-size:12px;}.upgrade-banner{flex-direction:column;}.offerta-card{flex-direction:column;}}
   </style>
 </head>
 <body>
@@ -132,8 +142,10 @@
   <!-- TAB BAR -->
   <div class="tab-bar">
     <button class="tab-btn active" onclick="showTab('panoramica',this)">📊 Panoramica</button>
-    <button class="tab-btn" onclick="showTab('talenti',this)">🔍 Database Talenti</button>
+    <button class="tab-btn" onclick="showTab('notifiche',this)">🔔 Lavoratori <span id="badge-notifiche" style="background:var(--rosso);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;display:none;">0</span></button>
+    <button class="tab-btn" onclick="showTab('mie-offerte',this)">📋 Le Mie Offerte</button>
     <button class="tab-btn" onclick="showTab('offerte',this)">📢 Pubblica Offerta</button>
+    <button class="tab-btn" onclick="showTab('talenti',this)">🔍 Database Talenti</button>
     <button class="tab-btn" onclick="showTab('mercato',this)">📋 Recensioni Mercato</button>
   </div>
 
@@ -157,6 +169,27 @@
         </div>
       </div>
 
+    </div>
+
+    <!-- NOTIFICHE LAVORATORI COMPATIBILI -->
+    <div id="notifiche" class="section">
+      <div class="card">
+        <div class="card-title">🔔 Lavoratori Compatibili con le tue Offerte</div>
+        <p style="font-size:13px;color:var(--pietra);margin-bottom:16px;">Questi lavoratori hanno una mansione compatibile con le offerte che hai pubblicato. I profili sono anonimi.</p>
+        <div id="lista-notifiche-lavoratori">
+          <div class="empty-state"><span class="empty-icon">⏳</span><h3>Caricamento...</h3></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LE MIE OFFERTE -->
+    <div id="mie-offerte" class="section">
+      <div class="card">
+        <div class="card-title">📋 Le Mie Offerte Pubblicate</div>
+        <div id="lista-mie-offerte">
+          <div class="empty-state"><span class="empty-icon">⏳</span><h3>Caricamento...</h3></div>
+        </div>
+      </div>
     </div>
 
     <!-- TALENTI -->
@@ -280,6 +313,7 @@
       });
 
       caricaDatiRecensioni(_nomeAzienda);
+      caricaNotificheLavoratori();
       if(_isPremium){
         caricaDatabaseLavoratori();
         caricaTutteLeRecensioni();
@@ -394,7 +428,7 @@
         localita:profilo?profilo.localita:"Valle d'Aosta",
         ruolo,descrizione:desc,contatti,is_attiva:true
       }]);
-      if(!error){alert("✅ Offerta pubblicata!");location.reload();}
+      if(!error){alert("✅ Offerta pubblicata!");caricaMieOfferte();showTab('mie-offerte',document.querySelector('.tab-btn:nth-child(3)'));}
       else alert("Errore: "+error.message);
     }
 
@@ -430,6 +464,94 @@
       alert("✅ Richiesta inviata!");
     }
 
+    async function caricaMieOfferte(){
+      const container = document.getElementById('lista-mie-offerte');
+      const{data:{user}} = await supabaseClient.auth.getUser();
+      const{data:offerte, error} = await supabaseClient.from('offerte_lavoro').select('*').eq('azienda_id', user.id).order('created_at', {ascending:false});
+      if(error || !offerte || offerte.length === 0){
+        container.innerHTML = `<div class="empty-state"><span class="empty-icon">📭</span><h3>Nessuna offerta pubblicata</h3><p>Vai su "Pubblica Offerta" per creare la tua prima offerta.</p></div>`;
+        return;
+      }
+      container.innerHTML = offerte.map(o => `
+        <div class="offerta-card">
+          <div class="offerta-info">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+              <span class="offerta-badge ${o.is_attiva ? 'badge-attiva' : 'badge-inattiva'}">${o.is_attiva ? '✅ Attiva' : '⏸ Sospesa'}</span>
+              <span style="font-size:11px;color:var(--pietra);">${new Date(o.created_at).toLocaleDateString('it-IT')}</span>
+            </div>
+            <h4>${o.ruolo || '—'}</h4>
+            <p>${o.descrizione ? o.descrizione.substring(0,100)+'...' : ''}</p>
+            <p style="margin-top:4px;">📞 ${o.contatti || '—'}</p>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <button class="btn-secondary" style="padding:6px 14px;font-size:12px;" onclick="toggleOfferta('${o.id}', ${o.is_attiva})">${o.is_attiva ? '⏸ Sospendi' : '▶ Riattiva'}</button>
+            <button class="btn-secondary" style="padding:6px 14px;font-size:12px;color:var(--rosso);border-color:var(--rosso);" onclick="eliminaOfferta('${o.id}')">🗑️</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function toggleOfferta(id, attuale){
+      const{error} = await supabaseClient.from('offerte_lavoro').update({is_attiva: !attuale}).eq('id', id);
+      if(!error) caricaMieOfferte();
+      else alert('Errore: ' + error.message);
+    }
+
+    async function eliminaOfferta(id){
+      if(!confirm('Eliminare questa offerta?')) return;
+      const{error} = await supabaseClient.from('offerte_lavoro').delete().eq('id', id);
+      if(!error) caricaMieOfferte();
+      else alert('Errore: ' + error.message);
+    }
+
+    async function caricaNotificheLavoratori(){
+      const container = document.getElementById('lista-notifiche-lavoratori');
+      const{data:{user}} = await supabaseClient.auth.getUser();
+
+      // Carica offerte attive dell'azienda
+      const{data:offerte} = await supabaseClient.from('offerte_lavoro').select('ruolo').eq('azienda_id', user.id).eq('is_attiva', true);
+      if(!offerte || offerte.length === 0){
+        container.innerHTML = `<div class="empty-state"><span class="empty-icon">📢</span><h3>Nessuna offerta attiva</h3><p>Pubblica un'offerta per ricevere notifiche sui lavoratori compatibili.</p></div>`;
+        return;
+      }
+
+      // Cerca lavoratori compatibili
+      const ruoli = offerte.map(o => o.ruolo.toLowerCase().trim());
+      const{data:lavoratori} = await supabaseClient.from('esperienze_lavoratori').select('user_id,settore,mansione_principale,tipo_disponibilita,localita_preferita,lingua_francese,lingua_inglese,disponibile_dal');
+
+      const compatibili = (lavoratori || []).filter(l => {
+        const mansione = (l.mansione_principale || '').toLowerCase().trim();
+        return ruoli.some(r => mansione.includes(r) || r.includes(mansione));
+      });
+
+      // Aggiorna badge
+      const badge = document.getElementById('badge-notifiche');
+      if(compatibili.length > 0){
+        badge.style.display = 'inline';
+        badge.innerText = compatibili.length;
+      }
+
+      if(compatibili.length === 0){
+        container.innerHTML = `<div class="empty-state"><span class="empty-icon">🔍</span><h3>Nessun lavoratore compatibile</h3><p>Non ci sono ancora lavoratori con mansioni compatibili con le tue offerte.</p></div>`;
+        return;
+      }
+
+      container.innerHTML = compatibili.map((l, i) => `
+        <div class="notifica-lav-card">
+          <h4>👤 Lavoratore #${i+1} — ${l.mansione_principale || 'Mansione N/D'}</h4>
+          <div class="lav-tags">
+            ${l.settore ? `<span class="lav-tag">🏷️ ${l.settore}</span>` : ''}
+            ${l.tipo_disponibilita ? `<span class="lav-tag">📅 ${l.tipo_disponibilita}</span>` : ''}
+            ${l.localita_preferita ? `<span class="lav-tag">📍 ${l.localita_preferita}</span>` : ''}
+            ${l.disponibile_dal ? `<span class="lav-tag">🗓️ Dal ${new Date(l.disponibile_dal).toLocaleDateString('it-IT',{month:'long',year:'numeric'})}</span>` : ''}
+            ${l.lingua_francese && l.lingua_francese !== 'Nessuno' ? `<span class="lav-tag">🇫🇷 ${l.lingua_francese}</span>` : ''}
+            ${l.lingua_inglese && l.lingua_inglese !== 'Nessuno' ? `<span class="lav-tag">🇬🇧 ${l.lingua_inglese}</span>` : ''}
+          </div>
+          ${_isPremium ? `<button class="btn-primary" style="margin-top:12px;padding:8px 16px;font-size:13px;" onclick="inviaPropostaAnonima('${l.user_id}')">📩 Invia Proposta</button>` : '<p style="font-size:12px;color:var(--pietra);margin-top:10px;">🔒 Attiva Premium per contattare il lavoratore</p>'}
+        </div>
+      `).join('');
+    }
+
     function showTab(id,btn){
       document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -437,6 +559,8 @@
       btn.classList.add('active');
       if(id==='talenti'&&_isPremium)caricaDatabaseLavoratori();
       if(id==='mercato'&&_isPremium)caricaTutteLeRecensioni();
+      if(id==='mie-offerte')caricaMieOfferte();
+      if(id==='notifiche')caricaNotificheLavoratori();
     }
 
     async function logout(){
