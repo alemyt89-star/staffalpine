@@ -703,7 +703,17 @@
       };
       const{error}=await supabaseClient.from('esperienze_lavoratori').upsert(dati);
       if(error)alert("Errore: "+error.message);
-      else alert("✅ Profilo salvato!");
+      else{
+        // Notifica alle aziende compatibili
+        try{
+          await fetch('/api/notifica-lavoratore',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({settore:dati.settore})
+          });
+        }catch(e){console.log('Notifica non inviata:',e);}
+        alert("✅ Profilo salvato!");
+      }
     }
 
     async function logout(){
