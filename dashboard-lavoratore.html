@@ -26,7 +26,7 @@
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:'DM Sans',sans-serif;background:var(--grigio);color:var(--testo);min-height:100vh;visibility:hidden;}
     .main-nav{background:var(--scuro);padding:14px 5%;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1000;box-shadow:0 2px 20px rgba(0,0,0,0.2);}
-    .nav-logo{font-family:'Playfair Display',serif;font-size:20px;color:var(--oro-chiaro);letter-spacing:1px;text-decoration:none;}
+    .nav-logo{font-family:'Playfair Display',serif;font-size:20px;color:var(--oro-chiaro);letter-spacing:1px;text-decoration:none;display:flex;align-items:center;gap:8px;}.nav-logo img{width:24px;height:24px;flex-shrink:0;}
     .nav-user{display:flex;align-items:center;gap:12px;}
     .nav-user-name{font-size:13px;color:rgba(255,255,255,0.6);}
     .nav-logout{color:#e88080;font-size:13px;cursor:pointer;border:1px solid rgba(232,128,128,0.3);padding:6px 14px;border-radius:8px;background:none;font-family:'DM Sans',sans-serif;}
@@ -99,7 +99,7 @@
 <body>
 
   <nav class="main-nav">
-    <a href="index.html" class="nav-logo">StaffAlpine</a>
+    <a href="index.html" class="nav-logo"><img src="stella-alpina.svg" alt="">StaffAlpine</a>
     <div class="nav-user">
       <span class="nav-user-name" id="nav-nome"></span>
       <button class="nav-logout" onclick="logout()">Esci</button>
