@@ -16,30 +16,19 @@
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:'DM Sans',sans-serif;background:var(--grigio);color:var(--testo);min-height:100vh;display:none;}
-
-    /* NAVBAR */
     .main-nav{background:var(--scuro);padding:14px 5%;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1000;box-shadow:0 2px 20px rgba(0,0,0,0.2);}
     .nav-logo{font-family:'Playfair Display',serif;font-size:20px;color:var(--rosso-chiaro);letter-spacing:1px;text-decoration:none;display:flex;align-items:center;gap:8px;}
     .nav-logo span{font-size:13px;color:rgba(255,255,255,0.4);font-family:'DM Sans',sans-serif;font-weight:400;letter-spacing:0;}
     .nav-logout{color:#e88080;font-size:13px;cursor:pointer;border:1px solid rgba(232,128,128,0.3);padding:6px 14px;border-radius:8px;background:none;font-family:'DM Sans',sans-serif;}
-
-    /* TAB BAR */
     .tab-bar{background:white;border-bottom:1px solid rgba(0,0,0,0.07);padding:0 5%;display:flex;overflow-x:auto;scrollbar-width:none;position:sticky;top:53px;z-index:999;}
     .tab-bar::-webkit-scrollbar{display:none;}
     .tab-btn{padding:14px 20px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--pietra);background:none;border:none;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;transition:all 0.2s;display:flex;align-items:center;gap:6px;}
     .tab-btn:hover{color:var(--testo);}
     .tab-btn.active{color:var(--rosso);border-bottom-color:var(--rosso);font-weight:600;}
     .tab-badge{background:var(--rosso);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;min-width:18px;text-align:center;}
-
-    /* CONTAINER */
     .container{max-width:960px;margin:0 auto;padding:32px 5%;}
     .section{display:none;}
     .section.active{display:block;}
-
-    /* CARDS */
-    .card{background:white;border-radius:16px;padding:22px;box-shadow:0 2px 12px rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.05);margin-bottom:14px;}
-
-    /* REVIEW CARD */
     .review-card{background:white;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.05);margin-bottom:12px;border-left:4px solid #ddd;}
     .review-card.pending{border-left-color:var(--oro);}
     .review-card.verified{border-left-color:var(--verde-chiaro);}
@@ -53,9 +42,8 @@
     .review-meta{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--pietra);margin-bottom:14px;}
     .review-meta b{color:var(--testo);}
     .action-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
-
-    /* AZIENDA CARD */
-    .azienda-card{background:white;border-radius:14px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.05);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+    .azienda-card{background:white;border-radius:14px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.05);margin-bottom:12px;}
+    .azienda-card-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
     .az-info h3{font-family:'Playfair Display',serif;font-size:1rem;color:var(--scuro);margin-bottom:2px;}
     .az-info p{font-size:12px;color:var(--pietra);}
     .az-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
@@ -63,8 +51,20 @@
     .prem-si{background:linear-gradient(135deg,var(--oro),var(--oro-chiaro));color:var(--scuro);}
     .prem-no{background:rgba(0,0,0,0.06);color:var(--pietra);}
     .app-badge{font-size:10px;font-weight:700;color:var(--verde-chiaro);padding:3px 8px;border:1px solid var(--verde-chiaro);border-radius:20px;}
-
-    /* BOTTONI */
+    /* DETTAGLIO */
+    .az-dettaglio{display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--grigio);animation:fadeIn 0.2s ease;}
+    .az-dettaglio.open{display:block;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
+    .det-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:16px;}
+    .det-stat{background:var(--grigio);border-radius:10px;padding:12px;text-align:center;}
+    .det-stat .val{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--scuro);display:block;}
+    .det-stat .lbl{font-size:10px;color:var(--pietra);text-transform:uppercase;letter-spacing:1px;}
+    .det-title{font-size:11px;font-weight:700;color:var(--pietra);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;margin-top:14px;}
+    .det-table{width:100%;border-collapse:collapse;font-size:12px;}
+    .det-table th{background:var(--grigio);padding:8px 10px;text-align:left;color:var(--pietra);font-weight:600;}
+    .det-table td{padding:8px 10px;border-bottom:1px solid rgba(0,0,0,0.04);color:var(--testo);}
+    .det-table tr:last-child td{border-bottom:none;}
+    .det-empty{font-size:12px;color:var(--pietra);text-align:center;padding:12px;background:var(--grigio);border-radius:8px;}
     .btn{padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;transition:all 0.2s;display:inline-flex;align-items:center;gap:5px;}
     .btn:hover{opacity:0.85;transform:translateY(-1px);}
     .btn-verify{background:#d1f0e0;color:var(--verde);}
@@ -72,69 +72,44 @@
     .btn-oro{background:linear-gradient(135deg,var(--oro),var(--oro-chiaro));color:var(--scuro);}
     .btn-blu{background:#dbeafe;color:var(--blu);}
     .btn-approve{background:var(--verde-chiaro);color:white;}
-    .btn-danger{background:var(--rosso);color:white;}
-
-    /* EMPTY */
+    .btn-detail{background:var(--grigio);color:var(--testo);}
     .empty-state{text-align:center;padding:48px 20px;color:var(--pietra);}
     .empty-state .empty-icon{font-size:36px;display:block;margin-bottom:12px;}
-
-    /* STATS ROW */
     .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px;}
     .stat-box{background:white;border-radius:12px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.04);}
     .stat-box .val{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--scuro);display:block;}
     .stat-box .lbl{font-size:11px;color:var(--pietra);text-transform:uppercase;letter-spacing:1px;}
-
-    /* RICHIESTE PREMIUM */
     .richiesta-card{background:white;border-radius:14px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.05);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;border-left:4px solid var(--oro);}
     .ric-info h3{font-family:'Playfair Display',serif;font-size:1rem;color:var(--scuro);margin-bottom:2px;}
     .ric-info p{font-size:12px;color:var(--pietra);}
-
-    @media(max-width:480px){.azienda-card,.richiesta-card{flex-direction:column;align-items:flex-start;}.az-actions{width:100%;}.review-top{flex-direction:column;}.action-row{justify-content:flex-start;}}
+    @media(max-width:480px){.azienda-card-top{flex-direction:column;align-items:flex-start;}.az-actions{width:100%;}.richiesta-card{flex-direction:column;align-items:flex-start;}.review-top{flex-direction:column;}.action-row{justify-content:flex-start;}}
   </style>
 </head>
 <body>
-
-  <!-- NAVBAR -->
   <nav class="main-nav">
     <a href="index.html" class="nav-logo">🛡️ StaffAlpine <span>Admin</span></a>
     <button class="nav-logout" onclick="logout()">Esci</button>
   </nav>
-
-  <!-- TAB BAR -->
   <div class="tab-bar">
     <button class="tab-btn active" onclick="showTab('recensioni',this)">📋 Recensioni <span class="tab-badge" id="badge-recs">0</span></button>
     <button class="tab-btn" onclick="showTab('aziende',this)">🏢 Aziende <span class="tab-badge" id="badge-az">0</span></button>
     <button class="tab-btn" onclick="showTab('premium',this)">💎 Richieste Premium <span class="tab-badge" id="badge-prem">0</span></button>
   </div>
-
   <div class="container">
-
-    <!-- RECENSIONI -->
     <div id="recensioni" class="section active">
-      <div class="stats-row" id="stats-recs">
+      <div class="stats-row">
         <div class="stat-box"><span class="val" id="stat-tot">—</span><span class="lbl">Totali</span></div>
         <div class="stat-box"><span class="val" id="stat-att">—</span><span class="lbl">In Attesa</span></div>
         <div class="stat-box"><span class="val" id="stat-ver">—</span><span class="lbl">Verificate</span></div>
       </div>
-      <div id="lista-recensioni">
-        <div class="empty-state"><span class="empty-icon">⏳</span><p>Caricamento...</p></div>
-      </div>
+      <div id="lista-recensioni"><div class="empty-state"><span class="empty-icon">⏳</span><p>Caricamento...</p></div></div>
     </div>
-
-    <!-- AZIENDE -->
     <div id="aziende" class="section">
-      <div id="lista-aziende">
-        <div class="empty-state"><span class="empty-icon">⏳</span><p>Caricamento...</p></div>
-      </div>
+      <div id="lista-aziende"><div class="empty-state"><span class="empty-icon">⏳</span><p>Caricamento...</p></div></div>
     </div>
-
-    <!-- RICHIESTE PREMIUM -->
     <div id="premium" class="section">
-      <div id="lista-premium">
-        <div class="empty-state"><span class="empty-icon">⏳</span><p>Caricamento...</p></div>
-      </div>
+      <div id="lista-premium"><div class="empty-state"><span class="empty-icon">⏳</span><p>Caricamento...</p></div></div>
     </div>
-
   </div>
 
   <script>
@@ -152,24 +127,18 @@
 
     async function inizializzaAdmin(){
       const{data:{user},error}=await supabaseClient.auth.getUser();
-      if(error||!user||user.email!==ADMIN_EMAIL){
-        window.location.replace('index.html');
-        return;
-      }
+      if(error||!user||user.email!==ADMIN_EMAIL){window.location.replace('index.html');return;}
       document.body.style.display='block';
       caricaRecensioni();
       caricaAziende();
       caricaRichiestePremium();
     }
 
-    /* ─── RECENSIONI ─── */
     async function caricaRecensioni(){
       const div=document.getElementById('lista-recensioni');
       const{data:recensioni,error}=await supabaseClient.from('RECENSIONI').select('*').order('created_at',{ascending:false});
       if(error){div.innerHTML=`<div class="empty-state"><span class="empty-icon">❌</span><p>${error.message}</p></div>`;return;}
-
       const{data:profili}=await supabaseClient.from('esperienze_lavoratori').select('user_id,nome_reale,cognome_reale,data_nascita');
-
       const tot=recensioni.length;
       const att=recensioni.filter(r=>!r.VERIFICATA).length;
       const ver=recensioni.filter(r=>r.VERIFICATA).length;
@@ -177,9 +146,7 @@
       document.getElementById('stat-att').innerText=att;
       document.getElementById('stat-ver').innerText=ver;
       document.getElementById('badge-recs').innerText=att||'';
-
       if(tot===0){div.innerHTML=`<div class="empty-state"><span class="empty-icon">📭</span><p>Nessuna recensione.</p></div>`;return;}
-
       div.innerHTML=recensioni.map(rec=>{
         const isVer=rec.VERIFICATA===true;
         const profilo=profili?profili.find(p=>p.user_id===rec.USER_HASH):null;
@@ -187,7 +154,6 @@
           ?`<b>${profilo.nome_reale} ${profilo.cognome_reale}</b> · ${profilo.data_nascita?new Date(profilo.data_nascita).toLocaleDateString('it-IT'):''}`
           :`<span style="color:var(--oro)">⚠️ Profilo non creato</span>`;
         const pathContratto=rec.URL_CONTRATTO?rec.URL_CONTRATTO.replace('contratti/',''):null;
-
         return `
           <div class="review-card ${isVer?'verified':'pending'}">
             <div class="review-top">
@@ -212,8 +178,7 @@
               ${!isVer?`<button class="btn btn-verify" onclick="verificaRecensione(${rec.id})">✔️ Verifica</button>`:''}
               <button class="btn btn-delete" onclick="eliminaRecensione(${rec.id})">🗑️ Elimina</button>
             </div>
-          </div>
-        `;
+          </div>`;
       }).join('');
     }
 
@@ -244,37 +209,113 @@
       else caricaRecensioni();
     }
 
-    /* ─── AZIENDE ─── */
     async function caricaAziende(){
       const div=document.getElementById('lista-aziende');
       const{data:aziende,error}=await supabaseClient.from('profili_aziende').select('*').order('nome_azienda',{ascending:true});
       if(error){div.innerHTML=`<div class="empty-state"><span class="empty-icon">❌</span><p>${error.message}</p></div>`;return;}
       document.getElementById('badge-az').innerText=aziende.filter(a=>!a.is_approvata).length||'';
-
       if(!aziende.length){div.innerHTML=`<div class="empty-state"><span class="empty-icon">🏢</span><p>Nessuna azienda registrata.</p></div>`;return;}
-
       div.innerHTML=aziende.map(az=>{
         const prem=az.is_premium===true;
         const app=az.is_approvata===true;
         return `
           <div class="azienda-card">
-            <div class="az-info">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <span class="prem-badge ${prem?'prem-si':'prem-no'}">${prem?'⭐ PREMIUM':'BASE'}</span>
-                ${app?'<span class="app-badge">✓ Approvata</span>':'<span style="font-size:10px;color:var(--oro);font-weight:700;">⏳ Da approvare</span>'}
+            <div class="azienda-card-top">
+              <div class="az-info">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                  <span class="prem-badge ${prem?'prem-si':'prem-no'}">${prem?'⭐ PREMIUM':'BASE'}</span>
+                  ${app?'<span class="app-badge">✓ Approvata</span>':'<span style="font-size:10px;color:var(--oro);font-weight:700;">⏳ Da approvare</span>'}
+                </div>
+                <h3>${az.nome_azienda}</h3>
+                <p>P.IVA: ${az.partita_iva}</p>
               </div>
-              <h3>${az.nome_azienda}</h3>
-              <p>P.IVA: ${az.partita_iva}</p>
+              <div class="az-actions">
+                ${!app?`<button class="btn btn-approve" onclick="approvaAzienda('${az.id}')">✅ Approva</button>`:''}
+                <button class="btn btn-detail" onclick="toggleDettaglio('${az.id}','${az.nome_azienda.replace(/'/g,"\\'")}')">📊 Dettaglio</button>
+                <button class="btn btn-blu" onclick="window.open('https://ec.europa.eu/taxation_customs/vies/#/vat-validation','_blank')">🔍 VIES</button>
+                <button class="btn btn-oro" onclick="togglePremium('${az.id}',${prem})">${prem?'Togli Premium':'Rendi Premium'}</button>
+                <button class="btn btn-delete" onclick="eliminaAzienda('${az.id}')">🗑️</button>
+              </div>
             </div>
-            <div class="az-actions">
-              ${!app?`<button class="btn btn-approve" onclick="approvaAzienda('${az.id}')">✅ Approva</button>`:''}
-              <button class="btn btn-blu" onclick="window.open('https://ec.europa.eu/taxation_customs/vies/#/vat-validation','_blank')">🔍 VIES</button>
-              <button class="btn btn-oro" onclick="togglePremium('${az.id}',${prem})">${prem?'Togli Premium':'Rendi Premium'}</button>
-              <button class="btn btn-delete" onclick="eliminaAzienda('${az.id}')">🗑️</button>
+            <div class="az-dettaglio" id="det-${az.id}">
+              <div class="empty-state" style="padding:16px;"><p>⏳ Caricamento...</p></div>
             </div>
-          </div>
-        `;
+          </div>`;
       }).join('');
+    }
+
+    async function toggleDettaglio(azId, nomeAzienda){
+      const panel=document.getElementById(`det-${azId}`);
+      const isOpen=panel.classList.contains('open');
+      document.querySelectorAll('.az-dettaglio').forEach(p=>p.classList.remove('open'));
+      if(isOpen)return;
+      panel.classList.add('open');
+      panel.innerHTML=`<div class="empty-state" style="padding:16px;"><p>⏳ Caricamento...</p></div>`;
+
+      const[
+        {data:recensioni},
+        {data:offerte},
+        {data:notifiche}
+      ]=await Promise.all([
+        supabaseClient.from('RECENSIONI').select('id,VOTO_PAGA,RISPETTO_TITOLARE,created_at,VERIFICATA').ilike('AZIENDA',nomeAzienda),
+        supabaseClient.from('offerte_lavoro').select('id,titolo,created_at,mansione').eq('azienda_id',azId),
+        supabaseClient.from('notifiche_lavoratori').select('id,created_at,stato,esperienze_lavoratori(mansione_principale)').eq('azienda_id',azId)
+      ]);
+
+      const totRec=recensioni?.length||0;
+      const votoMedio=totRec>0
+        ?(recensioni.reduce((s,r)=>s+(r.VOTO_PAGA||0)+(r.RISPETTO_TITOLARE||0),0)/(totRec*2)).toFixed(1)
+        :'—';
+      const totOfferte=offerte?.length||0;
+      const totMatch=notifiche?.length||0;
+
+      const mansioni={};
+      notifiche?.forEach(n=>{
+        const m=n.esperienze_lavoratori?.mansione_principale||'N/D';
+        mansioni[m]=(mansioni[m]||0)+1;
+      });
+
+      panel.innerHTML=`
+        <div class="det-stats">
+          <div class="det-stat"><span class="val">${totRec}</span><span class="lbl">Recensioni</span></div>
+          <div class="det-stat"><span class="val">${votoMedio}</span><span class="lbl">Voto medio</span></div>
+          <div class="det-stat"><span class="val">${totOfferte}</span><span class="lbl">Offerte</span></div>
+          <div class="det-stat"><span class="val">${totMatch}</span><span class="lbl">Match</span></div>
+        </div>
+        <div class="det-title">📋 Ultime recensioni</div>
+        ${totRec===0
+          ?'<div class="det-empty">Nessuna recensione per questa azienda</div>'
+          :`<table class="det-table">
+              <tr><th>Data</th><th>Voto Paga</th><th>Rispetto</th><th>Stato</th></tr>
+              ${recensioni.slice(0,5).map(r=>`
+                <tr>
+                  <td>${new Date(r.created_at).toLocaleDateString('it-IT')}</td>
+                  <td>${r.VOTO_PAGA||'—'}/5</td>
+                  <td>${r.RISPETTO_TITOLARE||'—'}/5</td>
+                  <td>${r.VERIFICATA?'✅ Verificata':'⏳ In attesa'}</td>
+                </tr>`).join('')}
+            </table>`}
+        <div class="det-title" style="margin-top:14px;">📢 Offerte di lavoro</div>
+        ${totOfferte===0
+          ?'<div class="det-empty">Nessuna offerta pubblicata</div>'
+          :`<table class="det-table">
+              <tr><th>Titolo</th><th>Mansione</th><th>Data</th></tr>
+              ${offerte.slice(0,5).map(o=>`
+                <tr>
+                  <td>${o.titolo||'—'}</td>
+                  <td>${o.mansione||'—'}</td>
+                  <td>${new Date(o.created_at).toLocaleDateString('it-IT')}</td>
+                </tr>`).join('')}
+            </table>`}
+        <div class="det-title" style="margin-top:14px;">🎯 Match per profilo</div>
+        ${totMatch===0
+          ?'<div class="det-empty">Nessun match effettuato</div>'
+          :`<table class="det-table">
+              <tr><th>Mansione</th><th>N° Match</th></tr>
+              ${Object.entries(mansioni).sort((a,b)=>b[1]-a[1]).map(([m,n])=>`
+                <tr><td>${m}</td><td><b>${n}</b></td></tr>`).join('')}
+            </table>`}
+      `;
     }
 
     async function approvaAzienda(id){
@@ -297,17 +338,13 @@
       caricaAziende();
     }
 
-    /* ─── RICHIESTE PREMIUM ─── */
     async function caricaRichiestePremium(){
       const div=document.getElementById('lista-premium');
       const{data:richieste,error}=await supabaseClient.from('richieste_premium').select('*').order('created_at',{ascending:false});
       if(error){div.innerHTML=`<div class="empty-state"><span class="empty-icon">❌</span><p>${error.message}</p></div>`;return;}
-
       const inAttesa=richieste.filter(r=>r.stato==='in_attesa');
       document.getElementById('badge-prem').innerText=inAttesa.length||'';
-
       if(!richieste.length){div.innerHTML=`<div class="empty-state"><span class="empty-icon">💎</span><p>Nessuna richiesta Premium.</p></div>`;return;}
-
       div.innerHTML=richieste.map(r=>{
         const isAttesa=r.stato==='in_attesa';
         return `
@@ -322,8 +359,7 @@
                 <button class="btn btn-delete" onclick="rifiutaPremium('${r.id}')">✕ Rifiuta</button>
               </div>
             `:'<span style="font-size:11px;color:var(--verde);font-weight:700;">✅ Approvata</span>'}
-          </div>
-        `;
+          </div>`;
       }).join('');
     }
 
