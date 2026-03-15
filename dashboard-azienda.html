@@ -597,6 +597,8 @@
       try{ const lng=JSON.parse(profilo.lingue_richieste||'[]'); lng.forEach(l=>{ const map={fr:'🇫🇷 Francese',en:'🇬🇧 Inglese',de:'🇩🇪 Tedesco',es:'🇪🇸 Spagnolo'}; tags.push(map[l]||l); }); }catch(e){}
       document.getElementById('view-tags').innerHTML=tags.map(t=>`<span style="background:var(--grigio);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--pietra);">${t}</span>`).join('');
     }
+
+    function anteprimaFotoAzienda(input){
       const file = input.files[0];
       if(!file) return;
       if(file.size > 2*1024*1024){ alert('Immagine troppo grande — max 2MB'); input.value=''; return; }
