@@ -337,9 +337,7 @@
       transition: all 0.4s ease;
       position: relative;
       overflow: hidden;
-      opacity: 0;
-      transform: translateY(30px);
-      transition: opacity 0.6s ease, transform 0.6s ease, box-shadow 0.3s ease;
+      transition: box-shadow 0.3s ease;
     }
     .feature-card.visible { opacity: 1; transform: translateY(0); }
     .feature-card:hover {
@@ -410,8 +408,6 @@
 
     .step {
       text-align: center;
-      opacity: 0;
-      transform: translateY(20px);
       transition: all 0.6s ease;
     }
     .step.visible { opacity: 1; transform: translateY(0); }
@@ -780,13 +776,8 @@
           observer.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.05 });
-    document.querySelectorAll('.feature-card, .step').forEach(el => observer.observe(el));
-    setTimeout(() => {
-      document.querySelectorAll('.feature-card, .step').forEach((el, i) => {
-        setTimeout(() => el.classList.add('visible'), i * 80);
-      });
-    }, 400);
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.feature-card, .step-item').forEach(el => observer.observe(el));
 
     // ── MODAL PRIVACY ──
     const PRIVACY_KEY = 'staffalpine_privacy_v1';
