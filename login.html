@@ -58,10 +58,13 @@
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 100;
-      padding: 20px 5%;
+      padding: 14px 5%;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      background: rgba(26, 46, 26, 0.97);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 2px 20px rgba(0,0,0,0.3);
     }
     .nav-logo {
       font-family: 'Playfair Display', serif;
@@ -69,7 +72,11 @@
       color: var(--oro-chiaro);
       text-decoration: none;
       letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
+    .nav-logo img { width: 26px; height: 26px; flex-shrink: 0; }
     .nav-back {
       color: rgba(255,255,255,0.6);
       text-decoration: none;
@@ -331,7 +338,10 @@
   <div class="bg"></div>
 
   <nav>
-    <a href="index.html" class="nav-logo">StaffAlpine</a>
+    <a href="index.html" class="nav-logo">
+      <img src="stella-alpina.svg" alt="">
+      StaffAlpine
+    </a>
     <a href="index.html" class="nav-back">← Torna alla Home</a>
   </nav>
 
