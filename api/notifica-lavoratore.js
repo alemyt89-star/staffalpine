@@ -3,23 +3,24 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { settore } = req.body;
-  if (!settore) return res.status(400).json({ error: 'Settore mancante' });
+  const { mansione } = req.body;
+  if (!mansione) return res.status(400).json({ error: 'Mansione mancante' });
 
   try {
-    // Cerca aziende con offerte attive nello stesso settore
     const supabaseUrl = 'https://maeoqoxzjzusjwrdrkbd.supabase.co';
-    const supabaseKey = process.env.SUPABASE_SERVICE_KEY || 'sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX';
+    const supabaseKey = 'sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX';
 
-    // 1. Trova offerte attive con stesso settore
+    // 1. Trova offerte attive con ruolo simile alla mansione del lavoratore
     const offerteRes = await fetch(
-      `${supabaseUrl}/rest/v1/offerte_lavoro?settore=eq.${encodeURIComponent(settore)}&is_attiva=eq.true&select=azienda_id,nome_azienda`,
+      `${supabaseUrl}/rest/v1/offerte_lavoro?ruolo=ilike.*${encodeURIComponent(mansione)}*&is_attiva=eq.true&select=azienda_id,nome_azienda,ruolo`,
       { headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` } }
     );
     const offerte = await offerteRes.json();
 
+    console.log(`Mansione: ${mansione}, Offerte trovate: ${offerte?.length || 0}`);
+
     if (!offerte || offerte.length === 0) {
-      return res.status(200).json({ success: true, notifiche: 0 });
+      return res.status(200).json({ success: true, notifiche: 0, msg: 'Nessuna offerta compatibile' });
     }
 
     // 2. Aziende uniche
@@ -33,12 +34,15 @@ export default async function handler(req, res) {
     );
     const profili = await profiliRes.json();
 
+    console.log(`Profili trovati: ${profili?.length || 0}`);
+
     // 4. Invia email solo alle aziende approvate con email valida
     const aziendeDaNotificare = profili.filter(p => p.is_approvata && p.email);
-    let inviate = 0;
+    console.log(`Aziende da notificare: ${aziendeDaNotificare.length}`);
 
+    let inviate = 0;
     for (const azienda of aziendeDaNotificare) {
-      await fetch('https://api.resend.com/emails', {
+      const emailRes = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
@@ -47,7 +51,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           from: 'StaffAlpine <noreply@staffalpine.it>',
           to: azienda.email,
-          subject: `🔔 Nuovo lavoratore disponibile — ${settore}`,
+          subject: `🔔 Nuovo lavoratore disponibile — ${mansione}`,
           html: `
             <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; background: #f0f2ee; padding: 32px; border-radius: 12px;">
               <div style="background: #1a2e1a; padding: 24px; border-radius: 8px; text-align: center; margin-bottom: 24px;">
@@ -57,7 +61,7 @@ export default async function handler(req, res) {
               <div style="background: white; padding: 24px; border-radius: 8px;">
                 <p style="color: #1a2e1a; font-size: 16px;">Gentile <strong>${azienda.nome_azienda}</strong>,</p>
                 <p style="color: #1a2e1a; font-size: 16px;">
-                  Un nuovo lavoratore nel settore <strong>${settore}</strong> si è appena registrato su StaffAlpine
+                  Un nuovo lavoratore con mansione <strong>${mansione}</strong> si è appena registrato su StaffAlpine
                   e potrebbe essere compatibile con le vostre offerte attive.
                 </p>
                 <div style="background: #f0f2ee; padding: 16px; border-radius: 8px; margin: 16px 0; border-left: 4px solid #52b788;">
@@ -73,13 +77,14 @@ export default async function handler(req, res) {
                 </div>
               </div>
               <p style="color: #6b705c; font-size: 11px; text-align: center; margin-top: 16px;">
-                Per non ricevere più queste notifiche, accedi alla dashboard e modifica le preferenze.<br>
                 StaffAlpine — Valle d'Aosta
               </p>
             </div>
           `
         })
       });
+      const emailData = await emailRes.json();
+      console.log(`Email inviata a ${azienda.email}:`, emailData);
       inviate++;
     }
 
