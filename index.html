@@ -780,8 +780,15 @@
           observer.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.1 });
+    }, { threshold: 0.05 });
     document.querySelectorAll('.feature-card, .step-item, .step').forEach(el => observer.observe(el));
+
+    // Fallback — mostra tutto dopo 500ms nel caso l'observer non scatti
+    setTimeout(() => {
+      document.querySelectorAll('.feature-card, .step-item, .step').forEach((el, i) => {
+        setTimeout(() => el.classList.add('visible'), i * 80);
+      });
+    }, 500);
 
     // ── MODAL PRIVACY ──
     const PRIVACY_KEY = 'staffalpine_privacy_v1';
