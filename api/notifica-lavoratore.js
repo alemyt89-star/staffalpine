@@ -12,7 +12,7 @@ module.exports = async function handler(req, res) {
 
     // 1. Recupera TUTTE le offerte attive
     const offerteRes = await fetch(
-      `${supabaseUrl}/rest/v1/offerte_lavoro?is_attiva=eq.true&select=azienda_id,nome_azienda,ruolo`,
+      `${supabaseUrl}/rest/v1/offerte_lavoro?select=azienda_id,nome_azienda,ruolo`,
       { headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` } }
     );
     const tutteOfferte = await offerteRes.json();
