@@ -145,6 +145,7 @@
     <button class="tab-btn" onclick="showTab('notifiche',this)">🔔 Lavoratori <span id="badge-notifiche" style="background:var(--rosso);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;display:none;">0</span></button>
     <button class="tab-btn" onclick="showTab('mie-offerte',this)">📋 Le Mie Offerte</button>
     <button class="tab-btn" onclick="showTab('offerte',this)">📢 Pubblica Offerta</button>
+    <button class="tab-btn" onclick="showTab('profilo-az',this)">🏢 Il Mio Profilo</button>
     <button class="tab-btn" onclick="showTab('talenti',this)">🔍 Database Talenti</button>
     <button class="tab-btn" onclick="showTab('mercato',this)">📋 Recensioni Mercato</button>
   </div>
@@ -245,12 +246,90 @@
             <label class="form-label">Descrizione Offerta</label>
             <textarea id="j-desc" class="form-control" placeholder="Descrivi il ruolo, la stagione, eventuali benefit..."></textarea>
           </div>
+          <!-- CALENDARIO DISPONIBILITÀ -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group">
+              <label class="form-label">Periodo Dal</label>
+              <input type="date" id="j-dal" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Periodo Al</label>
+              <input type="date" id="j-al" class="form-control">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tipo Contratto</label>
+            <select id="j-tipo" class="form-control">
+              <option value="Stagionale Invernale">Stagionale Invernale</option>
+              <option value="Stagionale Estiva">Stagionale Estiva</option>
+              <option value="Extra / Weekend">Extra / Weekend</option>
+              <option value="Fisso">Fisso tutto l'anno</option>
+            </select>
+          </div>
           <div class="form-group">
             <label class="form-label">Contatto per Candidature</label>
             <input type="text" id="j-contatto" class="form-control" placeholder="Email o numero di telefono">
           </div>
           <button class="btn-primary" onclick="pubblicaOfferta()" style="margin-top:6px;">🚀 Pubblica Offerta</button>
         </div>
+      </div>
+    </div>
+
+    <!-- PROFILO AZIENDA -->
+    <div id="profilo-az" class="section">
+      <div class="card">
+        <div class="card-title">🏢 Scheda Pubblica della tua Azienda</div>
+        <p style="font-size:13px;color:var(--pietra);margin-bottom:20px;">Queste informazioni saranno visibili ai lavoratori nella pagina pubblica della tua azienda.</p>
+        <div class="form-group">
+          <label class="form-label">Descrizione Azienda</label>
+          <textarea id="az-descrizione" class="form-control" rows="4" placeholder="Descrivi la tua attività, l'ambiente di lavoro, i valori aziendali..."></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="form-group">
+            <label class="form-label">Numero Dipendenti</label>
+            <select id="az-dipendenti" class="form-control">
+              <option value="">— Seleziona —</option>
+              <option value="1-5">1 - 5</option>
+              <option value="6-15">6 - 15</option>
+              <option value="16-30">16 - 30</option>
+              <option value="31-50">31 - 50</option>
+              <option value="50+">Più di 50</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Zona</label>
+            <select id="az-zona" class="form-control">
+              <option value="">— Seleziona —</option>
+              <option value="Alta Valle">Alta Valle</option>
+              <option value="Aosta">Aosta e dintorni</option>
+              <option value="Bassa Valle">Bassa Valle</option>
+              <option value="Ayas-Gressoney">Val d'Ayas / Gressoney</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tipi di contratto offerti</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--grigio);padding:14px;border-radius:10px;">
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" id="ct-stagionale"> Stagionale</label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" id="ct-fisso"> Fisso</label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" id="ct-extra"> Extra / Weekend</label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" id="ct-apprendistato"> Apprendistato</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Lingue richieste al personale</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--grigio);padding:14px;border-radius:10px;">
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" id="lng-fr"> Francese</label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" id="lng-en"> Inglese</label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" id="lng-de"> Tedesco</label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" id="lng-es"> Spagnolo</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sito Web (opzionale)</label>
+          <input type="url" id="az-sito" class="form-control" placeholder="https://www.tuohotel.it">
+        </div>
+        <button class="btn-primary" onclick="salvaProfiloAzienda()" style="margin-top:6px;">💾 Salva Profilo Pubblico</button>
       </div>
     </div>
 
@@ -419,16 +498,77 @@
       const ruolo=document.getElementById('j-ruolo').value;
       const desc=document.getElementById('j-desc').value;
       const contatti=document.getElementById('j-contatto').value;
+      const dal=document.getElementById('j-dal').value;
+      const al=document.getElementById('j-al').value;
+      const tipo=document.getElementById('j-tipo').value;
       if(!ruolo||!desc||!contatti)return alert("Compila tutti i campi!");
       const{data:{user}}=await supabaseClient.auth.getUser();
       const{data:profilo}=await supabaseClient.from('profili_aziende').select('*').eq('id',user.id).maybeSingle();
       const{error}=await supabaseClient.from('offerte_lavoro').insert([{
         azienda_id:user.id,
         nome_azienda:profilo?profilo.nome_azienda:'Azienda',
-        localita:profilo?profilo.localita:"Valle d'Aosta",
-        ruolo,descrizione:desc,contatti,is_attiva:true
+        localita:profilo?profilo.zona:"Valle d'Aosta",
+        ruolo,descrizione:desc,contatti,is_attiva:true,
+        settore:tipo,
+        periodo_dal:dal||null,
+        periodo_al:al||null
       }]);
-      if(!error){alert("✅ Offerta pubblicata!");caricaMieOfferte();showTab('mie-offerte',document.querySelector('.tab-btn:nth-child(3)'));}
+      if(!error){
+        // Pulisci form
+        ['j-ruolo','j-desc','j-contatto','j-dal','j-al'].forEach(id=>{
+          const el=document.getElementById(id);
+          if(el)el.value='';
+        });
+        alert("✅ Offerta pubblicata!");
+        caricaMieOfferte();
+        showTab('mie-offerte',document.querySelector('.tab-btn:nth-child(3)'));
+      }
+      else alert("Errore: "+error.message);
+    }
+
+    async function caricaProfiloAzienda(){
+      const{data:{user}}=await supabaseClient.auth.getUser();
+      const{data:profilo}=await supabaseClient.from('profili_aziende').select('*').eq('id',user.id).maybeSingle();
+      if(!profilo)return;
+      if(profilo.descrizione)document.getElementById('az-descrizione').value=profilo.descrizione;
+      if(profilo.num_dipendenti)document.getElementById('az-dipendenti').value=profilo.num_dipendenti;
+      if(profilo.zona)document.getElementById('az-zona').value=profilo.zona;
+      if(profilo.sito_web)document.getElementById('az-sito').value=profilo.sito_web;
+      // Contratti
+      const ct=profilo.tipi_contratto?JSON.parse(profilo.tipi_contratto):[];
+      if(ct.includes('Stagionale'))document.getElementById('ct-stagionale').checked=true;
+      if(ct.includes('Fisso'))document.getElementById('ct-fisso').checked=true;
+      if(ct.includes('Extra'))document.getElementById('ct-extra').checked=true;
+      if(ct.includes('Apprendistato'))document.getElementById('ct-apprendistato').checked=true;
+      // Lingue
+      const lng=profilo.lingue_richieste?JSON.parse(profilo.lingue_richieste):[];
+      if(lng.includes('fr'))document.getElementById('lng-fr').checked=true;
+      if(lng.includes('en'))document.getElementById('lng-en').checked=true;
+      if(lng.includes('de'))document.getElementById('lng-de').checked=true;
+      if(lng.includes('es'))document.getElementById('lng-es').checked=true;
+    }
+
+    async function salvaProfiloAzienda(){
+      const{data:{user}}=await supabaseClient.auth.getUser();
+      const ct=[];
+      if(document.getElementById('ct-stagionale').checked)ct.push('Stagionale');
+      if(document.getElementById('ct-fisso').checked)ct.push('Fisso');
+      if(document.getElementById('ct-extra').checked)ct.push('Extra');
+      if(document.getElementById('ct-apprendistato').checked)ct.push('Apprendistato');
+      const lng=[];
+      if(document.getElementById('lng-fr').checked)lng.push('fr');
+      if(document.getElementById('lng-en').checked)lng.push('en');
+      if(document.getElementById('lng-de').checked)lng.push('de');
+      if(document.getElementById('lng-es').checked)lng.push('es');
+      const{error}=await supabaseClient.from('profili_aziende').update({
+        descrizione:document.getElementById('az-descrizione').value,
+        num_dipendenti:document.getElementById('az-dipendenti').value,
+        zona:document.getElementById('az-zona').value,
+        sito_web:document.getElementById('az-sito').value,
+        tipi_contratto:JSON.stringify(ct),
+        lingue_richieste:JSON.stringify(lng)
+      }).eq('id',user.id);
+      if(!error)alert("✅ Profilo aggiornato!");
       else alert("Errore: "+error.message);
     }
 
@@ -561,6 +701,7 @@
       if(id==='mercato'&&_isPremium)caricaTutteLeRecensioni();
       if(id==='mie-offerte')caricaMieOfferte();
       if(id==='notifiche')caricaNotificheLavoratori();
+      if(id==='profilo-az')caricaProfiloAzienda();
     }
 
     async function logout(){
