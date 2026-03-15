@@ -280,6 +280,21 @@
       <div class="card">
         <div class="card-title">🏢 Scheda Pubblica della tua Azienda</div>
         <p style="font-size:13px;color:var(--pietra);margin-bottom:20px;">Queste informazioni saranno visibili ai lavoratori nella pagina pubblica della tua azienda.</p>
+
+        <!-- FOTO PROFILO -->
+        <div class="form-group">
+          <label class="form-label">Logo / Foto Azienda</label>
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;">
+            <div id="az-foto-preview" style="width:80px;height:80px;border-radius:12px;background:var(--grigio);border:2px dashed rgba(0,0,0,0.1);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
+              <span style="font-size:28px;">🏢</span>
+            </div>
+            <div>
+              <input type="file" id="az-foto-input" accept="image/*" style="display:none;" onchange="anteprimaFotoAzienda(this)">
+              <button type="button" class="btn-secondary" style="padding:8px 16px;font-size:13px;" onclick="document.getElementById('az-foto-input').click()">📷 Carica immagine</button>
+              <p style="font-size:11px;color:var(--pietra);margin-top:6px;">JPG, PNG — max 2MB</p>
+            </div>
+          </div>
+        </div>
         <div class="form-group">
           <label class="form-label">Descrizione Azienda</label>
           <textarea id="az-descrizione" class="form-control" rows="4" placeholder="Descrivi la tua attività, l'ambiente di lavoro, i valori aziendali..."></textarea>
@@ -526,6 +541,18 @@
       else alert("Errore: "+error.message);
     }
 
+    function anteprimaFotoAzienda(input){
+      const file = input.files[0];
+      if(!file) return;
+      if(file.size > 2*1024*1024){ alert('Immagine troppo grande — max 2MB'); input.value=''; return; }
+      const reader = new FileReader();
+      reader.onload = e => {
+        const preview = document.getElementById('az-foto-preview');
+        preview.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
+      };
+      reader.readAsDataURL(file);
+    }
+
     async function caricaProfiloAzienda(){
       const{data:{user}}=await supabaseClient.auth.getUser();
       const{data:profilo}=await supabaseClient.from('profili_aziende').select('*').eq('id',user.id).maybeSingle();
@@ -534,6 +561,11 @@
       if(profilo.num_dipendenti)document.getElementById('az-dipendenti').value=profilo.num_dipendenti;
       if(profilo.zona)document.getElementById('az-zona').value=profilo.zona;
       if(profilo.sito_web)document.getElementById('az-sito').value=profilo.sito_web;
+      // Foto profilo
+      if(profilo.foto_url){
+        const preview=document.getElementById('az-foto-preview');
+        preview.innerHTML=`<img src="${profilo.foto_url}" style="width:100%;height:100%;object-fit:cover;">`;
+      }
       // Contratti
       const ct=profilo.tipi_contratto?JSON.parse(profilo.tipi_contratto):[];
       if(ct.includes('Stagionale'))document.getElementById('ct-stagionale').checked=true;
@@ -560,15 +592,30 @@
       if(document.getElementById('lng-en').checked)lng.push('en');
       if(document.getElementById('lng-de').checked)lng.push('de');
       if(document.getElementById('lng-es').checked)lng.push('es');
-      const{error}=await supabaseClient.from('profili_aziende').update({
+
+      let foto_url = null;
+      const fileInput = document.getElementById('az-foto-input');
+      if(fileInput.files.length > 0){
+        const file = fileInput.files[0];
+        const fileName = `aziende/${user.id}/logo.${file.name.split('.').pop()}`;
+        const{data:uploadData, error:uploadError} = await supabaseClient.storage.from('foto-aziende').upload(fileName, file, {upsert:true});
+        if(uploadError){ alert('Errore caricamento foto: '+uploadError.message); return; }
+        const{data:urlData} = supabaseClient.storage.from('foto-aziende').getPublicUrl(fileName);
+        foto_url = urlData.publicUrl;
+      }
+
+      const aggiornamenti = {
         descrizione:document.getElementById('az-descrizione').value,
         num_dipendenti:document.getElementById('az-dipendenti').value,
         zona:document.getElementById('az-zona').value,
         sito_web:document.getElementById('az-sito').value,
         tipi_contratto:JSON.stringify(ct),
         lingue_richieste:JSON.stringify(lng)
-      }).eq('id',user.id);
-      if(!error)alert("✅ Profilo aggiornato!");
+      };
+      if(foto_url) aggiornamenti.foto_url = foto_url;
+
+      const{error}=await supabaseClient.from('profili_aziende').update(aggiornamenti).eq('id',user.id);
+      if(!error) alert("✅ Profilo aggiornato!");
       else alert("Errore: "+error.message);
     }
 
@@ -632,16 +679,18 @@
     }
 
     async function toggleOfferta(id, attuale){
-      const{error} = await supabaseClient.from('offerte_lavoro').update({is_attiva: !attuale}).eq('id', id);
-      if(!error) caricaMieOfferte();
-      else alert('Errore: ' + error.message);
+      const{data:{user}}=await supabaseClient.auth.getUser();
+      const{error}=await supabaseClient.from('offerte_lavoro').update({is_attiva: !attuale}).eq('id', id).eq('azienda_id', user.id);
+      if(!error){ caricaMieOfferte(); }
+      else alert('Errore aggiornamento: ' + error.message);
     }
 
     async function eliminaOfferta(id){
       if(!confirm('Eliminare questa offerta?')) return;
-      const{error} = await supabaseClient.from('offerte_lavoro').delete().eq('id', id);
-      if(!error) caricaMieOfferte();
-      else alert('Errore: ' + error.message);
+      const{data:{user}}=await supabaseClient.auth.getUser();
+      const{error}=await supabaseClient.from('offerte_lavoro').delete().eq('id', id).eq('azienda_id', user.id);
+      if(!error){ caricaMieOfferte(); }
+      else alert('Errore eliminazione: ' + error.message);
     }
 
     async function caricaNotificheLavoratori(){
@@ -687,7 +736,7 @@
             ${l.lingua_francese && l.lingua_francese !== 'Nessuno' ? `<span class="lav-tag">🇫🇷 ${l.lingua_francese}</span>` : ''}
             ${l.lingua_inglese && l.lingua_inglese !== 'Nessuno' ? `<span class="lav-tag">🇬🇧 ${l.lingua_inglese}</span>` : ''}
           </div>
-          ${_isPremium ? `<button class="btn-primary" style="margin-top:12px;padding:8px 16px;font-size:13px;" onclick="inviaPropostaAnonima('${l.user_id}')">📩 Invia Proposta</button>` : '<p style="font-size:12px;color:var(--pietra);margin-top:10px;">🔒 Attiva Premium per contattare il lavoratore</p>'}
+          ${_isPremium ? `<button class="btn-primary" style="margin-top:12px;padding:8px 16px;font-size:13px;" onclick="inviaInteresse('${l.user_id}')">📩 Invia Proposta</button>` : '<p style="font-size:12px;color:var(--pietra);margin-top:10px;">🔒 Attiva Premium per contattare il lavoratore</p>'}
         </div>
       `).join('');
     }
