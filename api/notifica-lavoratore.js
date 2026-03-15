@@ -31,9 +31,10 @@ module.exports = async function handler(req, res) {
 
     // 3. Aziende uniche
     const aziendeUniche = [...new Map(offerte.map(o => [o.azienda_id, o])).values()];
-    const ids = aziendeUniche.map(a => `id=eq.${a.azienda_id}`).join(',');
+    const ids = aziendeUniche.map(a => a.azienda_id);
+    const idsParam = ids.map(id => `"${id}"`).join(',');
     const profiliRes = await fetch(
-      `${supabaseUrl}/rest/v1/profili_aziende?or=(${ids})&select=id,nome_azienda,email,is_approvata`,
+      `${supabaseUrl}/rest/v1/profili_aziende?id=in.(${idsParam})&select=id,nome_azienda,email,is_approvata`,
       { headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` } }
     );
     const profili = await profiliRes.json();
