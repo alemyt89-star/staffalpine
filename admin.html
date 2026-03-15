@@ -95,6 +95,30 @@
     <button class="tab-btn" onclick="showTab('aziende',this)">🏢 Aziende <span class="tab-badge" id="badge-az">0</span></button>
     <button class="tab-btn" onclick="showTab('premium',this)">💎 Richieste Premium <span class="tab-badge" id="badge-prem">0</span></button>
   </div>
+  <!-- STATISTICHE GLOBALI -->
+  <div id="global-stats" style="background:var(--scuro);padding:16px 5%;display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;">
+    <div style="background:rgba(255,255,255,0.06);border-radius:12px;padding:14px 20px;min-width:130px;text-align:center;flex-shrink:0;">
+      <div id="gs-lavoratori" style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--verde-chiaro);">—</div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Lavoratori</div>
+    </div>
+    <div style="background:rgba(255,255,255,0.06);border-radius:12px;padding:14px 20px;min-width:130px;text-align:center;flex-shrink:0;">
+      <div id="gs-aziende" style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--verde-chiaro);">—</div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Aziende approvate</div>
+    </div>
+    <div style="background:rgba(255,255,255,0.06);border-radius:12px;padding:14px 20px;min-width:130px;text-align:center;flex-shrink:0;">
+      <div id="gs-recensioni" style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--oro-chiaro);">—</div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Recensioni settimana</div>
+    </div>
+    <div style="background:rgba(255,255,255,0.06);border-radius:12px;padding:14px 20px;min-width:160px;text-align:center;flex-shrink:0;">
+      <div id="gs-topazienda" style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--oro-chiaro);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;">—</div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">🏆 Più recensita</div>
+    </div>
+    <div style="background:rgba(255,255,255,0.06);border-radius:12px;padding:14px 20px;min-width:130px;text-align:center;flex-shrink:0;">
+      <div id="gs-premium" style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--oro-chiaro);">—</div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">⭐ Premium attive</div>
+    </div>
+  </div>
+
   <div class="container">
     <div id="recensioni" class="section active">
       <div class="stats-row">
@@ -129,9 +153,37 @@
       const{data:{user},error}=await supabaseClient.auth.getUser();
       if(error||!user||user.email!==ADMIN_EMAIL){window.location.replace('index.html');return;}
       document.body.style.display='block';
+      caricaStatisticheGlobali();
       caricaRecensioni();
       caricaAziende();
       caricaRichiestePremium();
+    }
+
+    /* ─── STATISTICHE GLOBALI ─── */
+    async function caricaStatisticheGlobali(){
+      const settimanaFa = new Date();
+      settimanaFa.setDate(settimanaFa.getDate() - 7);
+      const [
+        { count: totLavoratori },
+        { data: aziende },
+        { count: totRecSettimana },
+        { data: tutteRecensioni }
+      ] = await Promise.all([
+        supabaseClient.from('esperienze_lavoratori').select('*', { count: 'exact', head: true }),
+        supabaseClient.from('profili_aziende').select('nome_azienda,is_approvata,is_premium'),
+        supabaseClient.from('RECENSIONI').select('*', { count: 'exact', head: true }).gte('created_at', settimanaFa.toISOString()),
+        supabaseClient.from('RECENSIONI').select('AZIENDA')
+      ]);
+      const azApprovate = aziende?.filter(a => a.is_approvata).length || 0;
+      const azPremium = aziende?.filter(a => a.is_premium).length || 0;
+      const conteggio = {};
+      tutteRecensioni?.forEach(r => { if(r.AZIENDA) conteggio[r.AZIENDA] = (conteggio[r.AZIENDA]||0)+1; });
+      const topAzienda = Object.entries(conteggio).sort((a,b)=>b[1]-a[1])[0];
+      document.getElementById('gs-lavoratori').innerText = totLavoratori || 0;
+      document.getElementById('gs-aziende').innerText = azApprovate;
+      document.getElementById('gs-recensioni').innerText = totRecSettimana || 0;
+      document.getElementById('gs-topazienda').innerText = topAzienda ? `${topAzienda[0]} (${topAzienda[1]})` : '—';
+      document.getElementById('gs-premium').innerText = azPremium;
     }
 
     async function caricaRecensioni(){
