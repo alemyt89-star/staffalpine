@@ -436,6 +436,8 @@
 
       caricaDatiRecensioni(_nomeAzienda);
       caricaNotificheLavoratori();
+      // Carica profilo azienda all'avvio passando il profilo già disponibile
+      caricaProfiloAziendaDaProfilo(profilo);
       if(_isPremium){
         caricaDatabaseLavoratori();
         caricaTutteLeRecensioni();
@@ -608,6 +610,31 @@
         preview.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
       };
       reader.readAsDataURL(file);
+    }
+
+    function caricaProfiloAziendaDaProfilo(profilo){
+      if(!profilo) return;
+      // Precarica form
+      if(profilo.descrizione) document.getElementById('az-descrizione').value=profilo.descrizione;
+      if(profilo.num_dipendenti) document.getElementById('az-dipendenti').value=profilo.num_dipendenti;
+      if(profilo.zona) document.getElementById('az-zona').value=profilo.zona;
+      if(profilo.sito_web) document.getElementById('az-sito').value=profilo.sito_web;
+      if(profilo.foto_url) document.getElementById('az-foto-preview').innerHTML=`<img src="${profilo.foto_url}" style="width:100%;height:100%;object-fit:cover;">`;
+      const ct=profilo.tipi_contratto?JSON.parse(profilo.tipi_contratto):[];
+      if(ct.includes('Stagionale')) document.getElementById('ct-stagionale').checked=true;
+      if(ct.includes('Fisso')) document.getElementById('ct-fisso').checked=true;
+      if(ct.includes('Extra')) document.getElementById('ct-extra').checked=true;
+      if(ct.includes('Apprendistato')) document.getElementById('ct-apprendistato').checked=true;
+      const lng=profilo.lingue_richieste?JSON.parse(profilo.lingue_richieste):[];
+      if(lng.includes('fr')) document.getElementById('lng-fr').checked=true;
+      if(lng.includes('en')) document.getElementById('lng-en').checked=true;
+      if(lng.includes('de')) document.getElementById('lng-de').checked=true;
+      if(lng.includes('es')) document.getElementById('lng-es').checked=true;
+      // Mostra view se il profilo è compilato
+      if(profilo.descrizione || profilo.zona || profilo.foto_url){
+        aggiornaViewProfilo(profilo);
+        mostraViewProfilo();
+      }
     }
 
     async function caricaProfiloAzienda(){
