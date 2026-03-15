@@ -277,8 +277,32 @@
 
     <!-- PROFILO AZIENDA -->
     <div id="profilo-az" class="section">
+
+      <!-- VISUALIZZAZIONE PROFILO -->
+      <div id="profilo-az-view" style="display:none;">
+        <div class="card" style="margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+            <div style="display:flex;align-items:center;gap:16px;">
+              <div id="view-foto" style="width:72px;height:72px;border-radius:12px;background:var(--grigio);overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <span style="font-size:28px;">🏢</span>
+              </div>
+              <div>
+                <h2 id="view-nome" style="font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--scuro);"></h2>
+                <p id="view-zona" style="font-size:13px;color:var(--pietra);"></p>
+                <a id="view-sito" href="#" target="_blank" style="font-size:12px;color:var(--verde);display:none;"></a>
+              </div>
+            </div>
+            <button class="btn-secondary" style="padding:8px 16px;font-size:13px;" onclick="mostraFormProfilo()">✏️ Modifica</button>
+          </div>
+          <p id="view-descrizione" style="font-size:13px;color:var(--testo);margin-top:16px;line-height:1.6;"></p>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;" id="view-tags"></div>
+        </div>
+      </div>
+
+      <!-- FORM MODIFICA/CREAZIONE -->
+      <div id="profilo-az-form">
       <div class="card">
-        <div class="card-title">🏢 Scheda Pubblica della tua Azienda</div>
+        <div class="card-title" id="profilo-form-title">🏢 Scheda Pubblica della tua Azienda</div>
         <p style="font-size:13px;color:var(--pietra);margin-bottom:20px;">Queste informazioni saranno visibili ai lavoratori nella pagina pubblica della tua azienda.</p>
 
         <!-- FOTO PROFILO -->
@@ -344,7 +368,11 @@
           <label class="form-label">Sito Web (opzionale)</label>
           <input type="url" id="az-sito" class="form-control" placeholder="https://www.tuohotel.it">
         </div>
-        <button class="btn-primary" onclick="salvaProfiloAzienda()" style="margin-top:6px;">💾 Salva Profilo Pubblico</button>
+        <div style="display:flex;gap:10px;margin-top:6px;">
+          <button class="btn-primary" onclick="salvaProfiloAzienda()">💾 Salva Profilo</button>
+          <button class="btn-secondary" id="btn-annulla-profilo" onclick="mostraViewProfilo()" style="display:none;">Annulla</button>
+        </div>
+      </div>
       </div>
     </div>
 
@@ -541,7 +569,34 @@
       else alert("Errore: "+error.message);
     }
 
-    function anteprimaFotoAzienda(input){
+    function mostraViewProfilo(){
+      document.getElementById('profilo-az-view').style.display='block';
+      document.getElementById('profilo-az-form').style.display='none';
+    }
+
+    function mostraFormProfilo(){
+      document.getElementById('profilo-az-view').style.display='none';
+      document.getElementById('profilo-az-form').style.display='block';
+      document.getElementById('btn-annulla-profilo').style.display='inline-flex';
+    }
+
+    function aggiornaViewProfilo(profilo){
+      document.getElementById('view-nome').innerText = profilo.nome_azienda || '';
+      document.getElementById('view-zona').innerText = profilo.zona ? '📍 '+profilo.zona : '';
+      document.getElementById('view-descrizione').innerText = profilo.descrizione || 'Nessuna descrizione inserita.';
+      const sitoEl = document.getElementById('view-sito');
+      if(profilo.sito_web){ sitoEl.href=profilo.sito_web; sitoEl.innerText='🌐 '+profilo.sito_web; sitoEl.style.display='inline'; }
+      else sitoEl.style.display='none';
+      if(profilo.foto_url){
+        document.getElementById('view-foto').innerHTML=`<img src="${profilo.foto_url}" style="width:100%;height:100%;object-fit:cover;">`;
+      }
+      // Tags
+      const tags=[];
+      if(profilo.num_dipendenti)tags.push(`👥 ${profilo.num_dipendenti} dipendenti`);
+      try{ const ct=JSON.parse(profilo.tipi_contratto||'[]'); ct.forEach(c=>tags.push('📋 '+c)); }catch(e){}
+      try{ const lng=JSON.parse(profilo.lingue_richieste||'[]'); lng.forEach(l=>{ const map={fr:'🇫🇷 Francese',en:'🇬🇧 Inglese',de:'🇩🇪 Tedesco',es:'🇪🇸 Spagnolo'}; tags.push(map[l]||l); }); }catch(e){}
+      document.getElementById('view-tags').innerHTML=tags.map(t=>`<span style="background:var(--grigio);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--pietra);">${t}</span>`).join('');
+    }
       const file = input.files[0];
       if(!file) return;
       if(file.size > 2*1024*1024){ alert('Immagine troppo grande — max 2MB'); input.value=''; return; }
@@ -557,22 +612,26 @@
       const{data:{user}}=await supabaseClient.auth.getUser();
       const{data:profilo}=await supabaseClient.from('profili_aziende').select('*').eq('id',user.id).maybeSingle();
       if(!profilo)return;
+
+      // Se ha già un profilo compilato, mostra la view
+      if(profilo.descrizione || profilo.zona || profilo.foto_url){
+        aggiornaViewProfilo(profilo);
+        mostraViewProfilo();
+      }
+
+      // Precarica il form con i dati esistenti
       if(profilo.descrizione)document.getElementById('az-descrizione').value=profilo.descrizione;
       if(profilo.num_dipendenti)document.getElementById('az-dipendenti').value=profilo.num_dipendenti;
       if(profilo.zona)document.getElementById('az-zona').value=profilo.zona;
       if(profilo.sito_web)document.getElementById('az-sito').value=profilo.sito_web;
-      // Foto profilo
       if(profilo.foto_url){
-        const preview=document.getElementById('az-foto-preview');
-        preview.innerHTML=`<img src="${profilo.foto_url}" style="width:100%;height:100%;object-fit:cover;">`;
+        document.getElementById('az-foto-preview').innerHTML=`<img src="${profilo.foto_url}" style="width:100%;height:100%;object-fit:cover;">`;
       }
-      // Contratti
       const ct=profilo.tipi_contratto?JSON.parse(profilo.tipi_contratto):[];
       if(ct.includes('Stagionale'))document.getElementById('ct-stagionale').checked=true;
       if(ct.includes('Fisso'))document.getElementById('ct-fisso').checked=true;
       if(ct.includes('Extra'))document.getElementById('ct-extra').checked=true;
       if(ct.includes('Apprendistato'))document.getElementById('ct-apprendistato').checked=true;
-      // Lingue
       const lng=profilo.lingue_richieste?JSON.parse(profilo.lingue_richieste):[];
       if(lng.includes('fr'))document.getElementById('lng-fr').checked=true;
       if(lng.includes('en'))document.getElementById('lng-en').checked=true;
@@ -615,7 +674,12 @@
       if(foto_url) aggiornamenti.foto_url = foto_url;
 
       const{error}=await supabaseClient.from('profili_aziende').update(aggiornamenti).eq('id',user.id);
-      if(!error) alert("✅ Profilo aggiornato!");
+      if(!error){
+        // Ricarica il profilo aggiornato e mostra la view
+        const{data:profilo}=await supabaseClient.from('profili_aziende').select('*').eq('id',user.id).maybeSingle();
+        if(profilo){ aggiornaViewProfilo(profilo); mostraViewProfilo(); }
+        alert("✅ Profilo aggiornato!");
+      }
       else alert("Errore: "+error.message);
     }
 
@@ -628,9 +692,9 @@
         return;
       }
       container.innerHTML=recs.map(r=>`
-        <div class="rec-card">
+        <div class="rec-card" style="cursor:${_isPremium?'pointer':'default'};" ${_isPremium?`onclick="window.location.href='dettaglio-azienda.html?nome=${encodeURIComponent(r.AZIENDA)}'"`  :''}>
           <div class="rec-header">
-            <span class="rec-azienda">🏢 ${r.AZIENDA}</span>
+            <span class="rec-azienda">🏢 ${r.AZIENDA} ${_isPremium?'<span style="font-size:10px;color:var(--verde);">→ Vedi dettaglio</span>':''}</span>
             <span class="rec-data">${new Date(r.created_at).toLocaleDateString('it-IT')}</span>
           </div>
           <div class="rec-voti">
@@ -671,8 +735,7 @@
             <p style="margin-top:4px;">📞 ${o.contatti || '—'}</p>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-            <button class="btn-secondary" style="padding:6px 14px;font-size:12px;" onclick="toggleOfferta('${o.id}', ${o.is_attiva})">${o.is_attiva ? '⏸ Sospendi' : '▶ Riattiva'}</button>
-            <button class="btn-secondary" style="padding:6px 14px;font-size:12px;color:var(--rosso);border-color:var(--rosso);" onclick="eliminaOfferta('${o.id}')">🗑️</button>
+            <button class="btn-secondary" style="padding:6px 14px;font-size:12px;color:var(--rosso);border-color:var(--rosso);" onclick="eliminaOfferta('${o.id}')">🗑️ Elimina</button>
           </div>
         </div>
       `).join('');
