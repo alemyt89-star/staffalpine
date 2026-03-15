@@ -709,7 +709,7 @@
           await fetch('/api/notifica-lavoratore',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({settore:dati.settore})
+            body:JSON.stringify({mansione:dati.mansione_principale})
           });
         }catch(e){console.log('Notifica non inviata:',e);}
         alert("✅ Profilo salvato!");
