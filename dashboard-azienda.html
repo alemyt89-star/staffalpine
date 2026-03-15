@@ -654,17 +654,7 @@
       if(document.getElementById('lng-de').checked)lng.push('de');
       if(document.getElementById('lng-es').checked)lng.push('es');
 
-      let foto_url = null;
-      const fileInput = document.getElementById('az-foto-input');
-      if(fileInput.files.length > 0){
-        const file = fileInput.files[0];
-        const fileName = `aziende/${user.id}/logo.${file.name.split('.').pop()}`;
-        const{data:uploadData, error:uploadError} = await supabaseClient.storage.from('foto-aziende').upload(fileName, file, {upsert:true});
-        if(uploadError){ alert('Errore caricamento foto: '+uploadError.message); return; }
-        const{data:urlData} = supabaseClient.storage.from('foto-aziende').getPublicUrl(fileName);
-        foto_url = urlData.publicUrl;
-      }
-
+      // Costruisci oggetto aggiornamenti con i dati del form
       const aggiornamenti = {
         descrizione:document.getElementById('az-descrizione').value,
         num_dipendenti:document.getElementById('az-dipendenti').value,
@@ -673,13 +663,34 @@
         tipi_contratto:JSON.stringify(ct),
         lingue_richieste:JSON.stringify(lng)
       };
-      if(foto_url) aggiornamenti.foto_url = foto_url;
+
+      // Carica foto se presente
+      const fileInput = document.getElementById('az-foto-input');
+      if(fileInput.files.length > 0){
+        const file = fileInput.files[0];
+        const fileName = `aziende/${user.id}/logo.${file.name.split('.').pop()}`;
+        const{data:uploadData, error:uploadError} = await supabaseClient.storage.from('foto-aziende').upload(fileName, file, {upsert:true});
+        if(uploadError){ alert('Errore caricamento foto: '+uploadError.message); return; }
+        const{data:urlData} = supabaseClient.storage.from('foto-aziende').getPublicUrl(fileName);
+        // Aggiungi timestamp per evitare cache
+        aggiornamenti.foto_url = urlData.publicUrl + '?t=' + Date.now();
+      }
 
       const{error}=await supabaseClient.from('profili_aziende').update(aggiornamenti).eq('id',user.id);
       if(!error){
-        // Ricarica il profilo aggiornato e mostra la view
-        const{data:profilo}=await supabaseClient.from('profili_aziende').select('*').eq('id',user.id).maybeSingle();
-        if(profilo){ aggiornaViewProfilo(profilo); mostraViewProfilo(); }
+        // Aggiorna la view direttamente con i dati locali — no query extra
+        const profiloLocale = {
+          nome_azienda: _nomeAzienda,
+          descrizione: aggiornamenti.descrizione,
+          zona: aggiornamenti.zona,
+          sito_web: aggiornamenti.sito_web,
+          num_dipendenti: aggiornamenti.num_dipendenti,
+          tipi_contratto: aggiornamenti.tipi_contratto,
+          lingue_richieste: aggiornamenti.lingue_richieste,
+          foto_url: aggiornamenti.foto_url || document.getElementById('az-foto-preview').querySelector('img')?.src || null
+        };
+        aggiornaViewProfilo(profiloLocale);
+        mostraViewProfilo();
         alert("✅ Profilo aggiornato!");
       }
       else alert("Errore: "+error.message);
