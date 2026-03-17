@@ -60,7 +60,11 @@
       color: var(--oro-chiaro);
       text-decoration: none;
       letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
+    .nav-logo img { width: 26px; height: 26px; flex-shrink: 0; }
     .nav-links { display: flex; gap: 24px; align-items: center; }
     .nav-links a {
       color: rgba(255,255,255,0.75);
@@ -369,7 +373,7 @@
 
   <!-- NAVBAR -->
   <nav id="dynamic-nav" class="main-nav">
-    <a href="index.html" class="nav-logo">StaffAlpine</a>
+    <a href="index.html" class="nav-logo"><img src="stella-alpina.svg" alt="">StaffAlpine</a>
     <div id="nav-elements" class="nav-links"></div>
   </nav>
 

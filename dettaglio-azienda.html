@@ -29,7 +29,8 @@
 
     /* NAVBAR */
     .main-nav{background:var(--scuro);padding:14px 5%;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1000;box-shadow:0 2px 20px rgba(0,0,0,0.2);}
-    .nav-logo{font-family:'Playfair Display',serif;font-size:20px;color:var(--oro-chiaro);letter-spacing:1px;text-decoration:none;}
+    .nav-logo{font-family:'Playfair Display',serif;font-size:20px;color:var(--oro-chiaro);letter-spacing:1px;text-decoration:none;display:flex;align-items:center;gap:8px;}
+    .nav-logo img{width:24px;height:24px;flex-shrink:0;}
     .nav-links{display:flex;gap:20px;align-items:center;}
     .nav-links a{color:rgba(255,255,255,0.7);text-decoration:none;font-size:13px;font-weight:500;cursor:pointer;transition:color 0.2s;}
     .nav-links a:hover{color:white;}
@@ -118,7 +119,7 @@
 
   <!-- NAVBAR -->
   <nav class="main-nav">
-    <a href="index.html" class="nav-logo">StaffAlpine</a>
+    <a href="index.html" class="nav-logo"><img src="stella-alpina.svg" alt="">StaffAlpine</a>
     <div class="nav-links" id="nav-elements"></div>
   </nav>
 
