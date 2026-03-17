@@ -385,6 +385,12 @@
       }
     }
 
+    function condividiOfferta(id, ruolo, nomeAzienda){
+      const url = `https://staffalpine.it/offerta.html?id=${id}`;
+      const testo = `🏔️ Offerta di lavoro in Valle d'Aosta!\n\n*${ruolo}* presso ${nomeAzienda}\n\nVedi i dettagli e candidati su StaffAlpine:\n${url}`;
+      window.open(`https://wa.me/?text=${encodeURIComponent(testo)}`, '_blank');
+    }
+
     async function caricaOfferte(){
       const{data:offerte}=await supabaseClient.from('offerte_lavoro').select('*').eq('is_attiva',true);
       const container=document.getElementById('lista-offerte');
@@ -397,8 +403,12 @@
             <span style="font-size:11px;color:#94a3b8;">${new Date(o.created_at).toLocaleDateString('it-IT')}</span>
           </div>
           <p class="offerta-azienda">🏢 ${o.nome_azienda||'Azienda StaffAlpine'}</p>
-          <p class="offerta-desc">${o.descrizione||''}</p>
+          <p class="offerta-desc">${o.descrizione ? o.descrizione.substring(0,120)+'...' : ''}</p>
           <div class="offerta-contatto">📧 <b>Contatti:</b> ${o.contatti||'Contattare in piattaforma'}</div>
+          <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+            <button onclick="window.location.href='offerta.html?id=${o.id}'" style="background:var(--verde);color:white;border:none;padding:8px 16px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">👁️ Vedi offerta</button>
+            <button onclick="condividiOfferta('${o.id}','${(o.ruolo||'').replace(/'/g,"\\'")}','${(o.nome_azienda||'').replace(/'/g,"\\'")}');" style="background:#25D366;color:white;border:none;padding:8px 16px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">📲 Condividi</button>
+          </div>
         </div>`).join('');
     }
 

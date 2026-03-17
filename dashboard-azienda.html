@@ -796,6 +796,19 @@
       alert("✅ Richiesta inviata!");
     }
 
+    function condividiWhatsApp(id, ruolo, nomeAzienda){
+      const url = `https://staffalpine.it/offerta.html?id=${id}`;
+      const testo = `🏔️ Offerta di lavoro in Valle d'Aosta!\n\n*${ruolo}* presso ${nomeAzienda}\n\nVedi i dettagli e candidati su StaffAlpine:\n${url}`;
+      window.open(`https://wa.me/?text=${encodeURIComponent(testo)}`, '_blank');
+    }
+
+    function copiaLink(id){
+      const url = `https://staffalpine.it/offerta.html?id=${id}`;
+      navigator.clipboard.writeText(url).then(()=>alert('✅ Link copiato!')).catch(()=>{
+        prompt('Copia questo link:', url);
+      });
+    }
+
     async function caricaMieOfferte(){
       const container = document.getElementById('lista-mie-offerte');
       const{data:{user}} = await supabaseClient.auth.getUser();
@@ -816,6 +829,8 @@
             <p style="margin-top:4px;">📞 ${o.contatti || '—'}</p>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <button class="btn-secondary" style="padding:6px 14px;font-size:12px;color:#25D366;border-color:#25D366;" onclick="condividiWhatsApp('${o.id}','${(o.ruolo||'').replace(/'/g,"\\'")}','${(o.nome_azienda||'').replace(/'/g,"\\'")}')">📲 WhatsApp</button>
+            <button class="btn-secondary" style="padding:6px 14px;font-size:12px;" onclick="copiaLink('${o.id}')">🔗 Copia link</button>
             <button class="btn-secondary" style="padding:6px 14px;font-size:12px;color:var(--rosso);border-color:var(--rosso);" onclick="eliminaOfferta('${o.id}')">🗑️ Elimina</button>
           </div>
         </div>

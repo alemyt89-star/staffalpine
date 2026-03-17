@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offerta di Lavoro — StaffAlpine</title>
+  <meta name="description" content="Offerta di lavoro in Valle d'Aosta su StaffAlpine">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a2e1a">
+  <link rel="apple-touch-icon" href="icona-192.png">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --verde:#2d6a4f;--verde-chiaro:#52b788;--verde-accento:#74c69d;
+      --oro:#c9a84c;--oro-chiaro:#e9c46a;--scuro:#1a2e1a;
+      --pietra:#6b705c;--grigio:#f0f2ee;--testo:#2c3e2d;--rosso:#c0392b;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--grigio);color:var(--testo);min-height:100vh;}
+
+    /* NAVBAR */
+    .navbar{background:rgba(26,46,26,0.97);padding:14px 5%;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1000;box-shadow:0 2px 20px rgba(0,0,0,0.3);}
+    .nav-logo{font-family:'Playfair Display',serif;font-size:20px;color:var(--oro-chiaro);letter-spacing:1px;text-decoration:none;display:flex;align-items:center;gap:8px;}
+    .nav-logo img{width:26px;height:26px;flex-shrink:0;}
+    .nav-links{display:flex;gap:16px;align-items:center;}
+    .nav-links a{color:rgba(255,255,255,0.8);text-decoration:none;font-size:13px;font-weight:500;transition:color 0.3s;}
+    .nav-links a:hover{color:var(--oro-chiaro);}
+    .nav-cta{background:var(--verde-chiaro);color:white !important;padding:8px 18px;border-radius:10px;font-weight:600 !important;}
+
+    /* HERO */
+    .hero{background:linear-gradient(135deg,var(--scuro) 0%,#0d1f0d 100%);padding:50px 5% 60px;position:relative;overflow:hidden;}
+    .hero::before{content:'';position:absolute;top:-80px;right:-80px;width:350px;height:350px;background:radial-gradient(circle,rgba(82,183,136,0.08),transparent 70%);border-radius:50%;}
+    .hero-inner{max-width:700px;margin:0 auto;position:relative;z-index:1;}
+    .btn-back{display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,0.5);font-size:13px;cursor:pointer;margin-bottom:20px;transition:color 0.2s;background:none;border:none;font-family:'DM Sans',sans-serif;padding:0;}
+    .btn-back:hover{color:white;}
+    .hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(82,183,136,0.15);border:1px solid rgba(82,183,136,0.3);color:var(--verde-accento);font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:5px 14px;border-radius:20px;margin-bottom:16px;}
+    .hero-ruolo{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);color:white;line-height:1.15;margin-bottom:10px;}
+    .hero-azienda{font-size:15px;color:var(--oro-chiaro);font-weight:600;margin-bottom:20px;}
+    .hero-tags{display:flex;flex-wrap:wrap;gap:8px;}
+    .hero-tag{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);font-size:12px;padding:5px 12px;border-radius:20px;}
+
+    /* CONTAINER */
+    .container{max-width:700px;margin:-24px auto 0;padding:0 5% 60px;position:relative;z-index:10;}
+
+    /* CARD */
+    .card{background:white;border-radius:16px;padding:28px;box-shadow:0 2px 12px rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.05);margin-bottom:20px;}
+    .card-title{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--scuro);margin-bottom:16px;}
+
+    /* DESCRIZIONE */
+    .desc-text{font-size:14px;color:var(--testo);line-height:1.8;white-space:pre-wrap;}
+    .disclaimer{font-size:11px;color:var(--pietra);border-top:1px solid var(--grigio);padding-top:12px;margin-top:16px;line-height:1.6;}
+
+    /* INFO ROW */
+    .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;}
+    .info-item{background:var(--grigio);border-radius:10px;padding:14px;text-align:center;}
+    .info-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pietra);display:block;margin-bottom:4px;}
+    .info-val{font-size:14px;font-weight:600;color:var(--scuro);}
+
+    /* CTA */
+    .cta-card{background:linear-gradient(135deg,var(--scuro),#0d1f0d);border-radius:16px;padding:28px;text-align:center;color:white;}
+    .cta-card h3{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:10px;}
+    .cta-card p{font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:24px;line-height:1.6;}
+    .cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+    .btn-green{background:linear-gradient(135deg,var(--verde),var(--verde-chiaro));color:white;text-decoration:none;padding:13px 28px;border-radius:12px;font-weight:600;font-size:14px;transition:all 0.3s;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;}
+    .btn-green:hover{transform:translateY(-2px);}
+    .btn-wa{background:#25D366;color:white;text-decoration:none;padding:13px 28px;border-radius:12px;font-weight:600;font-size:14px;transition:all 0.3s;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;}
+    .btn-wa:hover{transform:translateY(-2px);}
+
+    /* EMPTY */
+    .empty-state{text-align:center;padding:80px 20px;color:var(--pietra);}
+    .empty-state .empty-icon{font-size:48px;display:block;margin-bottom:16px;}
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">
+      <img src="stella-alpina.svg" alt="">
+      StaffAlpine
+    </a>
+    <div class="nav-links">
+      <a href="login.html">Accedi</a>
+      <a href="login.html" class="nav-cta">Registrati →</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="azienda-hero" id="hero-section" style="background:linear-gradient(135deg,#1a2e1a 0%,#0d1f0d 100%);padding:50px 5% 60px;position:relative;overflow:hidden;">
+    <div style="max-width:700px;margin:0 auto;position:relative;z-index:1;">
+      <button class="btn-back" onclick="window.history.back()">← Torna indietro</button>
+      <div id="hero-badge" class="hero-badge">🏔️ Offerta di Lavoro</div>
+      <h1 id="hero-ruolo" style="font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.6rem);color:white;line-height:1.15;margin-bottom:10px;">Caricamento...</h1>
+      <p id="hero-azienda" style="font-size:15px;color:var(--oro-chiaro);font-weight:600;margin-bottom:20px;"></p>
+      <div id="hero-tags" class="hero-tags"></div>
+    </div>
+  </div>
+
+  <!-- CONTENUTO -->
+  <div class="container">
+    <div id="contenuto">
+      <div class="empty-state">
+        <span class="empty-icon">⏳</span>
+        <p>Caricamento offerta...</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL="https://maeoqoxzjzusjwrdrkbd.supabase.co";
+    const SUPABASE_KEY="sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX";
+    const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+    async function caricaOfferta(){
+      const params=new URLSearchParams(window.location.search);
+      const id=params.get('id');
+      if(!id){
+        document.getElementById('contenuto').innerHTML=`<div class="empty-state"><span class="empty-icon">❌</span><p>Offerta non trovata.</p></div>`;
+        return;
+      }
+
+      const{data:o,error}=await supabaseClient.from('offerte_lavoro').select('*').eq('id',id).maybeSingle();
+
+      if(error||!o){
+        document.getElementById('contenuto').innerHTML=`<div class="empty-state"><span class="empty-icon">📭</span><p>Questa offerta non è più disponibile.</p></div>`;
+        return;
+      }
+
+      // Hero
+      document.title=`${o.ruolo} — StaffAlpine`;
+      document.getElementById('hero-ruolo').innerText=o.ruolo||'Posizione Aperta';
+      document.getElementById('hero-azienda').innerText='🏢 '+(o.nome_azienda||'Azienda in Valle d\'Aosta');
+
+      // Tags hero
+      const tags=[];
+      if(o.localita)tags.push('📍 '+o.localita);
+      if(o.settore)tags.push('📋 '+o.settore);
+      if(o.periodo_dal&&o.periodo_al){
+        const dal=new Date(o.periodo_dal).toLocaleDateString('it-IT',{month:'short',year:'numeric'});
+        const al=new Date(o.periodo_al).toLocaleDateString('it-IT',{month:'short',year:'numeric'});
+        tags.push('📅 '+dal+' → '+al);
+      }
+      if(!o.is_attiva)tags.push('⏸ Offerta non più attiva');
+      document.getElementById('hero-tags').innerHTML=tags.map(t=>`<span class="hero-tag">${t}</span>`).join('');
+
+      // Descrizione — separa il disclaimer dalla descrizione
+      const descParts=(o.descrizione||'').split('\n\n---\n');
+      const descMain=descParts[0]||'';
+      const descDisclaimer=descParts[1]||'';
+
+      // Info grid
+      const infoHTML=`
+        <div class="card">
+          <div class="card-title">📋 Dettagli Offerta</div>
+          <div class="info-grid">
+            ${o.localita?`<div class="info-item"><span class="info-label">Zona</span><span class="info-val">📍 ${o.localita}</span></div>`:''}
+            ${o.settore?`<div class="info-item"><span class="info-label">Tipo Contratto</span><span class="info-val">${o.settore}</span></div>`:''}
+            ${o.periodo_dal?`<div class="info-item"><span class="info-label">Dal</span><span class="info-val">${new Date(o.periodo_dal).toLocaleDateString('it-IT',{day:'numeric',month:'long',year:'numeric'})}</span></div>`:''}
+            ${o.periodo_al?`<div class="info-item"><span class="info-label">Al</span><span class="info-val">${new Date(o.periodo_al).toLocaleDateString('it-IT',{day:'numeric',month:'long',year:'numeric'})}</span></div>`:''}
+          </div>
+        </div>
+      `;
+
+      // Descrizione card
+      const descHTML=descMain?`
+        <div class="card">
+          <div class="card-title">📝 Descrizione</div>
+          <p class="desc-text">${descMain}</p>
+          ${descDisclaimer?`<p class="disclaimer">${descDisclaimer}</p>`:''}
+        </div>
+      `:'';
+
+      // CTA
+      const ctaHTML=`
+        <div class="cta-card">
+          <h3>Interessato a questa offerta?</h3>
+          <p>Registrati su StaffAlpine per candidarti e scoprire tutte le opportunità di lavoro in Valle d'Aosta.</p>
+          <div class="cta-btns">
+            <a href="login.html" class="btn-green">🚀 Registrati e Candidati</a>
+            <button class="btn-wa" onclick="condividiWA()">📲 Condividi su WhatsApp</button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('contenuto').innerHTML=infoHTML+descHTML+ctaHTML;
+    }
+
+    function condividiWA(){
+      const url=window.location.href;
+      const ruolo=document.getElementById('hero-ruolo').innerText;
+      const azienda=document.getElementById('hero-azienda').innerText;
+      const testo=`🏔️ Offerta di lavoro in Valle d'Aosta!\n\n*${ruolo}* ${azienda}\n\nVedi i dettagli e candidati su StaffAlpine:\n${url}`;
+      window.open(`https://wa.me/?text=${encodeURIComponent(testo)}`, '_blank');
+    }
+
+    caricaOfferta();
+  </script>
+</body>
+</html>
