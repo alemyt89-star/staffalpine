@@ -578,8 +578,11 @@
         if(data)urlContratto=data.path;
       }
 
+      const nomeAziendaRaw = document.getElementById('nome_azienda').value.trim();
+      const nomeAziendaNorm = nomeAziendaRaw.replace(/\b\w/g, c => c.toUpperCase());
+
       const dati={
-        "AZIENDA":document.getElementById('nome_azienda').value,
+        "AZIENDA": nomeAziendaNorm,
         "PAGA_PUNTUALITA":document.getElementById('paga_puntualita').value,
         "VOTO_PAGA":parseInt(document.getElementById('voto_paga').value),
         "STRAORDINARI":document.getElementById('straordinari').value,

@@ -447,7 +447,9 @@
 
     async function caricaDatiRecensioni(nomeAz){
       const div=document.getElementById('stats-content');
-      const{data:recs}=await supabaseClient.from('RECENSIONI').select('*').ilike('AZIENDA',`%${nomeAz.trim()}%`).eq('VERIFICATA',true);
+      // Normalizza il nome per la ricerca — case insensitive, trim spazi
+      const nomeNorm = nomeAz.trim();
+      const{data:recs}=await supabaseClient.from('RECENSIONI').select('*').ilike('AZIENDA',`%${nomeNorm}%`).eq('VERIFICATA',true);
 
       if(!recs||recs.length===0){
         div.innerHTML=`<div class="empty-state"><span class="empty-icon">📭</span><h3>Nessuna recensione verificata</h3><p>Le recensioni appariranno qui una volta verificate dall'admin.</p></div>`;
