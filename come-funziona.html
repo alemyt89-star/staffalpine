@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a2e1a">
+  <link rel="apple-touch-icon" href="icona-192.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Come Funziona — StaffAlpine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --verde:#2d6a4f;--verde-chiaro:#52b788;--verde-accento:#74c69d;
+      --oro:#c9a84c;--oro-chiaro:#e9c46a;--scuro:#1a2e1a;
+      --pietra:#6b705c;--grigio:#f0f2ee;--testo:#2c3e2d;--rosso:#c0392b;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--grigio);color:var(--testo);}
+
+    /* NAVBAR */
+    .navbar{background:rgba(26,46,26,0.97);padding:14px 5%;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1000;box-shadow:0 2px 20px rgba(0,0,0,0.3);}
+    .nav-logo{font-family:'Playfair Display',serif;font-size:20px;color:var(--oro-chiaro);letter-spacing:1px;text-decoration:none;display:flex;align-items:center;gap:8px;}
+    .nav-logo img{width:26px;height:26px;flex-shrink:0;}
+    .nav-links{display:flex;gap:24px;align-items:center;}
+    .nav-links a{color:rgba(255,255,255,0.8);text-decoration:none;font-size:13px;font-weight:500;transition:color 0.3s;}
+    .nav-links a:hover{color:var(--oro-chiaro);}
+    .nav-cta{background:var(--verde-chiaro);color:white !important;padding:8px 18px;border-radius:10px;font-weight:600 !important;}
+    .nav-cta:hover{background:var(--verde-accento) !important;}
+
+    /* HERO */
+    .hero{background:linear-gradient(135deg,var(--scuro) 0%,#0d1f0d 100%);padding:80px 5% 90px;text-align:center;position:relative;overflow:hidden;}
+    .hero::before{content:'';position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(82,183,136,0.08),transparent 70%);border-radius:50%;}
+    .hero-tag{display:inline-block;background:rgba(233,196,106,0.15);border:1px solid rgba(233,196,106,0.3);color:var(--oro-chiaro);font-size:11px;letter-spacing:3px;text-transform:uppercase;padding:6px 16px;border-radius:20px;margin-bottom:24px;}
+    .hero h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.5rem);color:white;line-height:1.15;margin-bottom:20px;}
+    .hero h1 em{color:var(--verde-accento);font-style:normal;}
+    .hero p{font-size:16px;color:rgba(255,255,255,0.6);max-width:560px;margin:0 auto 36px;line-height:1.7;}
+    .hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+    .btn-primary{background:linear-gradient(135deg,var(--verde),var(--verde-chiaro));color:white;text-decoration:none;padding:14px 28px;border-radius:12px;font-weight:600;font-size:14px;transition:all 0.3s;}
+    .btn-secondary{background:rgba(255,255,255,0.08);color:white;text-decoration:none;padding:14px 28px;border-radius:12px;font-weight:500;font-size:14px;border:1px solid rgba(255,255,255,0.15);transition:all 0.3s;}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(82,183,136,0.3);}
+    .btn-secondary:hover{background:rgba(255,255,255,0.14);}
+
+    /* SEZIONI */
+    .section{padding:70px 5%;}
+    .section-alt{background:white;}
+    .section-inner{max-width:1000px;margin:0 auto;}
+    .section-tag{display:inline-block;background:var(--verde);color:white;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:20px;margin-bottom:14px;}
+    .section-title{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,3vw,2.2rem);color:var(--scuro);margin-bottom:10px;line-height:1.3;}
+    .section-title em{color:var(--verde);font-style:normal;}
+    .section-sub{color:var(--pietra);font-size:15px;line-height:1.7;max-width:600px;margin-bottom:40px;}
+
+    /* CARDS LAVORATORE / AZIENDA */
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+    @media(max-width:680px){.two-col{grid-template-columns:1fr;}}
+    .feature-block{background:var(--grigio);border-radius:16px;padding:30px;border:1px solid rgba(0,0,0,0.05);}
+    .feature-block.gold{background:linear-gradient(135deg,#fdf6e3,#fef9ed);border:1px solid rgba(201,168,76,0.2);}
+    .block-icon{font-size:32px;margin-bottom:16px;}
+    .block-title{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--scuro);margin-bottom:10px;}
+    .block-list{list-style:none;display:flex;flex-direction:column;gap:10px;}
+    .block-list li{font-size:14px;color:var(--testo);display:flex;align-items:flex-start;gap:10px;line-height:1.5;}
+    .block-list li::before{content:'✓';color:var(--verde-chiaro);font-weight:700;flex-shrink:0;margin-top:1px;}
+    .block-list li.oro::before{content:'⭐';font-size:12px;}
+
+    /* STEPS */
+    .steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;}
+    .step-item{text-align:center;padding:24px 16px;}
+    .step-num{width:48px;height:48px;border-radius:50%;background:var(--verde);color:white;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+    .step-item h4{font-size:15px;color:var(--scuro);margin-bottom:8px;font-family:'Playfair Display',serif;}
+    .step-item p{font-size:13px;color:var(--pietra);line-height:1.6;}
+
+    /* FAQ */
+    .faq-list{display:flex;flex-direction:column;gap:12px;max-width:700px;margin:0 auto;}
+    .faq-item{background:white;border-radius:12px;border:1px solid rgba(0,0,0,0.06);overflow:hidden;}
+    .faq-q{padding:18px 20px;font-weight:600;font-size:14px;color:var(--scuro);cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
+    .faq-q::after{content:'+';font-size:20px;color:var(--verde);font-weight:300;}
+    .faq-q.open::after{content:'−';}
+    .faq-a{padding:0 20px;max-height:0;overflow:hidden;transition:all 0.3s ease;font-size:14px;color:var(--pietra);line-height:1.7;}
+    .faq-a.open{padding:0 20px 18px;max-height:200px;}
+
+    /* CTA FINALE */
+    .cta-section{background:linear-gradient(135deg,var(--scuro) 0%,#0d1f0d 100%);padding:80px 5%;text-align:center;}
+    .cta-section h2{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);color:white;margin-bottom:16px;}
+    .cta-section h2 em{color:var(--verde-accento);font-style:normal;}
+    .cta-section p{color:rgba(255,255,255,0.55);font-size:15px;margin-bottom:36px;max-width:500px;margin-left:auto;margin-right:auto;}
+    .cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+
+    /* FOOTER */
+    footer{background:#0d1a0d;padding:30px 5%;text-align:center;}
+    footer p{color:rgba(255,255,255,0.3);font-size:12px;}
+
+    @media(max-width:540px){
+      .nav-links{gap:12px;}
+      .nav-links a:not(.nav-cta){display:none;}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">
+      <img src="stella-alpina.svg" alt="">
+      <div>StaffAlpine</div>
+    </a>
+    <div class="nav-links">
+      <a href="come-funziona.html" style="color:var(--oro-chiaro);">Come Funziona</a>
+      <a href="login.html">Per i Lavoratori</a>
+      <a href="login.html?role=business">Per le Aziende</a>
+      <a href="login.html" class="nav-cta">Accedi →</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <span class="hero-tag">Piattaforma Hospitality Valle d'Aosta</span>
+    <h1>Tutto quello che devi sapere<br>su <em>StaffAlpine</em></h1>
+    <p>La piattaforma che connette lavoratori e aziende dell'hospitality valdostano. Recensioni verificate, offerte di lavoro e molto altro.</p>
+    <div class="hero-btns">
+      <a href="login.html" class="btn-primary">Registrati Gratis</a>
+      <a href="login.html?role=business" class="btn-secondary">Sei un'Azienda?</a>
+    </div>
+  </section>
+
+  <!-- PER CHI È -->
+  <section class="section">
+    <div class="section-inner">
+      <div style="text-align:center;margin-bottom:40px;">
+        <span class="section-tag">Per chi è</span>
+        <h2 class="section-title">Una piattaforma,<br><em>due mondi</em></h2>
+      </div>
+      <div class="two-col">
+        <div class="feature-block">
+          <div class="block-icon">👷</div>
+          <div class="block-title">Per i Lavoratori</div>
+          <p style="font-size:13px;color:var(--pietra);margin-bottom:16px;line-height:1.6;">Accesso gratuito a tutto. Lascia recensioni verificate e fai scelte più consapevoli.</p>
+          <ul class="block-list">
+            <li>Lascia recensioni anonime e verificate</li>
+            <li>Consulta pagamenti, alloggi e gestione delle aziende</li>
+            <li>Crea il tuo profilo professionale con esperienze e lingue</li>
+            <li>Ricevi proposte di lavoro dalle aziende</li>
+            <li>Esplora tutte le offerte attive in Valle d'Aosta</li>
+          </ul>
+        </div>
+        <div class="feature-block">
+          <div class="block-icon">🏨</div>
+          <div class="block-title">Per le Aziende</div>
+          <p style="font-size:13px;color:var(--pietra);margin-bottom:16px;line-height:1.6;">Registra la tua azienda e inizia subito a trovare i migliori talenti.</p>
+          <ul class="block-list">
+            <li>Crea la tua scheda pubblica con foto e descrizione</li>
+            <li>Pubblica fino a 1 offerta di lavoro (piano base)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COME FUNZIONA LAVORATORI -->
+  <section class="section section-alt">
+    <div class="section-inner">
+      <div style="text-align:center;margin-bottom:40px;">
+        <span class="section-tag">Come funziona</span>
+        <h2 class="section-title">Semplice, <em>sicuro</em>, anonimo</h2>
+        <p class="section-sub" style="margin:10px auto 0;">Lasciare una recensione richiede meno di 5 minuti.</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <h4>Accedi con Email</h4>
+          <p>Nessuna password. Ricevi un codice OTP e sei dentro in 30 secondi.</p>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <h4>Lascia la Tua Recensione</h4>
+          <p>Valuta paga, alloggio e gestione. Puoi allegare un documento come prova.</p>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <h4>Viene Verificata</h4>
+          <p>Il nostro team controlla la recensione entro 24h e assegna il badge di autenticità.</p>
+        </div>
+        <div class="step-item">
+          <div class="step-num">4</div>
+          <h4>La Community ne Beneficia</h4>
+          <p>Tutti i lavoratori possono consultare i dati e fare scelte più consapevoli.</p>
+        </div>
+        <div class="step-item">
+          <div class="step-num">5</div>
+          <h4>Ricevi Proposte</h4>
+          <p>Le aziende trovano il tuo profilo e ti contattano in modo anonimo.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section section-alt">
+    <div class="section-inner">
+      <div style="text-align:center;margin-bottom:40px;">
+        <span class="section-tag">FAQ</span>
+        <h2 class="section-title">Domande <em>frequenti</em></h2>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">Le recensioni sono davvero anonime?</div>
+          <div class="faq-a">Sì. Il nome del lavoratore non è mai visibile alle aziende né ad altri utenti. Solo l'amministratore può verificare l'identità per garantire l'autenticità della recensione.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">Come viene verificata una recensione?</div>
+          <div class="faq-a">Il lavoratore può allegare un documento (busta paga, contratto, cedolino) come prova. Il nostro team controlla e assegna il badge di autenticità entro 24 ore.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">È gratuito per i lavoratori?</div>
+          <div class="faq-a">Sì, completamente gratuito. I lavoratori possono registrarsi, lasciare recensioni, creare il proprio profilo e ricevere proposte senza pagare nulla.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">Cosa possono fare le aziende su StaffAlpine?</div>
+          <div class="faq-a">Le aziende possono creare una scheda pubblica con foto e descrizione, pubblicare offerte di lavoro e ricevere notifiche automatiche sui lavoratori compatibili con i loro ruoli.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">Posso lasciare recensioni per più aziende?</div>
+          <div class="faq-a">Sì, puoi lasciare una recensione per ogni azienda in cui hai lavorato. Ogni recensione viene verificata separatamente.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">StaffAlpine è solo per la Valle d'Aosta?</div>
+          <div class="faq-a">Sì, per ora ci concentriamo esclusivamente sul territorio valdostano — dalla stagione invernale di Courmayeur a quella estiva di Gressoney, passando per Aosta e tutta la Bassa Valle.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA FINALE -->
+  <section class="cta-section">
+    <h2>Pronto a fare<br><em>la differenza?</em></h2>
+    <p>Unisciti alla community che sta rendendo il lavoro stagionale in Valle d'Aosta più trasparente.</p>
+    <div class="cta-btns">
+      <a href="login.html" class="btn-primary">Registrati Gratis</a>
+      <a href="login.html?role=business" class="btn-secondary">Registra la tua Azienda</a>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 StaffAlpine — Valle d'Aosta · Sicuro · Anonimo · Trasparente</p>
+  </footer>
+
+  <script>
+    function toggleFaq(el){
+      const answer = el.nextElementSibling;
+      const isOpen = answer.classList.contains('open');
+      document.querySelectorAll('.faq-a').forEach(a => a.classList.remove('open'));
+      document.querySelectorAll('.faq-q').forEach(q => q.classList.remove('open'));
+      if(!isOpen){ answer.classList.add('open'); el.classList.add('open'); }
+    }
+  </script>
+
+</body>
+</html>
