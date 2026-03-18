@@ -86,12 +86,12 @@
     .cert-label{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;}
 
     /* FILE INPUT */
-    .file-wrap{border:2px dashed rgba(0,0,0,0.1);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:all 0.3s;background:var(--grigio);}
+    .file-wrap{border:2px dashed rgba(0,0,0,0.1);border-radius:12px;padding:24px 20px;text-align:center;cursor:pointer;transition:all 0.3s;background:var(--grigio);display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;box-sizing:border-box;}
     .file-wrap:hover{border-color:var(--verde-chiaro);background:rgba(82,183,136,0.04);}
     .file-wrap input{display:none;}
-    .file-icon{font-size:28px;display:block;margin-bottom:8px;}
-    .file-text{font-size:13px;color:var(--pietra);}
-    .file-name{font-size:12px;color:var(--verde);font-weight:600;margin-top:6px;}
+    .file-icon{font-size:32px;display:block;}
+    .file-text{font-size:13px;color:var(--pietra);line-height:1.5;}
+    .file-name{font-size:12px;color:var(--verde);font-weight:600;}
 
     /* BOTTONI */
     .btn-primary{background:linear-gradient(135deg,var(--verde),var(--verde-chiaro));color:white;border:none;padding:13px 28px;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;width:100%;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;}
@@ -247,13 +247,49 @@
 
       <div class="form-card">
         <div class="form-card-title">📎 Prova di Lavoro</div>
-        <p style="font-size:13px;color:var(--pietra);margin-bottom:14px;line-height:1.5;">Allega un contratto o busta paga per verificare la recensione. Il documento è visibile <b>solo all'admin</b>.</p>
+
+        <!-- A COSA SERVE -->
+        <div style="background:#e8f5e9;border:1px solid #c8e6c9;border-radius:10px;padding:14px 16px;margin-bottom:12px;display:flex;gap:12px;align-items:flex-start;">
+          <span style="font-size:20px;flex-shrink:0;">✅</span>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--verde);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">A cosa serve</div>
+            <p style="font-size:13px;color:#2e7d32;line-height:1.6;margin:0;">Il documento serve <strong>solo a verificare che hai lavorato per questa azienda</strong>. Non viene condiviso con nessuno ed è visibile esclusivamente all'amministratore di StaffAlpine.</p>
+          </div>
+        </div>
+
+        <!-- AVVISO DATI SENSIBILI -->
+        <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;gap:12px;align-items:flex-start;">
+          <span style="font-size:20px;flex-shrink:0;">🔒</span>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#8a6d00;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Oscura i dati sensibili prima di caricare</div>
+            <p style="font-size:13px;color:#7d6608;line-height:1.6;margin:0 0 8px;">Prima di allegare il documento, ti consigliamo di <strong>coprire o oscurare</strong>:</p>
+            <ul style="font-size:13px;color:#7d6608;line-height:1.8;margin:0;padding-left:18px;">
+              <li>Codice fiscale</li>
+              <li>Numero di conto corrente o IBAN</li>
+              <li>Indirizzo di residenza</li>
+              <li>Dati di contatto personali (telefono, email privata)</li>
+            </ul>
+            <p style="font-size:12px;color:#a08400;margin-top:8px;margin-bottom:0;">Puoi farlo con qualsiasi app di fotoritocco, coprendo le aree con un rettangolo nero prima di salvare il file.</p>
+          </div>
+        </div>
+
+        <!-- DOCUMENTI ACCETTATI -->
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
+          <span style="background:var(--grigio);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--pietra);">📄 Busta paga</span>
+          <span style="background:var(--grigio);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--pietra);">📋 Contratto di lavoro</span>
+          <span style="background:var(--grigio);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--pietra);">📑 Cedolino stipendio</span>
+          <span style="background:var(--grigio);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--pietra);">🖼️ Screenshot</span>
+        </div>
+
         <label class="file-wrap" for="prova_lavoro">
           <span class="file-icon">📄</span>
-          <span class="file-text">Tocca per caricare un documento (PDF o immagine)</span>
+          <span class="file-text">Tocca per caricare un documento</span>
+          <span style="font-size:11px;color:var(--pietra);">PDF, JPG, PNG · Max 5MB</span>
           <span class="file-name" id="file-label"></span>
           <input type="file" id="prova_lavoro" accept="image/*,application/pdf" onchange="mostraFile(this)">
         </label>
+
+        <p style="font-size:11px;color:var(--pietra);margin-top:10px;line-height:1.5;">⚠️ Il caricamento è facoltativo ma <strong>accelera la verifica</strong>. Senza documento la recensione potrebbe richiedere più tempo per essere approvata.</p>
       </div>
 
       <button class="btn-primary" id="btn-invia" onclick="inviaRecensione()">🚀 Pubblica Recensione</button>
