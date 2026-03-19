@@ -82,6 +82,11 @@
     .richiesta-card{background:white;border-radius:14px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.05);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;border-left:4px solid var(--oro);}
     .ric-info h3{font-family:'Playfair Display',serif;font-size:1rem;color:var(--scuro);margin-bottom:2px;}
     .ric-info p{font-size:12px;color:var(--pietra);}
+    .verifica-card{background:white;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.05);margin-bottom:12px;border-left:4px solid var(--oro);}
+    .verifica-card.verificata{border-left-color:var(--verde-chiaro);}
+    .ver-exp{background:var(--grigio);border-radius:10px;padding:12px 14px;margin-top:10px;}
+    .ver-exp-title{font-size:10px;font-weight:700;color:var(--pietra);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+    .ver-exp-info{font-size:13px;color:var(--testo);margin-bottom:8px;}
     @media(max-width:480px){.azienda-card-top{flex-direction:column;align-items:flex-start;}.az-actions{width:100%;}.richiesta-card{flex-direction:column;align-items:flex-start;}.review-top{flex-direction:column;}.action-row{justify-content:flex-start;}}
   </style>
 </head>
@@ -94,6 +99,7 @@
     <button class="tab-btn active" onclick="showTab('recensioni',this)">📋 Recensioni <span class="tab-badge" id="badge-recs">0</span></button>
     <button class="tab-btn" onclick="showTab('aziende',this)">🏢 Aziende <span class="tab-badge" id="badge-az">0</span></button>
     <button class="tab-btn" onclick="showTab('lavoratori',this)">👤 Lavoratori <span class="tab-badge" id="badge-lav">0</span></button>
+    <button class="tab-btn" onclick="showTab('verifiche',this)">🏅 Verifiche <span class="tab-badge" id="badge-ver">0</span></button>
     <button class="tab-btn" onclick="showTab('offerte',this)">📢 Offerte <span class="tab-badge" id="badge-off">0</span></button>
     <button class="tab-btn" onclick="showTab('premium',this)">💎 Richieste Premium <span class="tab-badge" id="badge-prem">0</span></button>
   </div>
@@ -139,6 +145,9 @@
     <div id="offerte" class="section">
       <div id="lista-offerte-admin"><div class="empty-state"><span class="empty-icon">⏳</span><p>Caricamento...</p></div></div>
     </div>
+    <div id="verifiche" class="section">
+      <div id="lista-verifiche"><div class="empty-state"><span class="empty-icon">⏳</span><p>Caricamento...</p></div></div>
+    </div>
     <div id="premium" class="section">
       <div id="lista-premium"><div class="empty-state"><span class="empty-icon">⏳</span><p>Caricamento...</p></div></div>
     </div>
@@ -181,8 +190,8 @@
           <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--grigio);">
             <div style="font-size:10px;font-weight:700;color:var(--pietra);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Esperienze</div>
             <div style="display:flex;flex-direction:column;gap:6px;">
-              ${l.exp1_mansione?`<div style="background:var(--grigio);border-radius:8px;padding:8px 12px;font-size:12px;"><b>${l.exp1_mansione}</b> · ${l.exp1_zona||''} ${l.exp1_dal?'('+l.exp1_dal.substring(0,7)+(l.exp1_al?' → '+l.exp1_al.substring(0,7):'')+')'  :''}</div>`:''}
-              ${l.exp2_mansione?`<div style="background:var(--grigio);border-radius:8px;padding:8px 12px;font-size:12px;"><b>${l.exp2_mansione}</b> · ${l.exp2_zona||''} ${l.exp2_dal?'('+l.exp2_dal.substring(0,7)+(l.exp2_al?' → '+l.exp2_al.substring(0,7):'')+')'  :''}</div>`:''}
+              ${l.exp1_mansione?`<div style="background:var(--grigio);border-radius:8px;padding:8px 12px;font-size:12px;display:flex;justify-content:space-between;align-items:center;"><span><b>${l.exp1_mansione}</b>${l.exp1_azienda?' · '+l.exp1_azienda:''} ${l.exp1_dal?'('+l.exp1_dal.substring(0,7)+(l.exp1_al?' → '+l.exp1_al.substring(0,7):'')+')'  :''}</span>${l.exp1_verificata?'<span style="color:var(--verde);font-weight:700;font-size:11px;">✅ Verificata</span>':l.exp1_verifica_pending?'<span style="color:var(--oro);font-weight:700;font-size:11px;">⏳ In attesa</span>':''}</div>`:''}
+              ${l.exp2_mansione?`<div style="background:var(--grigio);border-radius:8px;padding:8px 12px;font-size:12px;display:flex;justify-content:space-between;align-items:center;"><span><b>${l.exp2_mansione}</b>${l.exp2_azienda?' · '+l.exp2_azienda:''} ${l.exp2_dal?'('+l.exp2_dal.substring(0,7)+(l.exp2_al?' → '+l.exp2_al.substring(0,7):'')+')'  :''}</span>${l.exp2_verificata?'<span style="color:var(--verde);font-weight:700;font-size:11px;">✅ Verificata</span>':l.exp2_verifica_pending?'<span style="color:var(--oro);font-weight:700;font-size:11px;">⏳ In attesa</span>':''}</div>`:''}
             </div>
           </div>`:''}
         </div>`;
@@ -233,6 +242,7 @@
       document.getElementById(id).classList.add('active');
       btn.classList.add('active');
       if(id==='lavoratori')caricaLavoratori();
+      if(id==='verifiche')caricaVerifiche();
       if(id==='offerte')caricaOfferteAdmin();
     }
 
@@ -244,6 +254,7 @@
       caricaRecensioni();
       caricaAziende();
       caricaRichiestePremium();
+      caricaVerifiche();
     }
 
     /* ─── STATISTICHE GLOBALI ─── */
@@ -549,6 +560,103 @@
       if(!confirm("Rifiutare questa richiesta?"))return;
       await supabaseClient.from('richieste_premium').delete().eq('id',richId);
       caricaRichiestePremium();
+    }
+
+    async function caricaVerifiche(){
+      const div = document.getElementById('lista-verifiche');
+      const { data: lavoratori, error } = await supabaseClient
+        .from('esperienze_lavoratori')
+        .select('*')
+        .or('exp1_verifica_pending.eq.true,exp2_verifica_pending.eq.true')
+        .order('aggiornato_il', { ascending: false });
+
+      if(error){ div.innerHTML=`<div class="empty-state"><span class="empty-icon">❌</span><p>${error.message}</p></div>`; return; }
+
+      const pending = (lavoratori||[]).filter(l => l.exp1_verifica_pending || l.exp2_verifica_pending);
+      document.getElementById('badge-ver').innerText = pending.length || '';
+
+      if(!pending.length){
+        div.innerHTML=`<div class="empty-state"><span class="empty-icon">🏅</span><p>Nessuna verifica in attesa.</p></div>`;
+        return;
+      }
+
+      div.innerHTML = pending.map((l, i) => {
+        const exps = [];
+        if(l.exp1_verifica_pending && !l.exp1_verificata) exps.push({ num:1, mansione:l.exp1_mansione, azienda:l.exp1_azienda, zona:l.exp1_zona, dal:l.exp1_dal, al:l.exp1_al, doc:l.exp1_doc_url });
+        if(l.exp2_verifica_pending && !l.exp2_verificata) exps.push({ num:2, mansione:l.exp2_mansione, azienda:l.exp2_azienda, zona:l.exp2_zona, dal:l.exp2_dal, al:l.exp2_al, doc:l.exp2_doc_url });
+        if(!exps.length) return '';
+
+        return `
+          <div class="verifica-card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+              <div>
+                <div style="font-size:10px;font-weight:700;color:var(--oro);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">⏳ Verifica in attesa</div>
+                <h3 style="font-family:'Playfair Display',serif;font-size:1rem;color:var(--scuro);">👤 Lavoratore #${i+1} — ${l.mansione_principale||'N/D'}</h3>
+                <p style="font-size:12px;color:var(--pietra);margin-top:2px;">
+                  ${l.nome_reale||''} ${l.cognome_reale||''} · ${l.data_nascita?new Date(l.data_nascita).toLocaleDateString('it-IT'):''}
+                </p>
+              </div>
+            </div>
+            ${exps.map(exp => `
+              <div class="ver-exp">
+                <div class="ver-exp-title">Esperienza ${exp.num}</div>
+                <div class="ver-exp-info">
+                  <b>${exp.mansione||'—'}</b>${exp.azienda?' presso '+exp.azienda:''}
+                  ${exp.zona?' · '+exp.zona:''}
+                  ${exp.dal?' · '+exp.dal.substring(0,7)+(exp.al?' → '+exp.al.substring(0,7):''):''}
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+                  ${exp.doc
+                    ? `<button class="btn btn-blu" onclick="apriDocVerifica('${l.user_id}','exp${exp.num}')">👁️ Vedi Documento</button>
+                       <button class="btn btn-verify" onclick="assegnaBadge('${l.user_id}',${exp.num})">✅ Assegna Badge</button>
+                       <button class="btn btn-delete" onclick="eliminaDocVerifica('${l.user_id}',${exp.num})">🗑️ Rimuovi File</button>`
+                    : '<span style="font-size:11px;color:#aaa;">Nessun documento caricato</span>'
+                  }
+                </div>
+              </div>
+            `).join('')}
+          </div>`;
+      }).join('');
+    }
+
+    async function apriDocVerifica(userId, expKey){
+      const path = `${userId}/${expKey}`;
+      const { data, error } = await supabaseClient.storage.from('verifiche-esperienze').createSignedUrl(path, 120);
+      if(error) return alert("Errore: " + error.message);
+      window.open(data.signedUrl, '_blank');
+    }
+
+    async function assegnaBadge(userId, expNum){
+      if(!confirm(`Assegnare il badge ✅ all'esperienza ${expNum}? Il documento verrà eliminato.`)) return;
+
+      // Segna come verificata e rimuove il pending
+      const update = {
+        [`exp${expNum}_verificata`]: true,
+        [`exp${expNum}_verifica_pending`]: false,
+        [`exp${expNum}_doc_url`]: null
+      };
+      const { error } = await supabaseClient.from('esperienze_lavoratori').update(update).eq('user_id', userId);
+      if(error) return alert("Errore DB: " + error.message);
+
+      // Elimina il file dallo storage
+      await supabaseClient.storage.from('verifiche-esperienze').remove([`${userId}/exp${expNum}`]);
+
+      caricaVerifiche();
+      caricaLavoratori();
+    }
+
+    async function eliminaDocVerifica(userId, expNum){
+      if(!confirm('Eliminare il documento senza assegnare il badge?')) return;
+
+      const update = {
+        [`exp${expNum}_verifica_pending`]: false,
+        [`exp${expNum}_doc_url`]: null
+      };
+      const { error } = await supabaseClient.from('esperienze_lavoratori').update(update).eq('user_id', userId);
+      if(error) return alert("Errore DB: " + error.message);
+
+      await supabaseClient.storage.from('verifiche-esperienze').remove([`${userId}/exp${expNum}`]);
+      caricaVerifiche();
     }
 
     async function logout(){
