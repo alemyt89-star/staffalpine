@@ -605,8 +605,7 @@
       };
       const{error}=await supabaseClient.from('esperienze_lavoratori').update(aggiornamenti).eq('user_id',user.id);
       if(!error){
-        const msgDoc = (exp1DocPath||exp2DocPath) ? '
-📎 Documento caricato — riceverai il badge ✅ dopo la verifica.' : '';
+        const msgDoc = (exp1DocPath||exp2DocPath) ? '\n📎 Documento caricato — riceverai il badge ✅ dopo la verifica.' : '';
         alert('✅ Profilo aggiornato!' + msgDoc);
         document.getElementById('modal-modifica').style.display='none';
         caricaProfilo(user.id);
