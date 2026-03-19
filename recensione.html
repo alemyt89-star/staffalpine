@@ -86,12 +86,12 @@
     .cert-label{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;}
 
     /* FILE INPUT */
-    .file-wrap{border:2px dashed rgba(0,0,0,0.1);border-radius:12px;padding:24px 20px;text-align:center;cursor:pointer;transition:all 0.3s;background:var(--grigio);display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;box-sizing:border-box;}
+    .file-wrap{border:2px dashed rgba(0,0,0,0.1);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:all 0.3s;background:var(--grigio);}
     .file-wrap:hover{border-color:var(--verde-chiaro);background:rgba(82,183,136,0.04);}
     .file-wrap input{display:none;}
-    .file-icon{font-size:32px;display:block;}
-    .file-text{font-size:13px;color:var(--pietra);line-height:1.5;}
-    .file-name{font-size:12px;color:var(--verde);font-weight:600;}
+    .file-icon{font-size:28px;display:block;margin-bottom:8px;}
+    .file-text{font-size:13px;color:var(--pietra);}
+    .file-name{font-size:12px;color:var(--verde);font-weight:600;margin-top:6px;}
 
     /* BOTTONI */
     .btn-primary{background:linear-gradient(135deg,var(--verde),var(--verde-chiaro));color:white;border:none;padding:13px 28px;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;width:100%;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;}
@@ -247,49 +247,13 @@
 
       <div class="form-card">
         <div class="form-card-title">📎 Prova di Lavoro</div>
-
-        <!-- A COSA SERVE -->
-        <div style="background:#e8f5e9;border:1px solid #c8e6c9;border-radius:10px;padding:14px 16px;margin-bottom:12px;display:flex;gap:12px;align-items:flex-start;">
-          <span style="font-size:20px;flex-shrink:0;">✅</span>
-          <div>
-            <div style="font-size:12px;font-weight:700;color:var(--verde);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">A cosa serve</div>
-            <p style="font-size:13px;color:#2e7d32;line-height:1.6;margin:0;">Il documento serve <strong>solo a verificare che hai lavorato per questa azienda</strong>. Non viene condiviso con nessuno ed è visibile esclusivamente all'amministratore di StaffAlpine.</p>
-          </div>
-        </div>
-
-        <!-- AVVISO DATI SENSIBILI -->
-        <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;gap:12px;align-items:flex-start;">
-          <span style="font-size:20px;flex-shrink:0;">🔒</span>
-          <div>
-            <div style="font-size:12px;font-weight:700;color:#8a6d00;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Oscura i dati sensibili prima di caricare</div>
-            <p style="font-size:13px;color:#7d6608;line-height:1.6;margin:0 0 8px;">Prima di allegare il documento, ti consigliamo di <strong>coprire o oscurare</strong>:</p>
-            <ul style="font-size:13px;color:#7d6608;line-height:1.8;margin:0;padding-left:18px;">
-              <li>Codice fiscale</li>
-              <li>Numero di conto corrente o IBAN</li>
-              <li>Indirizzo di residenza</li>
-              <li>Dati di contatto personali (telefono, email privata)</li>
-            </ul>
-            <p style="font-size:12px;color:#a08400;margin-top:8px;margin-bottom:0;">Puoi farlo con qualsiasi app di fotoritocco, coprendo le aree con un rettangolo nero prima di salvare il file.</p>
-          </div>
-        </div>
-
-        <!-- DOCUMENTI ACCETTATI -->
-        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
-          <span style="background:var(--grigio);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--pietra);">📄 Busta paga</span>
-          <span style="background:var(--grigio);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--pietra);">📋 Contratto di lavoro</span>
-          <span style="background:var(--grigio);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--pietra);">📑 Cedolino stipendio</span>
-          <span style="background:var(--grigio);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--pietra);">🖼️ Screenshot</span>
-        </div>
-
+        <p style="font-size:13px;color:var(--pietra);margin-bottom:14px;line-height:1.5;">Allega un contratto o busta paga per verificare la recensione. Il documento è visibile <b>solo all'admin</b>.</p>
         <label class="file-wrap" for="prova_lavoro">
           <span class="file-icon">📄</span>
-          <span class="file-text">Tocca per caricare un documento</span>
-          <span style="font-size:11px;color:var(--pietra);">PDF, JPG, PNG · Max 5MB</span>
+          <span class="file-text">Tocca per caricare un documento (PDF o immagine)</span>
           <span class="file-name" id="file-label"></span>
           <input type="file" id="prova_lavoro" accept="image/*,application/pdf" onchange="mostraFile(this)">
         </label>
-
-        <p style="font-size:11px;color:var(--pietra);margin-top:10px;line-height:1.5;">⚠️ Il caricamento è facoltativo ma <strong>accelera la verifica</strong>. Senza documento la recensione potrebbe richiedere più tempo per essere approvata.</p>
       </div>
 
       <button class="btn-primary" id="btn-invia" onclick="inviaRecensione()">🚀 Pubblica Recensione</button>
@@ -417,6 +381,31 @@
         <div class="form-card-title">📋 Storico Esperienze (ultime 2)</div>
         <p style="font-size:12px;color:var(--pietra);margin-bottom:16px;">Visibile alle aziende in forma anonima — senza il tuo nome.</p>
 
+        <!-- BOX INFO VERIFICA -->
+        <div style="background:#e8f5e9;border:1px solid #c8e6c9;border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;gap:12px;align-items:flex-start;">
+          <span style="font-size:20px;flex-shrink:0;">✅</span>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--verde);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Ottieni il badge "Esperienza Verificata"</div>
+            <p style="font-size:13px;color:#2e7d32;line-height:1.6;margin:0;">Caricando un documento per ogni esperienza, le aziende vedranno un badge <strong>✅ Verificata</strong> sul tuo profilo. Il documento viene <strong>cancellato dopo la verifica</strong> — viene conservato solo il badge.</p>
+          </div>
+        </div>
+
+        <!-- BOX DATI SENSIBILI -->
+        <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;gap:12px;align-items:flex-start;">
+          <span style="font-size:20px;flex-shrink:0;">🔒</span>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#8a6d00;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Oscura i dati sensibili prima di caricare</div>
+            <p style="font-size:13px;color:#7d6608;line-height:1.6;margin:0 0 6px;">Ci servono solo: <strong>nome, cognome, data di nascita, nome dell'azienda e periodo di lavoro</strong>. Tutto il resto va oscurato.</p>
+            <ul style="font-size:13px;color:#7d6608;line-height:1.8;margin:0;padding-left:18px;">
+              <li>Codice fiscale</li>
+              <li>IBAN / numero di conto</li>
+              <li>Indirizzo di residenza</li>
+              <li>Importi stipendio e dettagli retributivi</li>
+              <li>Dati di contatto personali</li>
+            </ul>
+          </div>
+        </div>
+
         <!-- Esperienza 1 -->
         <div style="background:var(--grigio);border-radius:10px;padding:14px;margin-bottom:12px;">
           <div style="font-size:11px;font-weight:700;color:var(--pietra);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Esperienza 1</div>
@@ -425,6 +414,12 @@
               <label class="form-label">Mansione</label>
               <input type="text" id="exp1_mansione" class="form-control" placeholder="es. Cameriere, Chef de Rang...">
             </div>
+            <div class="form-group">
+              <label class="form-label">Nome Azienda</label>
+              <input type="text" id="exp1_azienda" class="form-control" placeholder="es. Hotel Bellevue">
+            </div>
+          </div>
+          <div class="form-row">
             <div class="form-group">
               <label class="form-label">Zona</label>
               <select id="exp1_zona" class="form-control">
@@ -447,6 +442,17 @@
               <input type="month" id="exp1_al" class="form-control">
             </div>
           </div>
+          <!-- UPLOAD VERIFICA EXP1 -->
+          <div style="margin-top:12px;">
+            <label style="font-size:11px;font-weight:700;color:var(--pietra);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:8px;">📎 Documento di verifica (opzionale)</label>
+            <label class="file-wrap" for="exp1_doc" style="padding:16px;">
+              <span class="file-icon" style="font-size:22px;">📄</span>
+              <span class="file-text">Carica busta paga, contratto o cedolino</span>
+              <span style="font-size:11px;color:var(--pietra);">PDF, JPG, PNG · Max 5MB</span>
+              <span class="file-name" id="exp1-doc-label"></span>
+              <input type="file" id="exp1_doc" accept="image/*,application/pdf" onchange="mostraFileExp(this,'exp1-doc-label')">
+            </label>
+          </div>
         </div>
 
         <!-- Esperienza 2 -->
@@ -457,6 +463,12 @@
               <label class="form-label">Mansione</label>
               <input type="text" id="exp2_mansione" class="form-control" placeholder="es. Barista, Receptionist...">
             </div>
+            <div class="form-group">
+              <label class="form-label">Nome Azienda</label>
+              <input type="text" id="exp2_azienda" class="form-control" placeholder="es. Ristorante Da Mario">
+            </div>
+          </div>
+          <div class="form-row">
             <div class="form-group">
               <label class="form-label">Zona</label>
               <select id="exp2_zona" class="form-control">
@@ -478,6 +490,17 @@
               <label class="form-label">A</label>
               <input type="month" id="exp2_al" class="form-control">
             </div>
+          </div>
+          <!-- UPLOAD VERIFICA EXP2 -->
+          <div style="margin-top:12px;">
+            <label style="font-size:11px;font-weight:700;color:var(--pietra);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:8px;">📎 Documento di verifica (opzionale)</label>
+            <label class="file-wrap" for="exp2_doc" style="padding:16px;">
+              <span class="file-icon" style="font-size:22px;">📄</span>
+              <span class="file-text">Carica busta paga, contratto o cedolino</span>
+              <span style="font-size:11px;color:var(--pietra);">PDF, JPG, PNG · Max 5MB</span>
+              <span class="file-name" id="exp2-doc-label"></span>
+              <input type="file" id="exp2_doc" accept="image/*,application/pdf" onchange="mostraFileExp(this,'exp2-doc-label')">
+            </label>
           </div>
         </div>
       </div>
@@ -694,6 +717,14 @@
       document.getElementById('lingue-extra').appendChild(div);
     }
 
+    function mostraFileExp(input, labelId){
+      const label = document.getElementById(labelId);
+      if(input.files && input.files[0]){
+        if(input.files[0].size > 5*1024*1024){ alert('File troppo grande — max 5MB'); input.value=''; return; }
+        label.innerText = '✅ ' + input.files[0].name;
+      }
+    }
+
     async function salvaEsperienza(){
       const{data:{user}}=await supabaseClient.auth.getUser();
       if(!user)return alert("Accedi!");
@@ -710,6 +741,23 @@
         }
         if(nome) lingueExtra.push({ lingua: nome, livello: livEl?.value || 'Base' });
       }
+
+      const btn = document.querySelector('button[onclick="salvaEsperienza()"]');
+      if(btn){ btn.disabled=true; btn.innerHTML='⏳ Salvataggio...'; }
+
+      // Upload documenti verifica esperienze
+      const uploadDoc = async (inputId, path) => {
+        const input = document.getElementById(inputId);
+        if(!input || !input.files || input.files.length === 0) return null;
+        const file = input.files[0];
+        const { error } = await supabaseClient.storage.from('verifiche-esperienze').upload(path, file, { upsert:true, contentType: file.type });
+        if(error){ console.log('Upload error:', error.message); return null; }
+        const { data: urlData } = supabaseClient.storage.from('verifiche-esperienze').getPublicUrl(path);
+        return urlData.publicUrl;
+      };
+
+      const exp1DocUrl = await uploadDoc('exp1_doc', `${user.id}/exp1`);
+      const exp2DocUrl = await uploadDoc('exp2_doc', `${user.id}/exp2`);
 
       const dati={
         user_id:user.id,
@@ -732,15 +780,22 @@
         cert_sommelier:document.getElementById('sommelier').checked,
         cert_barman:document.getElementById('barman').checked,
         exp1_mansione:document.getElementById('exp1_mansione').value||null,
+        exp1_azienda:document.getElementById('exp1_azienda').value||null,
         exp1_zona:document.getElementById('exp1_zona').value||null,
         exp1_dal:document.getElementById('exp1_dal').value||null,
         exp1_al:document.getElementById('exp1_al').value||null,
         exp2_mansione:document.getElementById('exp2_mansione').value||null,
+        exp2_azienda:document.getElementById('exp2_azienda').value||null,
         exp2_zona:document.getElementById('exp2_zona').value||null,
         exp2_dal:document.getElementById('exp2_dal').value||null,
         exp2_al:document.getElementById('exp2_al').value||null,
+        // Documenti verifica — se caricati, mette pending
+        ...(exp1DocUrl && { exp1_doc_url: exp1DocUrl, exp1_verificata: false, exp1_verifica_pending: true }),
+        ...(exp2DocUrl && { exp2_doc_url: exp2DocUrl, exp2_verificata: false, exp2_verifica_pending: true }),
       };
+
       const{error}=await supabaseClient.from('esperienze_lavoratori').upsert(dati);
+      if(btn){ btn.disabled=false; btn.innerHTML='💾 Salva Profilo Esperienza'; }
       if(error)alert("Errore: "+error.message);
       else{
         // Notifica alle aziende compatibili
@@ -751,7 +806,8 @@
             body:JSON.stringify({mansione:dati.mansione_principale})
           });
         }catch(e){console.log('Notifica non inviata:',e);}
-        alert("✅ Profilo salvato!");
+        const msgVerifica = (exp1DocUrl || exp2DocUrl) ? '\n\n📎 Documento caricato — riceverai il badge ✅ dopo la verifica (entro 24h).' : '';
+        alert('✅ Profilo salvato!' + msgVerifica);
       }
     }
 
