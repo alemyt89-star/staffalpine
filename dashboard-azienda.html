@@ -126,6 +126,46 @@
     .notifica-lav-card .lav-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
     .lav-tag{background:white;border:1px solid rgba(0,0,0,0.08);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--pietra);}
     @media(max-width:480px){.tab-btn{padding:12px 14px;font-size:12px;}.upgrade-banner{flex-direction:column;}.offerta-card{flex-direction:column;}}
+    /* MODALE PROFILO LAVORATORE */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(5px);z-index:10000;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px;}
+    .modal-overlay.open{display:flex;}
+    .modal-box{background:white;border-radius:20px;width:100%;max-width:540px;margin:auto;animation:modalIn 0.3s ease;overflow:hidden;}
+    @keyframes modalIn{from{opacity:0;transform:translateY(24px) scale(0.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+    .modal-hero{background:linear-gradient(135deg,var(--scuro),#0d2a0d);padding:28px 28px 24px;position:relative;}
+    .modal-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.12);border:none;color:white;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+    .modal-close:hover{background:rgba(255,255,255,0.22);}
+    .modal-mansione{font-family:'Playfair Display',serif;font-size:1.5rem;color:white;margin-bottom:4px;}
+    .modal-settore{font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:16px;}
+    .modal-pills{display:flex;flex-wrap:wrap;gap:8px;}
+    .modal-pill{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.8);font-size:11px;padding:4px 12px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;}
+    .modal-pill.green{background:rgba(82,183,136,0.2);color:var(--verde-accento);}
+    .modal-pill.orange{background:rgba(230,126,34,0.2);color:#f0a050;}
+    .modal-body{padding:24px 28px;}
+    .modal-section{margin-bottom:20px;}
+    .modal-section-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--pietra);font-weight:700;margin-bottom:10px;}
+    .modal-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .modal-info-item{background:var(--grigio);border-radius:10px;padding:12px 14px;}
+    .modal-info-label{font-size:10px;color:var(--pietra);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;}
+    .modal-info-val{font-size:13px;font-weight:600;color:var(--scuro);}
+    .modal-lang-row{display:flex;flex-wrap:wrap;gap:8px;}
+    .modal-lang-item{background:var(--grigio);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;color:var(--testo);}
+    .modal-lang-item span{color:var(--pietra);font-weight:400;margin-left:4px;}
+    .exp-card{background:var(--grigio);border-radius:10px;padding:14px;border-left:3px solid var(--verde-chiaro);margin-bottom:8px;}
+    .exp-mansione{font-weight:700;color:var(--scuro);font-size:13px;margin-bottom:2px;}
+    .exp-zona{font-size:12px;color:var(--pietra);}
+    .exp-periodo{font-size:11px;color:var(--verde);font-weight:600;margin-top:4px;}
+    .proposta-form{background:var(--grigio);border-radius:12px;padding:18px;border:1px solid rgba(0,0,0,0.06);}
+    .proposta-form textarea{width:100%;padding:10px 13px;border:1px solid rgba(0,0,0,0.1);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:13px;min-height:80px;resize:vertical;outline:none;transition:border-color 0.3s;background:white;}
+    .proposta-form textarea:focus{border-color:var(--verde-chiaro);}
+    .proposta-form input{width:100%;padding:10px 13px;border:1px solid rgba(0,0,0,0.1);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color 0.3s;background:white;margin-top:8px;}
+    .proposta-form input:focus{border-color:var(--verde-chiaro);}
+    .proposta-actions{display:flex;gap:8px;margin-top:12px;}
+    .proposta-actions .btn-primary{flex:1;justify-content:center;}
+    .btn-ghost{background:none;border:1px solid rgba(0,0,0,0.1);color:var(--pietra);padding:10px 16px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;}
+    .proposta-success{text-align:center;padding:20px 0;}
+    .proposta-success .success-icon{font-size:40px;display:block;margin-bottom:10px;}
+    @media(max-width:540px){.modal-body{padding:20px 18px;}.modal-hero{padding:22px 18px 20px;}.modal-info-grid{grid-template-columns:1fr;}}
+
     /* ONBOARDING MODAL */
     .onboarding-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
     .onboarding-modal{background:white;border-radius:24px;padding:36px 32px;max-width:480px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,0.2);position:relative;}
@@ -146,6 +186,40 @@
   </style>
 </head>
 <body>
+
+  <!-- MODALE PROFILO LAVORATORE -->
+  <div id="modal-lavoratore" class="modal-overlay" onclick="chiudiModaleLavoratore(event)">
+    <div class="modal-box" id="modal-lavoratore-box">
+      <div class="modal-hero">
+        <button class="modal-close" onclick="document.getElementById('modal-lavoratore').classList.remove('open')">×</button>
+        <div class="modal-mansione" id="ml-mansione">—</div>
+        <div class="modal-settore" id="ml-settore">—</div>
+        <div class="modal-pills" id="ml-pills"></div>
+      </div>
+      <div class="modal-body">
+        <div class="modal-section">
+          <div class="modal-section-title">📋 Disponibilità</div>
+          <div class="modal-info-grid" id="ml-info-grid"></div>
+        </div>
+        <div class="modal-section" id="ml-section-lingue">
+          <div class="modal-section-title">🌍 Lingue</div>
+          <div class="modal-lang-row" id="ml-lingue"></div>
+        </div>
+        <div class="modal-section" id="ml-section-certs" style="display:none;">
+          <div class="modal-section-title">🏅 Certificazioni</div>
+          <div id="ml-certs"></div>
+        </div>
+        <div class="modal-section" id="ml-section-exp" style="display:none;">
+          <div class="modal-section-title">💼 Esperienze</div>
+          <div id="ml-esperienze"></div>
+        </div>
+        <div class="modal-section">
+          <div class="modal-section-title">📩 Invia una Proposta</div>
+          <div id="ml-proposta-area"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ONBOARDING MODAL -->
   <div id="onboarding-overlay" class="onboarding-overlay" style="display:none;">
@@ -561,23 +635,167 @@
       }).join('');
     }
 
+    let _lavoratoreCorrente = null;
+
+    function apriModaleLavoratore(w){
+      _lavoratoreCorrente = w;
+      document.getElementById('ml-mansione').innerText = w.mansione_principale || '—';
+      document.getElementById('ml-settore').innerText = [w.settore, w.localita_preferita].filter(Boolean).join(' · ');
+      // Pills
+      const pills = [];
+      if(w.exp1_verificata || w.exp2_verificata)
+        pills.push('<span class="modal-pill" style="background:rgba(46,125,50,0.25);color:#a5d6a7;font-weight:700;">✅ Esperienza Verificata</span>');
+      if(w.tipo_disponibilita) pills.push(`<span class="modal-pill">📅 ${w.tipo_disponibilita}</span>`);
+      pills.push(w.bisogno_vitto_alloggio
+        ? '<span class="modal-pill orange">🏠 Richiede alloggio</span>'
+        : '<span class="modal-pill green">🏠 Indipendente</span>');
+      if(w.disponibile_dal) pills.push(`<span class="modal-pill">🗓️ Dal ${new Date(w.disponibile_dal).toLocaleDateString('it-IT',{month:'long',year:'numeric'})}</span>`);
+      document.getElementById('ml-pills').innerHTML = pills.join('');
+      // Info grid
+      const infoItems = [];
+      if(w.settore) infoItems.push({label:'Settore', val: w.settore});
+      if(w.localita_preferita) infoItems.push({label:'Zona', val: '📍 '+w.localita_preferita});
+      if(w.tipo_disponibilita) infoItems.push({label:'Tipo Contratto', val: w.tipo_disponibilita});
+      if(w.disponibile_dal) infoItems.push({label:'Disponibile dal', val: new Date(w.disponibile_dal).toLocaleDateString('it-IT',{day:'numeric',month:'long',year:'numeric'})});
+      document.getElementById('ml-info-grid').innerHTML = infoItems.map(i=>`<div class="modal-info-item"><div class="modal-info-label">${i.label}</div><div class="modal-info-val">${i.val}</div></div>`).join('');
+      // Lingue
+      const lingueMap = [
+        {flag:'🇫🇷', nome:'Francese', val: w.lingua_francese},
+        {flag:'🇬🇧', nome:'Inglese', val: w.lingua_inglese},
+        {flag:'🇩🇪', nome:'Tedesco', val: w.lingua_tedesco},
+        {flag:'🇪🇸', nome:'Spagnolo', val: w.lingua_spagnolo},
+      ];
+      const lingueHTML = lingueMap.filter(l => l.val && l.val !== 'Nessuno')
+        .map(l => `<div class="modal-lang-item">${l.flag} ${l.nome} <span>${l.val}</span></div>`).join('');
+      document.getElementById('ml-lingue').innerHTML = lingueHTML || '<span style="font-size:13px;color:var(--pietra);">Nessuna lingua indicata</span>';
+      // Certificazioni
+      const certs = [
+        w.cert_haccp && {nome:'HACCP', emoji:'🧪'},
+        w.cert_sicurezza && {nome:'Sicurezza', emoji:'⛑️'},
+        w.cert_sommelier && {nome:'Sommelier', emoji:'🍷'},
+        w.cert_barman && {nome:'Barman', emoji:'🍸'},
+      ].filter(Boolean);
+      const certsSection = document.getElementById('ml-section-certs');
+      if(certs.length > 0){
+        document.getElementById('ml-certs').innerHTML = certs.map(c=>`<span class="badge-cert">${c.emoji} ${c.nome}</span>`).join('');
+        certsSection.style.display = 'block';
+      } else certsSection.style.display = 'none';
+      // Esperienze
+      const esps = [];
+      if(w.exp1_mansione) esps.push({mansione:w.exp1_mansione, azienda:w.exp1_azienda, zona:w.exp1_zona, dal:w.exp1_dal, al:w.exp1_al, verificata:w.exp1_verificata});
+      if(w.exp2_mansione) esps.push({mansione:w.exp2_mansione, azienda:w.exp2_azienda, zona:w.exp2_zona, dal:w.exp2_dal, al:w.exp2_al, verificata:w.exp2_verificata});
+      const expSection = document.getElementById('ml-section-exp');
+      if(esps.length > 0){
+        const fmtData = d => d ? new Date(d).toLocaleDateString('it-IT',{month:'short',year:'numeric'}) : '?';
+        document.getElementById('ml-esperienze').innerHTML = esps.map(e => {
+          const periodo = (e.dal||e.al) ? `${fmtData(e.dal)} → ${fmtData(e.al)}` : '';
+          return `<div class="exp-card" style="${e.verificata?'border-left-color:var(--verde);':''}">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+              <div class="exp-mansione">${e.mansione}${e.azienda?' · '+e.azienda:''}</div>
+              ${e.verificata?'<span style="font-size:11px;font-weight:700;color:var(--verde);">✅ Verificata</span>':''}
+            </div>
+            ${e.zona?`<div class="exp-zona">📍 ${e.zona}</div>`:''}
+            ${periodo?`<div class="exp-periodo">📅 ${periodo}</div>`:''}
+          </div>`;
+        }).join('');
+        expSection.style.display = 'block';
+      } else expSection.style.display = 'none';
+      // Form proposta
+      const contattoOfferta = document.getElementById('j-contatto');
+      const valContatto = (contattoOfferta && contattoOfferta.value) ? contattoOfferta.value : '';
+      document.getElementById('ml-proposta-area').innerHTML = `
+        <div class="proposta-form">
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--pietra);font-weight:600;display:block;margin-bottom:6px;">Il tuo messaggio</label>
+          <textarea id="ml-messaggio" placeholder="Ciao, ho letto il tuo profilo e sarei interessato a proporti una collaborazione..."></textarea>
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--pietra);font-weight:600;display:block;margin-top:12px;margin-bottom:4px;">Il tuo contatto (email o telefono)</label>
+          <input type="text" id="ml-contatto" placeholder="es. info@hotel.it oppure +39 333 123456" value="${valContatto}">
+          <div class="proposta-actions">
+            <button class="btn-ghost" onclick="document.getElementById('modal-lavoratore').classList.remove('open');document.body.style.overflow='';">Annulla</button>
+            <button class="btn-primary" onclick="inviaPropostaDaModale()">📩 Invia Proposta</button>
+          </div>
+        </div>`;
+      document.getElementById('modal-lavoratore').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function chiudiModaleLavoratore(event){
+      if(event.target === document.getElementById('modal-lavoratore')){
+        document.getElementById('modal-lavoratore').classList.remove('open');
+        document.body.style.overflow = '';
+      }
+    }
+
+    async function inviaPropostaDaModale(){
+      if(!_lavoratoreCorrente) return;
+      const messaggio = document.getElementById('ml-messaggio').value.trim();
+      const contatto = document.getElementById('ml-contatto').value.trim();
+      if(!messaggio) return alert("Scrivi un messaggio per il lavoratore.");
+      if(!contatto) return alert("Inserisci un tuo recapito per la risposta.");
+      const btn = document.querySelector('#ml-proposta-area .btn-primary');
+      if(btn){ btn.disabled=true; btn.innerHTML='⏳ Invio...'; }
+      const{data:{user}}=await supabaseClient.auth.getUser();
+      const{error}=await supabaseClient.from('notifiche_lavoratori').insert([{
+        lavoratore_id: _lavoratoreCorrente.user_id,
+        azienda_id: user.id,
+        nome_azienda: _nomeAzienda,
+        contatto_azienda: contatto,
+        messaggio: messaggio
+      }]);
+      if(!error){
+        document.getElementById('ml-proposta-area').innerHTML = `
+          <div class="proposta-success">
+            <span class="success-icon">✅</span>
+            <p><strong>Proposta inviata!</strong><br>Il lavoratore la riceverà nella sua area personale.</p>
+          </div>`;
+        setTimeout(()=>{
+          document.getElementById('modal-lavoratore').classList.remove('open');
+          document.body.style.overflow = '';
+        }, 2200);
+      } else {
+        alert("Errore: "+error.message);
+        if(btn){ btn.disabled=false; btn.innerHTML='📩 Invia Proposta'; }
+      }
+    }
+
+    function apriModalePropostaDiretta(userId, mansione, settore, localita){
+      _lavoratoreCorrente = { user_id: userId, mansione_principale: mansione, settore, localita_preferita: localita };
+      document.getElementById('ml-mansione').innerText = mansione || '—';
+      document.getElementById('ml-settore').innerText = [settore, localita].filter(Boolean).join(' · ');
+      document.getElementById('ml-pills').innerHTML = '';
+      document.getElementById('ml-info-grid').innerHTML = `
+        ${settore?`<div class="modal-info-item"><div class="modal-info-label">Settore</div><div class="modal-info-val">${settore}</div></div>`:''}
+        ${localita?`<div class="modal-info-item"><div class="modal-info-label">Zona</div><div class="modal-info-val">📍 ${localita}</div></div>`:''}`;
+      document.getElementById('ml-lingue').innerHTML = '<span style="font-size:13px;color:var(--pietra);">Dati non disponibili da questa vista</span>';
+      document.getElementById('ml-section-certs').style.display = 'none';
+      document.getElementById('ml-section-exp').style.display = 'none';
+      const contattoOfferta = document.getElementById('j-contatto');
+      const valContatto = (contattoOfferta && contattoOfferta.value) ? contattoOfferta.value : '';
+      document.getElementById('ml-proposta-area').innerHTML = `
+        <div class="proposta-form">
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--pietra);font-weight:600;display:block;margin-bottom:6px;">Il tuo messaggio</label>
+          <textarea id="ml-messaggio" placeholder="Ciao, sarei interessato a proporti una collaborazione..."></textarea>
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--pietra);font-weight:600;display:block;margin-top:12px;margin-bottom:4px;">Il tuo contatto (email o telefono)</label>
+          <input type="text" id="ml-contatto" placeholder="es. info@hotel.it oppure +39 333 123456" value="${valContatto}">
+          <div class="proposta-actions">
+            <button class="btn-ghost" onclick="document.getElementById('modal-lavoratore').classList.remove('open');document.body.style.overflow='';">Annulla</button>
+            <button class="btn-primary" onclick="inviaPropostaDaModale()">📩 Invia Proposta</button>
+          </div>
+        </div>`;
+      document.getElementById('modal-lavoratore').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
     async function inviaInteresse(lavoratoreId){
       const messaggio=prompt("Scrivi un messaggio per il lavoratore:");
       if(!messaggio)return;
       let contatto=document.getElementById('j-contatto').value;
-      if(!contatto){
-        contatto=prompt("Inserisci un tuo recapito (email o telefono) per la risposta:");
-        if(!contatto)return;
-      }
+      if(!contatto){ contatto=prompt("Inserisci un tuo recapito:"); if(!contatto)return; }
       const{data:{user}}=await supabaseClient.auth.getUser();
       const{error}=await supabaseClient.from('notifiche_lavoratori').insert([{
-        lavoratore_id:lavoratoreId,
-        azienda_id:user.id,
-        nome_azienda:_nomeAzienda,
-        contatto_azienda:contatto,
-        messaggio:messaggio
+        lavoratore_id:lavoratoreId, azienda_id:user.id, nome_azienda:_nomeAzienda,
+        contatto_azienda:contatto, messaggio:messaggio
       }]);
-      if(!error)alert("✅ Proposta inviata con successo!");
+      if(!error)alert("✅ Proposta inviata!");
       else alert("Errore: "+error.message);
     }
 
@@ -900,7 +1118,7 @@
             ${l.lingua_francese && l.lingua_francese !== 'Nessuno' ? `<span class="lav-tag">🇫🇷 ${l.lingua_francese}</span>` : ''}
             ${l.lingua_inglese && l.lingua_inglese !== 'Nessuno' ? `<span class="lav-tag">🇬🇧 ${l.lingua_inglese}</span>` : ''}
           </div>
-          ${_isPremium ? `<button class="btn-primary" style="margin-top:12px;padding:8px 16px;font-size:13px;" onclick="inviaInteresse('${l.user_id}')">📩 Invia Proposta</button>` : '<p style="font-size:12px;color:var(--pietra);margin-top:10px;">🔒 Attiva Premium per contattare il lavoratore</p>'}
+          ${_isPremium ? `<button class="btn-primary" style="margin-top:12px;padding:8px 16px;font-size:13px;" onclick="apriModalePropostaDiretta('${l.user_id}','${(l.mansione_principale||'').replace(/'/g,"\\'")}','${(l.settore||'').replace(/'/g,"\\'")}','${(l.localita_preferita||'').replace(/'/g,"\\'")}')">📩 Invia Proposta</button>` : '<p style="font-size:12px;color:var(--pietra);margin-top:10px;">🔒 Attiva Premium per contattare il lavoratore</p>'}
         </div>
       `).join('');
     }
