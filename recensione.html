@@ -752,8 +752,8 @@
         const file = input.files[0];
         const { error } = await supabaseClient.storage.from('verifiche-esperienze').upload(path, file, { upsert:true, contentType: file.type });
         if(error){ console.log('Upload error:', error.message); return null; }
-        const { data: urlData } = supabaseClient.storage.from('verifiche-esperienze').getPublicUrl(path);
-        return urlData.publicUrl;
+        // Salviamo il path (non l'URL pubblico) — il bucket è privato
+        return path;
       };
 
       const exp1DocUrl = await uploadDoc('exp1_doc', `${user.id}/exp1`);
