@@ -1,0 +1,77 @@
+module.exports = async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { emailLavoratore, nomeLavoratore, nomeAzienda } = req.body;
+
+  if (!emailLavoratore) {
+    return res.status(400).json({ error: 'Email lavoratore mancante' });
+  }
+
+  try {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: 'StaffAlpine <noreply@staffalpine.it>',
+        to: emailLavoratore,
+        subject: `✅ La tua recensione è stata verificata — StaffAlpine`,
+        html: `
+          <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; background: #f0f2ee; padding: 32px; border-radius: 12px;">
+            <div style="background: #1a2e1a; padding: 24px; border-radius: 8px; text-align: center; margin-bottom: 24px;">
+              <h1 style="color: #e9c46a; margin: 0; font-size: 24px;">✅ Recensione Verificata</h1>
+              <p style="color: #52b788; margin: 8px 0 0; font-size: 14px;">StaffAlpine — Valle d'Aosta</p>
+            </div>
+            <div style="background: white; padding: 28px; border-radius: 8px;">
+              <p style="color: #1a2e1a; font-size: 16px; margin-bottom: 16px;">
+                Ciao <strong>${nomeLavoratore}</strong>,
+              </p>
+              <p style="color: #1a2e1a; font-size: 15px; line-height: 1.7; margin-bottom: 20px;">
+                La tua recensione per <strong>${nomeAzienda}</strong> è stata verificata dal nostro team e 
+                <strong style="color: #2d6a4f;">è ora visibile nella piattaforma</strong>. 
+                Grazie per aver contribuito a rendere il lavoro stagionale in Valle d'Aosta più trasparente!
+              </p>
+
+              <div style="background: #e8f5e9; border-radius: 8px; padding: 18px 20px; margin-bottom: 24px; text-align: center;">
+                <span style="font-size: 32px;">⭐</span>
+                <p style="color: #2d6a4f; font-size: 14px; font-weight: 600; margin: 8px 0 0;">
+                  La tua esperienza aiuta altri lavoratori a fare scelte più consapevoli.
+                </p>
+              </div>
+
+              <p style="color: #6b705c; font-size: 13px; line-height: 1.6; margin-bottom: 24px;">
+                Puoi visualizzare le tue recensioni nella tua area personale, nel tab <strong>Mie Recensioni</strong>.
+              </p>
+
+              <div style="text-align: center;">
+                <a href="https://staffalpine.it/dashboard-lavoratore.html"
+                   style="background: #2d6a4f; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-size: 15px; font-weight: 600; display: inline-block;">
+                  Vai alla Dashboard →
+                </a>
+              </div>
+            </div>
+            <p style="color: #6b705c; font-size: 12px; text-align: center; margin-top: 20px;">
+              StaffAlpine — Valle d'Aosta · <a href="https://staffalpine.it" style="color: #52b788;">staffalpine.it</a>
+            </p>
+          </div>
+        `
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Errore invio email');
+    }
+
+    return res.status(200).json({ success: true });
+
+  } catch (error) {
+    console.error('Errore email conferma recensione:', error);
+    return res.status(500).json({ error: error.message });
+  }
+}
