@@ -11,7 +11,9 @@ const urlsToCache = [
   '/offerta.html',
   '/registrazione_aziende.html',
   '/stella-alpina.svg',
-  '/manifest.json'
+  '/manifest.json',
+  '/informativa-privacy.html',
+  '/termini.html',
 ];
 
 self.addEventListener('install', event => {
