@@ -101,6 +101,21 @@
     .modal-actions{display:flex;gap:10px;margin-top:24px;}
     .modal-actions .btn-primary{flex:1;justify-content:center;}
     @media(max-width:480px){.form-row{grid-template-columns:1fr;}.tab-btn{padding:12px 14px;font-size:12px;}}
+    /* ONBOARDING */
+    .ob-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
+    .ob-modal{background:white;border-radius:20px;padding:32px;max-width:440px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,0.2);}
+    .ob-steps{display:flex;gap:6px;margin-bottom:24px;}
+    .ob-step{height:4px;flex:1;border-radius:4px;background:var(--grigio);}
+    .ob-step.active{background:var(--verde);}
+    .ob-step.done{background:var(--verde-chiaro);}
+    .ob-icon{font-size:40px;text-align:center;margin-bottom:12px;}
+    .ob-title{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--scuro);text-align:center;margin-bottom:8px;}
+    .ob-desc{font-size:13px;color:var(--pietra);line-height:1.7;text-align:center;margin-bottom:20px;}
+    .ob-list{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:24px;}
+    .ob-list li{display:flex;align-items:center;gap:10px;font-size:13px;background:var(--grigio);padding:10px 14px;border-radius:10px;}
+    .ob-btns{display:flex;gap:10px;}
+    .ob-skip{flex:1;background:none;border:1px solid rgba(0,0,0,0.1);color:var(--pietra);padding:11px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;}
+    .ob-next{flex:2;background:linear-gradient(135deg,var(--verde),var(--verde-chiaro));color:white;border:none;padding:11px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;}
   </style>
 </head>
 <body>
@@ -109,6 +124,7 @@
     <a href="index.html" class="nav-logo"><img src="stella-alpina.svg" alt="">StaffAlpine</a>
     <div class="nav-user">
       <span class="nav-user-name" id="nav-nome"></span>
+      <span id="nav-badge-proposte" onclick="showTab('proposte',document.getElementById('tab-proposte'))" style="display:none;background:var(--rosso);color:white;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;cursor:pointer;" title="Proposte ricevute">🔔 <span id="nav-badge-num">0</span></span>
       <button class="nav-logout" onclick="logout()">Esci</button>
     </div>
   </nav>
@@ -316,6 +332,22 @@
     </div>
   </div>
 
+  <!-- ONBOARDING LAVORATORE -->
+  <div id="ob-overlay" class="ob-overlay" style="display:none;">
+    <div class="ob-modal">
+      <div class="ob-steps">
+        <div class="ob-step active" id="ob-s1"></div>
+        <div class="ob-step" id="ob-s2"></div>
+        <div class="ob-step" id="ob-s3"></div>
+      </div>
+      <div id="ob-content"></div>
+      <div class="ob-btns">
+        <button class="ob-skip" onclick="chiudiOnboarding()">Salta</button>
+        <button class="ob-next" id="ob-next-btn" onclick="nextOb()">Inizia →</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const SUPABASE_URL="https://maeoqoxzjzusjwrdrkbd.supabase.co";
     const SUPABASE_KEY="sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX";
@@ -329,6 +361,63 @@
       caricaNotifiche();
       caricaMieRecensioni();
       caricaOfferte();
+      mostraOnboardingLavoratore();
+    }
+
+    // ── ONBOARDING LAVORATORE ──
+    const OB_LAV_KEY = 'staffalpine_ob_lav_v1';
+    let _obLavStep = 1;
+    const obLavSteps = [
+      {
+        icon: '👋', title: 'Benvenuto su StaffAlpine!',
+        desc: "Sei nel posto giusto per trovare lavoro nell'hospitality valdostano e condividere le tue esperienze.",
+        items: ['📝 Completa il tuo profilo professionale','🏢 Cerca aziende e leggi le recensioni','💼 Esplora le offerte di lavoro attive'],
+        btn: 'Inizia →'
+      },
+      {
+        icon: '✍️', title: 'Lascia una Recensione',
+        desc: "Hai lavorato in un'azienda? Condividi la tua esperienza in modo anonimo. Le recensioni verificate aiutano tutti i lavoratori.",
+        items: ['🔒 La tua identità è protetta','📎 Allega un documento per la verifica','⭐ Valuta paga, alloggio e ambiente'],
+        btn: 'Capito →'
+      },
+      {
+        icon: '🚀', title: 'Completa il Profilo',
+        desc: "Un profilo completo ti rende visibile alle aziende Premium che cercano personale qualificato in Valle d'Aosta.",
+        items: ['💼 Aggiungi le tue esperienze','🌍 Indica le lingue parlate','📅 Specifica la tua disponibilità'],
+        btn: 'Vai al Profilo ✓'
+      }
+    ];
+
+    function mostraOnboardingLavoratore(){
+      if(localStorage.getItem(OB_LAV_KEY)) return;
+      _obLavStep = 1;
+      renderObLav();
+      document.getElementById('ob-overlay').style.display = 'flex';
+    }
+
+    function renderObLav(){
+      const step = obLavSteps[_obLavStep - 1];
+      document.getElementById('ob-content').innerHTML = `
+        <div class="ob-icon">${step.icon}</div>
+        <div class="ob-title">${step.title}</div>
+        <div class="ob-desc">${step.desc}</div>
+        <ul class="ob-list">${step.items.map(i=>`<li><span style="font-size:16px;">${i.substring(0,2)}</span><span>${i.substring(2)}</span></li>`).join('')}</ul>`;
+      document.getElementById('ob-next-btn').innerText = step.btn;
+      [1,2,3].forEach(i=>{
+        const el = document.getElementById(`ob-s${i}`);
+        el.className = 'ob-step' + (i < _obLavStep ? ' done' : i === _obLavStep ? ' active' : '');
+      });
+    }
+
+    function nextOb(){
+      if(_obLavStep < 3){ _obLavStep++; renderObLav(); }
+      else chiudiOnboarding();
+    }
+
+    function chiudiOnboarding(){
+      localStorage.setItem(OB_LAV_KEY, '1');
+      document.getElementById('ob-overlay').style.display = 'none';
+      if(_obLavStep === 3) showTab('profilo', document.getElementById('tab-profilo'));
     }
 
     function showTab(id,btn){
@@ -401,14 +490,24 @@
       const{data:notifiche}=await supabaseClient.from('notifiche_lavoratori').select('*').eq('lavoratore_id',user.id).order('created_at',{ascending:false});
       const container=document.getElementById('lista-notifiche');
       if(notifiche&&notifiche.length>0){
+        // Badge tab
         document.getElementById('badge-notifiche').classList.add('visible');
+        document.getElementById('badge-notifiche').innerText = notifiche.length;
+        // Badge navbar
+        document.getElementById('nav-badge-proposte').style.display='inline-flex';
+        document.getElementById('nav-badge-num').innerText = notifiche.length;
         container.innerHTML=notifiche.map(n=>`
           <div class="notifica-card">
             <div class="notifica-header"><span class="notifica-azienda">🏢 ${n.nome_azienda}</span><span class="notifica-data">${new Date(n.created_at).toLocaleDateString('it-IT')}</span></div>
             <div class="notifica-messaggio">"${n.messaggio}"</div>
             <div class="notifica-contatto">📞 Contatto: <b>${n.contatto_azienda||'Non specificato'}</b></div>
-            <div style="margin-top:14px;"><button class="btn-secondary" onclick="window.location.href='dettaglio-azienda.html?nome=${encodeURIComponent(n.nome_azienda)}'">⭐ Vedi Recensioni Azienda</button></div>
+            <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn-secondary" onclick="window.location.href='dettaglio-azienda.html?nome=${encodeURIComponent(n.nome_azienda)}'">⭐ Vedi Recensioni Azienda</button>
+            </div>
           </div>`).join('');
+      } else {
+        document.getElementById('badge-notifiche').classList.remove('visible');
+        document.getElementById('nav-badge-proposte').style.display='none';
       }
     }
 
@@ -442,18 +541,24 @@
     let _tutteAziende = [];
 
     async function caricaAziendeCerca(){
-      const { data: recs } = await supabaseClient
-        .from('RECENSIONI')
-        .select('AZIENDA, VOTO_PAGA, RISPETTO_TITOLARE, VERIFICATA')
-        .eq('VERIFICATA', true);
+      const [{ data: recs }, { data: offerte }] = await Promise.all([
+        supabaseClient.from('RECENSIONI').select('AZIENDA, VOTO_PAGA, RISPETTO_TITOLARE').eq('VERIFICATA', true),
+        supabaseClient.from('offerte_lavoro').select('nome_azienda').eq('is_attiva', true)
+      ]);
       if(!recs) return;
-      // Raggruppa per azienda
+      // Conta offerte per azienda
+      const offerteMap = {};
+      (offerte||[]).forEach(o => {
+        if(o.nome_azienda) offerteMap[o.nome_azienda] = (offerteMap[o.nome_azienda]||0) + 1;
+      });
+      // Raggruppa recensioni per azienda
       const map = {};
       recs.forEach(r => {
-        if(!map[r.AZIENDA]) map[r.AZIENDA] = { nome: r.AZIENDA, voti_paga: [], voti_rispetto: [], count: 0 };
+        if(!map[r.AZIENDA]) map[r.AZIENDA] = { nome: r.AZIENDA, voti_paga: [], voti_rispetto: [], count: 0, offerte: 0 };
         map[r.AZIENDA].voti_paga.push(parseFloat(r.VOTO_PAGA)||0);
         map[r.AZIENDA].voti_rispetto.push(parseFloat(r.RISPETTO_TITOLARE)||0);
         map[r.AZIENDA].count++;
+        map[r.AZIENDA].offerte = offerteMap[r.AZIENDA] || 0;
       });
       _tutteAziende = Object.values(map).sort((a,b) => b.count - a.count);
       filtraAziende('');
@@ -473,7 +578,10 @@
       const media = arr => arr.length ? (arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(1) : '—';
       container.innerHTML = filtrate.map(a => `
         <div class="az-card-cerca" onclick="window.location.href='dettaglio-azienda.html?nome=${encodeURIComponent(a.nome)}'">
-          <h4>🏢 ${a.nome}</h4>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:6px;">
+            <h4>🏢 ${a.nome}</h4>
+            ${a.offerte>0?`<span style="background:#d1f0e0;color:var(--verde);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;">💼 ${a.offerte} offerta${a.offerte>1?'e':''} attiva${a.offerte>1?'':'e'}</span>`:''}
+          </div>
           <div class="az-voti">
             <span>📋 <b>${a.count}</b> recension${a.count===1?'e':'i'}</span>
             <span>💰 Paga: <b>${media(a.voti_paga)}/5</b></span>
@@ -492,9 +600,17 @@
         return;
       }
       container.innerHTML=recensioni.map(r=>`
-        <div class="recensione-card">
-          <div><h3 style="font-family:'Playfair Display',serif;color:var(--scuro);margin-bottom:4px;">🏢 ${r.AZIENDA}</h3><p style="font-size:13px;color:var(--pietra);">Paga: <b>${r.VOTO_PAGA}/5</b> · Ambiente: <b>${r.RISPETTO_TITOLARE}/5</b></p></div>
-          <span class="status-pill ${r.VERIFICATA?'pill-ok':'pill-wait'}">${r.VERIFICATA?'✅ Verificata':'⏳ In attesa'}</span>
+        <div class="recensione-card" style="flex-direction:column;align-items:flex-start;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;width:100%;flex-wrap:wrap;gap:8px;">
+            <div>
+              <h3 style="font-family:'Playfair Display',serif;color:var(--scuro);margin-bottom:4px;">🏢 ${r.AZIENDA}</h3>
+              <p style="font-size:13px;color:var(--pietra);">Paga: <b>${r.VOTO_PAGA}/5</b> · Ambiente: <b>${r.RISPETTO_TITOLARE}/5</b></p>
+            </div>
+            <span class="status-pill ${r.VERIFICATA?'pill-ok':'pill-wait'}">${r.VERIFICATA?'✅ Verificata':'⏳ In attesa'}</span>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn-secondary" style="font-size:12px;padding:6px 14px;" onclick="window.location.href='dettaglio-azienda.html?nome=${encodeURIComponent(r.AZIENDA)}'">📊 Vedi Scheda Azienda</button>
+          </div>
         </div>`).join('');
     }
 
