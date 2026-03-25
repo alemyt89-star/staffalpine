@@ -222,6 +222,11 @@
           <input type="email" id="email_azienda" class="form-control" placeholder="info@tuohotel.it">
         </div>
 
+        <!-- CONSENSO PRIVACY -->
+        <label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;cursor:pointer;">
+          <input type="checkbox" id="check-consenso-az" style="margin-top:3px;accent-color:#52b788;width:15px;height:15px;flex-shrink:0;">
+          <span style="font-size:12px;color:rgba(255,255,255,0.45);line-height:1.5;">Ho letto e accetto l'<a href="informativa-privacy.html" target="_blank" style="color:#52b788;">Informativa Privacy</a> e i <a href="termini.html" target="_blank" style="color:#52b788;">Termini di Servizio</a>. Acconsento al trattamento dei dati aziendali.</span>
+        </label>
         <button class="btn-primary" id="btn-step1" onclick="procediAlCodice()">
           Ricevi Codice di Accesso →
         </button>
@@ -307,8 +312,10 @@
       const ragione=document.getElementById('ragione_sociale').value.trim();
       const piva=document.getElementById('p_iva').value.trim();
       const email=document.getElementById('email_azienda').value.trim();
+      const consenso=document.getElementById('check-consenso-az');
 
       if(!ragione||!piva||!email)return alert("Compila tutti i campi!");
+      if(consenso && !consenso.checked)return alert("Devi accettare l'Informativa Privacy e i Termini di Servizio per continuare.");
       if(!convalidaPIVA(piva))return alert("La Partita IVA inserita non è valida. Controlla i dati.");
 
       const btn=document.getElementById('btn-step1');

@@ -380,6 +380,11 @@
             <span class="input-icon">✉️</span>
             <input type="email" id="email" placeholder="la-tua@email.com" autocomplete="email">
           </div>
+          <!-- CONSENSO PRIVACY -->
+          <label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;cursor:pointer;font-size:12px;color:rgba(255,255,255,0.5);line-height:1.5;">
+            <input type="checkbox" id="check-consenso" style="margin-top:2px;accent-color:#52b788;width:15px;height:15px;flex-shrink:0;">
+            <span>Ho letto e accetto l'<a href="informativa-privacy.html" target="_blank" style="color:#52b788;">Informativa Privacy</a> e i <a href="termini.html" target="_blank" style="color:#52b788;">Termini di Servizio</a> di StaffAlpine. Acconsento al trattamento dei miei dati personali.</span>
+          </label>
           <button class="btn-login" onclick="inviaCodice()">
             <span>Invia Codice Accesso →</span>
           </button>
@@ -416,8 +421,10 @@
 
     async function inviaCodice() {
       const email = document.getElementById('email').value;
+      const consenso = document.getElementById('check-consenso');
       const btn = document.querySelector('#step-1 .btn-login');
       if (!email) return alert("Inserisci un indirizzo email!");
+      if (consenso && !consenso.checked) return alert("Devi accettare l'Informativa Privacy e i Termini di Servizio per continuare.");
 
       btn.disabled = true;
       btn.querySelector('span').innerText = 'Invio in corso...';

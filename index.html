@@ -700,13 +700,13 @@
       </div>
       <div class="footer-col">
         <h4>Contatti</h4>
-        <a href="mailto:info@staffalpine.it">info@staffalpine.it</a>
+        <a href="/cdn-cgi/l/email-protection#4a23242c250a393e2b2c2c2b263a23242f64233e"><span class="__cf_email__" data-cfemail="472e292128073433262121262b372e2922692e33">[email&#160;protected]</span></a>
         <a href="#">Instagram</a>
         <a href="#">Facebook</a>
       </div>
     </div>
     <div class="footer-bottom">
-      <p>© 2026 StaffAlpine — Valle d'Aosta</p>
+      <p>© 2026 StaffAlpine — Valle d'Aosta · <a href='privacy.html' style='color:rgba(255,255,255,0.4);text-decoration:none;'>Privacy</a> · <a href='termini.html' style='color:rgba(255,255,255,0.4);text-decoration:none;'>Termini</a></p>
       <span class="footer-badge">🏔️ MADE IN VDA</span>
       <a href="login.html" style="color: rgba(255,255,255,0.3); font-size:12px; text-decoration:none;">Accesso Staff 🛡️</a>
     </div>
@@ -752,7 +752,7 @@
       <div style="padding:20px 28px; border-top:1px solid #f0f2ee; flex-shrink:0; display:flex; flex-direction:column; gap:10px;">
         <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer; font-size:13px; color:#2c3e2d; line-height:1.4;">
           <input type="checkbox" id="check-privacy" style="margin-top:2px; accent-color:#2d6a4f; width:16px; height:16px; flex-shrink:0;">
-          Ho letto e accetto i Termini di utilizzo e l'Informativa sulla Privacy di StaffAlpine.
+          Ho letto e accetto i <a href="termini.html" target="_blank" style="color:#52b788;">Termini di Servizio</a> e l'<a href="informativa-privacy.html" target="_blank" style="color:#52b788;">Informativa sulla Privacy</a> di StaffAlpine.
         </label>
         <button id="btn-accetta" onclick="accettaPrivacy()" disabled
           style="width:100%; padding:13px; background:#ccc; color:white; border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:700; cursor:not-allowed; transition:all 0.3s;">
@@ -762,7 +762,7 @@
     </div>
   </div>
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     // Navbar scroll effect
     const navbar = document.getElementById('navbar');
     window.addEventListener('scroll', () => {
@@ -820,9 +820,4 @@
       });
     });
 
-    // Dopo accettazione, vai alla destinazione salvata
-    const originalAccetta = window.accettaPrivacy;
-    window.accettaPrivacy = function() {
-      localStorage.setItem(PRIVACY_KEY, '1');
-      document.getElementById('modal-privacy').style.display = 'none';
-      const dest = s
+    // Dopo accettazione, vai alla destina

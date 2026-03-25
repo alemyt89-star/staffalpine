@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a2e1a">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Informativa Privacy — StaffAlpine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{--verde:#2d6a4f;--verde-chiaro:#52b788;--oro:#c9a84c;--oro-chiaro:#e9c46a;--scuro:#1a2e1a;--pietra:#6b705c;--grigio:#f0f2ee;--testo:#2c3e2d;}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--grigio);color:var(--testo);min-height:100vh;}
+    .navbar{background:var(--scuro);padding:14px 5%;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1000;box-shadow:0 2px 20px rgba(0,0,0,0.2);}
+    .nav-logo{font-family:'Playfair Display',serif;font-size:20px;color:var(--oro-chiaro);letter-spacing:1px;text-decoration:none;display:flex;align-items:center;gap:8px;}
+    .nav-logo img{width:24px;height:24px;}
+    .nav-back{color:rgba(255,255,255,0.6);font-size:13px;text-decoration:none;transition:color 0.2s;}
+    .nav-back:hover{color:white;}
+    .hero{background:linear-gradient(135deg,var(--scuro),#0d1f0d);padding:48px 5% 40px;text-align:center;}
+    .hero h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.6rem);color:white;margin-bottom:8px;}
+    .hero p{color:rgba(255,255,255,0.5);font-size:13px;}
+    .container{max-width:780px;margin:0 auto;padding:40px 5% 60px;}
+    .doc-card{background:white;border-radius:16px;padding:36px;box-shadow:0 2px 12px rgba(0,0,0,0.05);margin-bottom:20px;}
+    h2{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--scuro);margin:28px 0 10px;padding-bottom:8px;border-bottom:2px solid var(--grigio);}
+    h2:first-child{margin-top:0;}
+    h3{font-size:1rem;color:var(--verde);margin:16px 0 6px;font-weight:700;}
+    p{font-size:14px;line-height:1.8;color:var(--testo);margin-bottom:10px;}
+    ul{font-size:14px;line-height:1.8;color:var(--testo);margin:8px 0 10px;padding-left:20px;}
+    ul li{margin-bottom:4px;}
+    .highlight{background:#e8f5e9;border-left:4px solid var(--verde-chiaro);border-radius:0 8px 8px 0;padding:12px 16px;margin:14px 0;font-size:13px;color:var(--verde);}
+    .info-box{background:var(--grigio);border-radius:10px;padding:16px;font-size:13px;margin:12px 0;}
+    .info-box strong{display:block;margin-bottom:4px;color:var(--scuro);}
+    .updated{font-size:11px;color:var(--pietra);text-align:center;margin-top:24px;}
+    footer{background:var(--scuro);padding:24px 5%;text-align:center;}
+    footer p{color:rgba(255,255,255,0.3);font-size:12px;}
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo"><img src="stella-alpina.svg" alt="">StaffAlpine</a>
+    <a href="index.html" class="nav-back">← Torna alla home</a>
+  </nav>
+
+  <div class="hero">
+    <h1>Informativa sulla Privacy</h1>
+    <p>Ai sensi del Regolamento UE 2016/679 (GDPR) e del D.Lgs. 196/2003</p>
+  </div>
+
+  <div class="container">
+    <div class="doc-card">
+
+      <h2>1. Titolare del Trattamento</h2>
+      <div class="info-box">
+        <strong>Team StaffAlpine</strong>
+        Località Grand Chemin 93, Saint-Christophe (AO)<br>
+        P.IVA: 01275120077<br>
+        Email: <a href="mailto:info@staffalpine.it" style="color:var(--verde);">info@staffalpine.it</a>
+      </div>
+      <p>Per qualsiasi questione relativa al trattamento dei tuoi dati personali puoi contattarci all'indirizzo email sopra indicato.</p>
+
+      <h2>2. Dati Raccolti e Finalità</h2>
+
+      <h3>2.1 Lavoratori</h3>
+      <p>Raccogliamo i seguenti dati personali degli utenti registrati come lavoratori:</p>
+      <ul>
+        <li><strong>Email</strong> — necessaria per l'autenticazione tramite codice OTP</li>
+        <li><strong>Nome, Cognome, Data di Nascita</strong> — raccolti esclusivamente per verificare l'autenticità delle recensioni; non vengono mai resi visibili alle aziende</li>
+        <li><strong>Profilo professionale</strong> (mansione, settore, lingue, certificazioni, disponibilità) — reso visibile in forma anonima alle aziende Premium per il matchmaking lavorativo</li>
+        <li><strong>Documenti di verifica</strong> (buste paga, contratti, cedolini) — caricati facoltativamente per la verifica delle recensioni o delle esperienze; vengono eliminati definitivamente dopo la verifica</li>
+      </ul>
+
+      <h3>2.2 Aziende</h3>
+      <ul>
+        <li><strong>Email aziendale</strong> — necessaria per l'autenticazione e le comunicazioni</li>
+        <li><strong>Ragione Sociale e Partita IVA</strong> — per l'identificazione dell'azienda e la verifica della sua legittimità</li>
+        <li><strong>Profilo pubblico</strong> (descrizione, foto, zona, tipi di contratto) — pubblicato sulla piattaforma e visibile ai lavoratori</li>
+      </ul>
+
+      <h3>2.3 Recensioni</h3>
+      <p>Le recensioni sono associate all'identità del lavoratore esclusivamente per finalità di verifica. Verso le aziende e gli altri utenti le recensioni sono completamente anonime. Il gestore della piattaforma può risalire all'autore solo in caso di contestazioni o necessità di verifica.</p>
+
+      <h2>3. Base Giuridica del Trattamento</h2>
+      <ul>
+        <li><strong>Esecuzione di un contratto</strong> (art. 6.1.b GDPR) — per fornire i servizi della piattaforma</li>
+        <li><strong>Consenso</strong> (art. 6.1.a GDPR) — per la raccolta del profilo professionale e la visibilità nel database talenti</li>
+        <li><strong>Legittimo interesse</strong> (art. 6.1.f GDPR) — per la verifica dell'autenticità delle recensioni e la prevenzione di abusi</li>
+        <li><strong>Obbligo legale</strong> (art. 6.1.c GDPR) — per la conservazione dei dati fiscali delle aziende</li>
+      </ul>
+
+      <h2>4. Conservazione dei Dati</h2>
+      <ul>
+        <li><strong>Documenti di verifica</strong> (buste paga, contratti) — eliminati immediatamente dopo la verifica, entro 30 giorni dal caricamento</li>
+        <li><strong>Profilo lavoratore</strong> — conservato fino alla cancellazione volontaria da parte dell'utente</li>
+        <li><strong>Recensioni verificate</strong> — conservate a tempo indeterminato in forma anonima, essendo di interesse pubblico per la community</li>
+        <li><strong>Dati aziende</strong> — conservati per la durata del rapporto contrattuale e per i successivi 10 anni per obblighi fiscali</li>
+        <li><strong>Log di accesso</strong> — conservati per 12 mesi</li>
+      </ul>
+
+      <h2>5. Comunicazione e Diffusione dei Dati</h2>
+      <p>I tuoi dati personali non vengono venduti né ceduti a terzi per finalità commerciali. Possono essere comunicati a:</p>
+      <ul>
+        <li><strong>Supabase Inc.</strong> — fornitore del database e dell'autenticazione (Data Processing Agreement in essere)</li>
+        <li><strong>Vercel Inc.</strong> — fornitore dell'hosting (server in Europa)</li>
+        <li><strong>Resend Inc.</strong> — fornitore del servizio email transazionale</li>
+        <li><strong>Autorità competenti</strong> — su richiesta dell'autorità giudiziaria o di pubblica sicurezza</li>
+      </ul>
+
+      <h2>6. Diritti dell'Interessato</h2>
+      <p>Ai sensi degli artt. 15-22 del GDPR hai diritto a:</p>
+      <ul>
+        <li><strong>Accesso</strong> — ottenere conferma del trattamento e copia dei dati</li>
+        <li><strong>Rettifica</strong> — correggere dati inesatti o incompleti</li>
+        <li><strong>Cancellazione</strong> ("diritto all'oblio") — richiedere la cancellazione dei tuoi dati</li>
+        <li><strong>Limitazione</strong> — limitare il trattamento in determinati casi</li>
+        <li><strong>Portabilità</strong> — ricevere i tuoi dati in formato strutturato</li>
+        <li><strong>Opposizione</strong> — opporti al trattamento basato su legittimo interesse</li>
+        <li><strong>Revoca del consenso</strong> — in qualsiasi momento, senza pregiudizio per la liceità del trattamento precedente</li>
+      </ul>
+      <div class="highlight">
+        Per esercitare i tuoi diritti scrivi a <strong>info@staffalpine.it</strong>. Risponderemo entro 30 giorni.
+      </div>
+
+      <h2>7. Cookie e Tecnologie di Tracciamento</h2>
+      <p>StaffAlpine utilizza esclusivamente:</p>
+      <ul>
+        <li><strong>Cookie tecnici</strong> — necessari per il funzionamento della piattaforma (sessione di autenticazione)</li>
+        <li><strong>LocalStorage</strong> — per memorizzare le preferenze dell'utente (es. onboarding completato)</li>
+        <li><strong>Google Fonts</strong> — per il caricamento dei font tipografici; Google può raccogliere dati tecnici di accesso</li>
+      </ul>
+      <p>Non utilizziamo cookie di profilazione, pixel di tracciamento o strumenti di analisi comportamentale.</p>
+
+      <h2>8. Sicurezza dei Dati</h2>
+      <p>Adottiamo misure tecniche e organizzative adeguate per proteggere i dati personali, tra cui:</p>
+      <ul>
+        <li>Connessioni cifrate HTTPS su tutti i canali</li>
+        <li>Autenticazione senza password tramite OTP (One-Time Password)</li>
+        <li>Accesso ai dati sensibili limitato all'amministratore tramite Row Level Security (RLS) su Supabase</li>
+        <li>Eliminazione automatica dei documenti sensibili dopo la verifica</li>
+      </ul>
+
+      <h2>9. Minori</h2>
+      <p>StaffAlpine è destinata a persone maggiorenni. Non raccogliamo consapevolmente dati di minori di 18 anni. Se ritieni che un minore abbia fornito dati personali, contattaci immediatamente a info@staffalpine.it.</p>
+
+      <h2>10. Modifiche all'Informativa</h2>
+      <p>Ci riserviamo di aggiornare questa informativa. Le modifiche sostanziali saranno comunicate via email agli utenti registrati. La versione aggiornata è sempre disponibile su questa pagina.</p>
+
+      <h2>11. Reclamo all'Autorità di Controllo</h2>
+      <p>Hai il diritto di proporre reclamo al <strong>Garante per la Protezione dei Dati Personali</strong> (www.garanteprivacy.it) qualora ritieni che il trattamento dei tuoi dati violi il GDPR.</p>
+
+      <p class="updated">Ultimo aggiornamento: Marzo 2026</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2026 StaffAlpine — Valle d'Aosta · <a href="privacy.html" style="color:rgba(255,255,255,0.4);">Privacy</a> · <a href="termini.html" style="color:rgba(255,255,255,0.4);">Termini</a></p>
+  </footer>
+
+</body>
+</html>
