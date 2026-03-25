@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin — StaffAlpine</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
@@ -102,6 +103,7 @@
     <button class="tab-btn" onclick="showTab('verifiche',this)">🏅 Verifiche <span class="tab-badge" id="badge-ver">0</span></button>
     <button class="tab-btn" onclick="showTab('offerte',this)">📢 Offerte <span class="tab-badge" id="badge-off">0</span></button>
     <button class="tab-btn" onclick="showTab('premium',this)">💎 Richieste Premium <span class="tab-badge" id="badge-prem">0</span></button>
+    <button class="tab-btn" onclick="showTab('statistiche',this)">📈 Statistiche</button>
   </div>
   <!-- STATISTICHE GLOBALI -->
   <div id="global-stats" style="background:var(--scuro);padding:16px 5%;display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;">
@@ -147,6 +149,9 @@
     </div>
     <div id="verifiche" class="section">
       <div id="lista-verifiche"><div class="empty-state"><span class="empty-icon">⏳</span><p>Caricamento...</p></div></div>
+    </div>
+    <div id="statistiche" class="section">
+      <div id="stats-grafici"><div class="empty-state"><span class="empty-icon">⏳</span><p>Caricamento...</p></div></div>
     </div>
     <div id="premium" class="section">
       <div id="lista-premium"><div class="empty-state"><span class="empty-icon">⏳</span><p>Caricamento...</p></div></div>
@@ -243,6 +248,7 @@
       btn.classList.add('active');
       if(id==='lavoratori')caricaLavoratori();
       if(id==='verifiche')caricaVerifiche();
+      if(id==='statistiche')caricaStatisticheDettagliate();
       if(id==='offerte')caricaOfferteAdmin();
     }
 
@@ -348,7 +354,28 @@
     }
 
     async function verificaRecensione(id){
-      await supabaseClient.from('RECENSIONI').update({VERIFICATA:true}).eq('id',id);
+      const { error } = await supabaseClient.from('RECENSIONI').update({VERIFICATA:true}).eq('id',id);
+      if(error){ alert('Errore: '+error.message); return; }
+
+      // Recupera dati recensione per mandare email al lavoratore
+      try {
+        const { data: rec } = await supabaseClient.from('RECENSIONI').select('AZIENDA, USER_HASH').eq('id', id).maybeSingle();
+        if(rec && rec.USER_HASH){
+          const { data: prof } = await supabaseClient.from('esperienze_lavoratori').select('email, nome_reale').eq('user_id', rec.USER_HASH).maybeSingle();
+          if(prof && prof.email){
+            await fetch('/api/conferma-verifica-recensione', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                emailLavoratore: prof.email,
+                nomeLavoratore: prof.nome_reale || 'Lavoratore',
+                nomeAzienda: rec.AZIENDA || 'Azienda'
+              })
+            });
+          }
+        }
+      } catch(e){ console.log('Email conferma non inviata:', e); }
+
       caricaRecensioni();
     }
 
@@ -657,6 +684,167 @@
 
       await supabaseClient.storage.from('verifiche-esperienze').remove([`${userId}/exp${expNum}`]);
       caricaVerifiche();
+    }
+
+    async function caricaStatisticheDettagliate(){
+      const div = document.getElementById('stats-grafici');
+      div.innerHTML = '<div class="empty-state"><span class="empty-icon">⏳</span><p>Caricamento dati...</p></div>';
+
+      const [
+        { data: recensioni },
+        { data: lavoratori },
+        { data: aziende },
+        { data: offerte }
+      ] = await Promise.all([
+        supabaseClient.from('RECENSIONI').select('created_at, VERIFICATA, AZIENDA, VOTO_PAGA, RISPETTO_TITOLARE').order('created_at', {ascending:true}),
+        supabaseClient.from('esperienze_lavoratori').select('aggiornato_il, settore'),
+        supabaseClient.from('profili_aziende').select('is_approvata, is_premium'),
+        supabaseClient.from('offerte_lavoro').select('created_at, is_attiva')
+      ]);
+
+      // Raggruppa recensioni per mese
+      const meseMap = {};
+      (recensioni||[]).forEach(r => {
+        const d = new Date(r.created_at);
+        const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+        if(!meseMap[key]) meseMap[key] = { tot: 0, ver: 0 };
+        meseMap[key].tot++;
+        if(r.VERIFICATA) meseMap[key].ver++;
+      });
+      const mesiLabel = Object.keys(meseMap).sort();
+      const mesiTot = mesiLabel.map(k => meseMap[k].tot);
+      const mesiVer = mesiLabel.map(k => meseMap[k].ver);
+      const mesiFormatted = mesiLabel.map(k => {
+        const [y,m] = k.split('-');
+        return new Date(y, m-1).toLocaleDateString('it-IT', {month:'short', year:'2-digit'});
+      });
+
+      // Voti medi per azienda (top 5)
+      const azVoti = {};
+      (recensioni||[]).filter(r=>r.VERIFICATA).forEach(r => {
+        if(!azVoti[r.AZIENDA]) azVoti[r.AZIENDA] = { paga:[], rispetto:[] };
+        if(r.VOTO_PAGA) azVoti[r.AZIENDA].paga.push(parseFloat(r.VOTO_PAGA));
+        if(r.RISPETTO_TITOLARE) azVoti[r.AZIENDA].rispetto.push(parseFloat(r.RISPETTO_TITOLARE));
+      });
+      const topAz = Object.entries(azVoti)
+        .map(([nome, v]) => ({
+          nome,
+          paga: v.paga.length ? (v.paga.reduce((a,b)=>a+b,0)/v.paga.length).toFixed(1) : 0,
+          rispetto: v.rispetto.length ? (v.rispetto.reduce((a,b)=>a+b,0)/v.rispetto.length).toFixed(1) : 0
+        }))
+        .sort((a,b) => b.paga - a.paga)
+        .slice(0, 6);
+
+      // Settori lavoratori
+      const settoriMap = {};
+      (lavoratori||[]).forEach(l => {
+        const s = l.settore || 'N/D';
+        settoriMap[s] = (settoriMap[s]||0) + 1;
+      });
+
+      // KPI
+      const totRec = (recensioni||[]).length;
+      const verRec = (recensioni||[]).filter(r=>r.VERIFICATA).length;
+      const azTot = (aziende||[]).length;
+      const azPrem = (aziende||[]).filter(a=>a.is_premium).length;
+      const offTot = (offerte||[]).filter(o=>o.is_attiva).length;
+      const lavTot = (lavoratori||[]).length;
+
+      div.innerHTML = `
+        <!-- KPI -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:28px;">
+          ${[
+            {val:totRec, lbl:'Recensioni totali', col:'var(--oro)'},
+            {val:verRec, lbl:'Verificate', col:'var(--verde-chiaro)'},
+            {val:lavTot, lbl:'Lavoratori', col:'var(--verde-chiaro)'},
+            {val:azTot, lbl:'Aziende', col:'var(--oro-chiaro)'},
+            {val:azPrem, lbl:'Premium', col:'var(--oro)'},
+            {val:offTot, lbl:'Offerte attive', col:'var(--verde-chiaro)'},
+          ].map(k=>`
+            <div class="stat-box">
+              <span class="val" style="color:${k.col}">${k.val}</span>
+              <span class="lbl">${k.lbl}</span>
+            </div>`).join('')}
+        </div>
+
+        <!-- GRAFICO RECENSIONI NEL TEMPO -->
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-title" style="font-family:'Playfair Display',serif;color:var(--scuro);margin-bottom:16px;">📈 Recensioni nel Tempo</div>
+          <canvas id="chart-recensioni" height="100"></canvas>
+        </div>
+
+        <!-- GRAFICO VOTI AZIENDE -->
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-title" style="font-family:'Playfair Display',serif;color:var(--scuro);margin-bottom:16px;">🏆 Top Aziende per Voto Paga</div>
+          <canvas id="chart-aziende" height="120"></canvas>
+        </div>
+
+        <!-- GRAFICO SETTORI LAVORATORI -->
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-title" style="font-family:'Playfair Display',serif;color:var(--scuro);margin-bottom:16px;">👷 Lavoratori per Settore</div>
+          <canvas id="chart-settori" height="100"></canvas>
+        </div>
+      `;
+
+      // ── Grafico recensioni nel tempo ──
+      new Chart(document.getElementById('chart-recensioni'), {
+        type: 'bar',
+        data: {
+          labels: mesiFormatted,
+          datasets: [
+            { label: 'Totali', data: mesiTot, backgroundColor: 'rgba(201,168,76,0.7)', borderRadius: 6 },
+            { label: 'Verificate', data: mesiVer, backgroundColor: 'rgba(82,183,136,0.85)', borderRadius: 6 }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'top' } },
+          scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: 'rgba(0,0,0,0.05)' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+
+      // ── Grafico voti aziende ──
+      new Chart(document.getElementById('chart-aziende'), {
+        type: 'bar',
+        data: {
+          labels: topAz.map(a => a.nome.length > 20 ? a.nome.substring(0,20)+'…' : a.nome),
+          datasets: [
+            { label: 'Paga', data: topAz.map(a=>a.paga), backgroundColor: 'rgba(82,183,136,0.85)', borderRadius: 6 },
+            { label: 'Rispetto', data: topAz.map(a=>a.rispetto), backgroundColor: 'rgba(201,168,76,0.7)', borderRadius: 6 }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'top' } },
+          scales: {
+            y: { beginAtZero: true, max: 5, grid: { color: 'rgba(0,0,0,0.05)' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+
+      // ── Grafico settori lavoratori ──
+      const settoriNomi = Object.keys(settoriMap);
+      const settoriVals = Object.values(settoriMap);
+      new Chart(document.getElementById('chart-settori'), {
+        type: 'doughnut',
+        data: {
+          labels: settoriNomi,
+          datasets: [{
+            data: settoriVals,
+            backgroundColor: ['rgba(82,183,136,0.85)','rgba(201,168,76,0.8)','rgba(116,198,157,0.8)','rgba(45,106,79,0.8)','rgba(107,112,92,0.6)'],
+            borderWidth: 2,
+            borderColor: 'white'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'right' } }
+        }
+      });
     }
 
     async function logout(){
