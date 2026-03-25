@@ -692,6 +692,7 @@
       const exp2DocPath = await uploadDoc('edit-exp2-doc', `${user.id}/exp2`);
 
       const aggiornamenti={
+        email:user.email,
         mansione_principale:document.getElementById('edit-mansione').value,
         settore:document.getElementById('edit-settore').value,
         localita_preferita:document.getElementById('edit-localita').value,

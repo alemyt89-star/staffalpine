@@ -742,6 +742,29 @@
         messaggio: messaggio
       }]);
       if(!error){
+        // Invia email di notifica al lavoratore
+        try{
+          // Recupera email del lavoratore dal suo profilo
+          const { data: profLav } = await supabaseClient
+            .from('esperienze_lavoratori')
+            .select('email, mansione_principale')
+            .eq('user_id', _lavoratoreCorrente.user_id)
+            .maybeSingle();
+          if(profLav && profLav.email){
+            await fetch('/api/notifica-proposta-lavoratore', {
+              method:'POST',
+              headers:{'Content-Type':'application/json'},
+              body: JSON.stringify({
+                emailLavoratore: profLav.email,
+                mansione: profLav.mansione_principale || 'Lavoratore',
+                nomeAzienda: _nomeAzienda,
+                messaggio: messaggio,
+                contatto: contatto
+              })
+            });
+          }
+        } catch(e){ console.log('Email notifica non inviata:', e); }
+
         document.getElementById('ml-proposta-area').innerHTML = `
           <div class="proposta-success">
             <span class="success-icon">✅</span>
