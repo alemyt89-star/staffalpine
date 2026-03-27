@@ -369,34 +369,65 @@
           <div class="step-dot" id="dot-2"></div>
         </div>
 
-        <div id="role-badge" class="role-badge">💼 Stai accedendo come Azienda</div>
+        <div id="role-badge" class="role-badge" style="display:none;">&#128188; Accesso Business — per Hotel, Ristoranti e strutture ricettive</div>
+        <div id="role-badge-lav" style="display:none;background:rgba(82,183,136,0.15);border:1px solid rgba(82,183,136,0.3);color:#52b788;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:600;text-align:center;margin-bottom:16px;">&#128100; Accesso Lavoratori — per chi cerca lavoro nel settore hospitality</div>
 
-        <h2 class="card-title">Accedi con<br><em>la tua email</em></h2>
-        <p id="instruction-text">Nessuna password. Ti mandiamo un codice sicuro via email.</p>
+        <h2 class="card-title" id="card-title-main">Accedi con<br><em>la tua email</em></h2>
+        <p id="instruction-text">Nessuna password. Scegli come vuoi accedere.</p>
 
         <!-- STEP 1 -->
         <div id="step-1">
+
+          <!-- TOGGLE METODO ACCESSO -->
+          <div style="display:flex;background:rgba(255,255,255,0.06);border-radius:10px;padding:4px;margin-bottom:18px;gap:4px;">
+            <button id="btn-toggle-magic" onclick="setMetodo('magic')" style="flex:1;padding:8px;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;background:var(--verde-chiaro);color:white;transition:all 0.2s;">
+              ✨ Link Magico
+            </button>
+            <button id="btn-toggle-otp" onclick="setMetodo('otp')" style="flex:1;padding:8px;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;background:transparent;color:rgba(255,255,255,0.5);transition:all 0.2s;">
+              # Codice OTP
+            </button>
+          </div>
+
+          <p id="metodo-desc" style="font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:14px;line-height:1.5;">Riceverai un link via email. Toccalo e sei dentro — nessun codice da copiare.</p>
+
           <div class="input-wrap">
             <span class="input-icon">✉️</span>
             <input type="email" id="email" placeholder="la-tua@email.com" autocomplete="email">
           </div>
+
+          <!-- RICORDAMI -->
+          <label style="display:flex;align-items:center;gap:10px;margin-bottom:14px;cursor:pointer;font-size:12px;color:rgba(255,255,255,0.5);">
+            <input type="checkbox" id="check-ricordami" checked style="accent-color:#52b788;width:15px;height:15px;flex-shrink:0;">
+            <span>Ricordami per 30 giorni su questo dispositivo</span>
+          </label>
+
           <!-- CONSENSO PRIVACY -->
           <label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;cursor:pointer;font-size:12px;color:rgba(255,255,255,0.5);line-height:1.5;">
             <input type="checkbox" id="check-consenso" style="margin-top:2px;accent-color:#52b788;width:15px;height:15px;flex-shrink:0;">
-            <span>Ho letto e accetto l'<a href="informativa-privacy.html" target="_blank" style="color:#52b788;">Informativa Privacy</a> e i <a href="termini.html" target="_blank" style="color:#52b788;">Termini di Servizio</a> di StaffAlpine. Acconsento al trattamento dei miei dati personali.</span>
+            <span>Ho letto e accetto l'<a href="informativa-privacy.html" target="_blank" style="color:#52b788;">Informativa Privacy</a> e i <a href="termini.html" target="_blank" style="color:#52b788;">Termini di Servizio</a> di StaffAlpine.</span>
           </label>
-          <button class="btn-login" onclick="inviaCodice()">
-            <span>Invia Codice Accesso →</span>
+
+          <button class="btn-login" id="btn-invia-accesso" onclick="inviaCodice()">
+            <span>Invia Link Magico →</span>
           </button>
         </div>
 
-        <!-- STEP 2 -->
+        <!-- STEP 2 — OTP (solo se metodo=otp) -->
         <div id="step-2" style="display:none;">
-          <input type="text" id="otp-code" placeholder="· · · · · ·" maxlength="6" autocomplete="one-time-code">
+          <input type="text" id="otp-code" placeholder="· · · · · ·" maxlength="6" autocomplete="one-time-code" inputmode="numeric">
           <button class="btn-login" onclick="verificaCodice()" style="margin-top:16px;">
             <span>Verifica e Accedi →</span>
           </button>
           <div class="secondary-link" onclick="location.reload()"><span>← Cambia email</span></div>
+        </div>
+
+        <!-- STEP 2 — MAGIC LINK (messaggio attesa) -->
+        <div id="step-2-magic" style="display:none;text-align:center;padding:10px 0;">
+          <div style="font-size:48px;margin-bottom:16px;">📬</div>
+          <div style="font-size:16px;color:white;font-weight:600;margin-bottom:8px;">Controlla la tua email!</div>
+          <p style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:20px;" id="magic-desc">Abbiamo inviato un link di accesso. Toccalo per entrare direttamente.</p>
+          <p style="font-size:11px;color:rgba(255,255,255,0.3);">Controlla anche la cartella spam se non lo trovi.</p>
+          <div class="secondary-link" style="margin-top:20px;" onclick="location.reload()"><span>← Cambia email</span></div>
         </div>
 
         <div class="card-footer">
@@ -413,43 +444,93 @@
     const SUPABASE_KEY = "sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX";
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Mostra badge se arriva da Area Business
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('role') === 'business') {
       document.getElementById('role-badge').style.display = 'block';
+    } else {
+      const rlav = document.getElementById('role-badge-lav');
+      if(rlav) rlav.style.display = 'block';
+    }
+
+    let _metodo = 'magic'; // 'magic' o 'otp'
+
+    function setMetodo(m){
+      _metodo = m;
+      const btnMagic = document.getElementById('btn-toggle-magic');
+      const btnOtp = document.getElementById('btn-toggle-otp');
+      const desc = document.getElementById('metodo-desc');
+      const btnInvia = document.getElementById('btn-invia-accesso');
+      if(m === 'magic'){
+        btnMagic.style.background = 'var(--verde-chiaro)';
+        btnMagic.style.color = 'white';
+        btnOtp.style.background = 'transparent';
+        btnOtp.style.color = 'rgba(255,255,255,0.5)';
+        desc.innerText = 'Riceverai un link via email. Toccalo e sei dentro — nessun codice da copiare.';
+        btnInvia.querySelector('span').innerText = 'Invia Link Magico →';
+      } else {
+        btnOtp.style.background = 'var(--verde-chiaro)';
+        btnOtp.style.color = 'white';
+        btnMagic.style.background = 'transparent';
+        btnMagic.style.color = 'rgba(255,255,255,0.5)';
+        desc.innerText = 'Riceverai un codice a 6 cifre via email da inserire qui.';
+        btnInvia.querySelector('span').innerText = 'Invia Codice OTP →';
+      }
     }
 
     async function inviaCodice() {
       const email = document.getElementById('email').value;
       const consenso = document.getElementById('check-consenso');
-      const btn = document.querySelector('#step-1 .btn-login');
+      const ricordami = document.getElementById('check-ricordami');
+      const btn = document.getElementById('btn-invia-accesso');
       if (!email) return alert("Inserisci un indirizzo email!");
       if (consenso && !consenso.checked) return alert("Devi accettare l'Informativa Privacy e i Termini di Servizio per continuare.");
 
       btn.disabled = true;
       btn.querySelector('span').innerText = 'Invio in corso...';
 
-      document.getElementById('step-1').style.display = 'none';
-      document.getElementById('step-2').style.display = 'block';
-      document.getElementById('instruction-text').innerText = `Abbiamo inviato un codice a ${email}. Controlla la posta.`;
-      document.getElementById('dot-1').classList.remove('active');
-      document.getElementById('dot-2').classList.add('active');
-      document.getElementById('otp-code').focus();
+      // Imposta durata sessione
+      const sessionDuration = ricordami && ricordami.checked ? 60*60*24*30 : 60*60;
+      supabaseClient.auth.setSession && null; // placeholder
 
-      const { error } = await supabaseClient.auth.signInWithOtp({
-        email,
-        options: { shouldCreateUser: true }
-      });
-
-      if (error) {
-        alert("Errore nell'invio: " + error.message);
-        document.getElementById('step-1').style.display = 'block';
-        document.getElementById('step-2').style.display = 'none';
-        document.getElementById('instruction-text').innerText = "Inserisci l'email per accedere al tuo profilo.";
-        document.getElementById('dot-1').classList.add('active');
-        document.getElementById('dot-2').classList.remove('active');
-        btn.disabled = false;
-        btn.querySelector('span').innerText = 'Invia Codice Accesso →';
+      if(_metodo === 'magic'){
+        // Magic Link — redirect automatico
+        const redirectUrl = window.location.origin + '/login.html' + (urlParams.get('role')==='business' ? '?role=business' : '');
+        const { error } = await supabaseClient.auth.signInWithOtp({
+          email,
+          options: {
+            shouldCreateUser: true,
+            emailRedirectTo: redirectUrl
+          }
+        });
+        if(error){
+          alert("Errore: " + error.message);
+          btn.disabled = false;
+          btn.querySelector('span').innerText = 'Invia Link Magico →';
+        } else {
+          document.getElementById('step-1').style.display = 'none';
+          document.getElementById('step-2-magic').style.display = 'block';
+          document.getElementById('magic-desc').innerText = 'Abbiamo inviato un link a ' + email + '. Toccalo per entrare direttamente.';
+          document.getElementById('dot-1').classList.remove('active');
+          document.getElementById('dot-2').classList.add('active');
+        }
+      } else {
+        // OTP classico
+        const { error } = await supabaseClient.auth.signInWithOtp({
+          email,
+          options: { shouldCreateUser: true }
+        });
+        if(error){
+          alert("Errore: " + error.message);
+          btn.disabled = false;
+          btn.querySelector('span').innerText = 'Invia Codice OTP →';
+        } else {
+          document.getElementById('step-1').style.display = 'none';
+          document.getElementById('step-2').style.display = 'block';
+          document.getElementById('instruction-text').innerText = 'Codice inviato a ' + email + '. Controlla anche la cartella spam.';
+          document.getElementById('dot-1').classList.remove('active');
+          document.getElementById('dot-2').classList.add('active');
+          document.getElementById('otp-code').focus();
+        }
       }
     }
 
@@ -487,6 +568,24 @@
       } else {
         window.location.href = 'recensione.html';
       }
+    }
+
+    // Gestisce il ritorno dal magic link
+    async function gestisciMagicLinkReturn(){
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if(session && session.user){
+        smistaUtente(session.user);
+      }
+    }
+    // Controlla se c'e' una sessione attiva al caricamento (da magic link)
+    const hashParams = new URLSearchParams(window.location.hash.replace('#',''));
+    if(hashParams.get('access_token') || window.location.hash.includes('access_token')){
+      gestisciMagicLinkReturn();
+    } else {
+      // Controlla sessione esistente normale
+      supabaseClient.auth.getSession().then(({ data: { session } }) => {
+        if(session && session.user) smistaUtente(session.user);
+      });
     }
 
     async function mostraTastoAdminSeAutorizzato() {
