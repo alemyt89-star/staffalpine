@@ -236,15 +236,17 @@
       box-shadow: 0 0 0 3px rgba(82,183,136,0.15);
     }
 
-    /* OTP input speciale */
-    #otp-code {
-      text-align: center;
-      font-size: 28px;
-      letter-spacing: 10px;
-      padding: 18px 15px;
-      font-weight: 700;
-      font-family: 'Playfair Display', serif;
-    }
+    /* OTP 6 caselle */
+    .otp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:20px;}
+    .otp-cell{height:56px;border-radius:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:white;font-size:24px;font-weight:700;font-family:'Playfair Display',serif;text-align:center;outline:none;transition:border-color 0.2s,background 0.2s;-webkit-appearance:none;caret-color:transparent;}
+    .otp-cell:focus{border-color:var(--verde-chiaro);background:rgba(82,183,136,0.1);}
+    .otp-cell.filled{border-color:var(--verde-chiaro);}
+    /* Timer */
+    .otp-timer{text-align:center;font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:14px;}
+    .otp-timer b{color:var(--oro-chiaro);}
+    .otp-resend{text-align:center;font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:16px;}
+    .otp-resend button{background:none;border:none;color:var(--verde-chiaro);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:0;}
+    .otp-resend button:disabled{color:rgba(255,255,255,0.2);cursor:not-allowed;text-decoration:none;}
 
     /* Bottone */
     .btn-login {
@@ -275,6 +277,7 @@
     .btn-login:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(82,183,136,0.35); }
     .btn-login span { position: relative; z-index: 1; }
     .btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    @keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-8px);}40%{transform:translateX(8px);}60%{transform:translateX(-5px);}80%{transform:translateX(5px);}}
 
     .secondary-link {
       text-align: center;
@@ -378,17 +381,7 @@
         <!-- STEP 1 -->
         <div id="step-1">
 
-          <!-- TOGGLE METODO ACCESSO -->
-          <div style="display:flex;background:rgba(255,255,255,0.06);border-radius:10px;padding:4px;margin-bottom:18px;gap:4px;">
-            <button id="btn-toggle-magic" onclick="setMetodo('magic')" style="flex:1;padding:8px;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;background:var(--verde-chiaro);color:white;transition:all 0.2s;">
-              ✨ Link Magico
-            </button>
-            <button id="btn-toggle-otp" onclick="setMetodo('otp')" style="flex:1;padding:8px;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;background:transparent;color:rgba(255,255,255,0.5);transition:all 0.2s;">
-              # Codice OTP
-            </button>
-          </div>
-
-          <p id="metodo-desc" style="font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:14px;line-height:1.5;">Riceverai un link via email. Toccalo e sei dentro — nessun codice da copiare.</p>
+          <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:18px;line-height:1.5;">Nessuna password. Inserisci la tua email e ti mandiamo un codice sicuro a 6 cifre.</p>
 
           <div class="input-wrap">
             <span class="input-icon">✉️</span>
@@ -408,14 +401,27 @@
           </label>
 
           <button class="btn-login" id="btn-invia-accesso" onclick="inviaCodice()">
-            <span>Invia Link Magico →</span>
+            <span>Invia Codice →</span>
           </button>
         </div>
 
-        <!-- STEP 2 — OTP (solo se metodo=otp) -->
+        <!-- STEP 2 — OTP 6 caselle -->
         <div id="step-2" style="display:none;">
-          <input type="text" id="otp-code" placeholder="· · · · · ·" maxlength="6" autocomplete="one-time-code" inputmode="numeric">
-          <button class="btn-login" onclick="verificaCodice()" style="margin-top:16px;">
+          <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:16px;line-height:1.5;">Inserisci il codice a 6 cifre ricevuto via email. Controlla anche la cartella spam.</p>
+          <div class="otp-grid" id="otp-grid">
+            <input class="otp-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code">
+            <input class="otp-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+            <input class="otp-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+            <input class="otp-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+            <input class="otp-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+            <input class="otp-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+          </div>
+          <div class="otp-timer" id="otp-timer">Il codice scade tra <b id="otp-countdown">10:00</b></div>
+          <div class="otp-resend">
+            Non hai ricevuto il codice?
+            <button id="btn-resend" onclick="rinviaCodice()" disabled>Rinvia codice</button>
+          </div>
+          <button class="btn-login" id="btn-verifica" onclick="verificaCodice()" disabled>
             <span>Verifica e Accedi →</span>
           </button>
           <div class="secondary-link" onclick="location.reload()"><span>← Cambia email</span></div>
@@ -452,7 +458,7 @@
       if(rlav) rlav.style.display = 'block';
     }
 
-    let _metodo = 'magic'; // 'magic' o 'otp'
+    let _metodo = 'otp';
 
     function setMetodo(m){
       _metodo = m;
@@ -529,27 +535,128 @@
           document.getElementById('instruction-text').innerText = 'Codice inviato a ' + email + '. Controlla anche la cartella spam.';
           document.getElementById('dot-1').classList.remove('active');
           document.getElementById('dot-2').classList.add('active');
-          document.getElementById('otp-code').focus();
+          inizializzaCelleOTP();
+          avviaCountdown();
+          document.querySelectorAll('.otp-cell')[0].focus();
         }
       }
     }
 
     async function verificaCodice() {
       const email = document.getElementById('email').value;
-      const token = document.getElementById('otp-code').value;
-      const btn = document.querySelector('#step-2 .btn-login');
+      const cells = document.querySelectorAll('.otp-cell');
+      const token = [...cells].map(c=>c.value).join('');
+      const btn = document.getElementById('btn-verifica');
+      if(token.length < 6) return;
 
       btn.disabled = true;
       btn.querySelector('span').innerText = 'Verifica in corso...';
+      cells.forEach(c=>c.disabled=true);
 
       const { data, error } = await supabaseClient.auth.verifyOtp({ email, token, type: 'email' });
 
       if (error) {
-        alert("Codice errato o scaduto.");
+        // Shake e reset celle
+        const grid = document.getElementById('otp-grid');
+        grid.style.animation = 'shake 0.4s ease';
+        setTimeout(()=>{ grid.style.animation=''; }, 400);
+        cells.forEach(c=>{ c.value=''; c.disabled=false; c.classList.remove('filled'); });
+        cells[0].focus();
         btn.disabled = false;
         btn.querySelector('span').innerText = 'Verifica e Accedi →';
+        document.getElementById('otp-timer').innerHTML = 'Codice errato o scaduto. <b style="color:#e88080;">Riprova</b> o rinvia il codice.';
       } else if (data.user) {
+        btn.querySelector('span').innerText = '✅ Accesso completato!';
         smistaUtente(data.user);
+      }
+    }
+
+    // Inizializza le 6 celle OTP
+    function inizializzaCelleOTP(){
+      const cells = document.querySelectorAll('.otp-cell');
+      const btnVerifica = document.getElementById('btn-verifica');
+
+      cells.forEach((cell, idx) => {
+        cell.addEventListener('input', e => {
+          cell.value = cell.value.replace(/[^0-9]/g,'').slice(-1);
+          if(cell.value) {
+            cell.classList.add('filled');
+            if(idx < cells.length-1) cells[idx+1].focus();
+          } else {
+            cell.classList.remove('filled');
+          }
+          // Abilita bottone se tutte piene
+          const token = [...cells].map(c=>c.value).join('');
+          btnVerifica.disabled = token.length < 6;
+          if(token.length === 6) verificaCodice();
+        });
+        cell.addEventListener('keydown', e => {
+          if(e.key==='Backspace' && !cell.value && idx>0){
+            cells[idx-1].focus();
+            cells[idx-1].value='';
+            cells[idx-1].classList.remove('filled');
+          }
+          if(e.key==='ArrowLeft' && idx>0) cells[idx-1].focus();
+          if(e.key==='ArrowRight' && idx<cells.length-1) cells[idx+1].focus();
+        });
+        // Gestisce incolla
+        cell.addEventListener('paste', e => {
+          e.preventDefault();
+          const pasted = (e.clipboardData||window.clipboardData).getData('text').replace(/[^0-9]/g,'').slice(0,6);
+          pasted.split('').forEach((ch, i) => {
+            if(cells[i]){ cells[i].value=ch; cells[i].classList.add('filled'); }
+          });
+          const last = Math.min(pasted.length, cells.length-1);
+          cells[last].focus();
+          const token = [...cells].map(c=>c.value).join('');
+          btnVerifica.disabled = token.length < 6;
+          if(token.length === 6) setTimeout(verificaCodice, 100);
+        });
+      });
+    }
+
+    // Countdown timer
+    let _countdownInterval = null;
+    function avviaCountdown(){
+      let secondi = 600; // 10 minuti
+      const el = document.getElementById('otp-countdown');
+      const btnResend = document.getElementById('btn-resend');
+      if(_countdownInterval) clearInterval(_countdownInterval);
+      _countdownInterval = setInterval(()=>{
+        secondi--;
+        const m = Math.floor(secondi/60);
+        const s = secondi%60;
+        if(el) el.innerText = m+':'+(s<10?'0':'')+s;
+        if(secondi <= 60 && el) el.style.color='#e88080';
+        if(secondi <= 0){
+          clearInterval(_countdownInterval);
+          if(el) el.parentElement.innerText = 'Il codice è scaduto. Rinvia un nuovo codice.';
+          if(btnResend) btnResend.disabled=false;
+        }
+        // Abilita rinvia dopo 30 secondi
+        if(secondi === 570 && btnResend) btnResend.disabled=false;
+      }, 1000);
+    }
+
+    async function rinviaCodice(){
+      const email = document.getElementById('email').value;
+      const btnResend = document.getElementById('btn-resend');
+      btnResend.disabled=true;
+      btnResend.innerText='Invio...';
+      const { error } = await supabaseClient.auth.signInWithOtp({ email, options:{ shouldCreateUser:true } });
+      if(!error){
+        // Reset celle
+        document.querySelectorAll('.otp-cell').forEach(c=>{ c.value=''; c.classList.remove('filled'); c.disabled=false; });
+        document.querySelectorAll('.otp-cell')[0].focus();
+        document.getElementById('btn-verifica').disabled=true;
+        document.getElementById('otp-timer').innerHTML = 'Nuovo codice inviato. Scade tra <b id="otp-countdown">10:00</b>';
+        document.getElementById('otp-timer').style.color='';
+        avviaCountdown();
+        setTimeout(()=>{ btnResend.innerText='Rinvia codice'; }, 30000);
+      } else {
+        alert('Errore: '+error.message);
+        btnResend.disabled=false;
+        btnResend.innerText='Rinvia codice';
       }
     }
 
