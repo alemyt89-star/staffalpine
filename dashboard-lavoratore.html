@@ -101,6 +101,31 @@
     .modal-actions{display:flex;gap:10px;margin-top:24px;}
     .modal-actions .btn-primary{flex:1;justify-content:center;}
     @media(max-width:480px){.form-row{grid-template-columns:1fr;}.tab-btn{padding:12px 14px;font-size:12px;}}
+
+    /* DRAWER MENU */
+    .drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:2000;backdrop-filter:blur(2px);}
+    .drawer-overlay.open{display:block;}
+    .drawer{position:fixed;top:0;right:-100%;width:78%;max-width:300px;height:100%;background:white;z-index:2001;transition:right 0.28s cubic-bezier(0.4,0,0.2,1);display:flex;flex-direction:column;box-shadow:-4px 0 24px rgba(0,0,0,0.15);}
+    .drawer.open{right:0;}
+    .drawer-header{background:var(--scuro);padding:20px 18px 16px;flex-shrink:0;}
+    .drawer-nome{font-size:14px;color:rgba(255,255,255,0.9);font-weight:600;margin-bottom:2px;}
+    .drawer-sub{font-size:12px;color:rgba(255,255,255,0.45);}
+    .drawer-body{flex:1;overflow-y:auto;padding:8px 0;}
+    .drawer-item{display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer;transition:background 0.15s;position:relative;border:none;background:none;width:100%;font-family:'DM Sans',sans-serif;text-align:left;}
+    .drawer-item:hover{background:var(--grigio);}
+    .drawer-item.active{background:#e8f5e9;border-left:3px solid var(--verde);}
+    .drawer-item.active .drawer-item-text{color:var(--verde);font-weight:600;}
+    .drawer-item-icon{font-size:18px;width:24px;text-align:center;flex-shrink:0;}
+    .drawer-item-text{font-size:14px;color:var(--testo);flex:1;}
+    .drawer-item-badge{background:var(--rosso);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;}
+    .drawer-divider{height:1px;background:var(--grigio);margin:6px 0;}
+    .drawer-item.danger .drawer-item-text{color:var(--rosso);}
+    .hamburger-btn{display:none;flex-direction:column;gap:5px;padding:8px;cursor:pointer;background:none;border:none;}
+    .hamburger-btn span{display:block;width:20px;height:2px;background:rgba(255,255,255,0.8);border-radius:2px;}
+    @media(max-width:768px){
+      .hamburger-btn{display:flex;}
+      .tab-bar{display:none;}
+    }
     /* ONBOARDING */
     .ob-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
     .ob-modal{background:white;border-radius:20px;padding:32px;max-width:440px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,0.2);}
@@ -125,7 +150,8 @@
     <div class="nav-user">
       <span class="nav-user-name" id="nav-nome"></span>
       <span id="nav-badge-proposte" onclick="showTab('proposte',document.getElementById('tab-proposte'))" style="display:none;background:var(--rosso);color:white;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;cursor:pointer;" title="Proposte ricevute">🔔 <span id="nav-badge-num">0</span></span>
-      <button class="nav-logout" onclick="logout()">Esci</button>
+      <button class="nav-logout" onclick="logout()" id="btn-esci-nav" style="display:none;">Esci</button>
+      <button class="hamburger-btn" onclick="apriDrawer()" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>
   </nav>
 
@@ -348,6 +374,43 @@
     </div>
   </div>
 
+  <!-- DRAWER MENU -->
+  <div class="drawer-overlay" id="drawer-overlay" onclick="chiudiDrawer()"></div>
+  <div class="drawer" id="drawer">
+    <div class="drawer-header">
+      <div class="drawer-nome" id="drawer-nome">Area Personale</div>
+      <div class="drawer-sub" id="drawer-sub">StaffAlpine</div>
+    </div>
+    <div class="drawer-body">
+      <button class="drawer-item active" id="di-profilo" onclick="drawerTab('profilo',this)">
+        <span class="drawer-item-icon">&#128100;</span>
+        <span class="drawer-item-text">Area Personale</span>
+      </button>
+      <button class="drawer-item" id="di-proposte" onclick="drawerTab('proposte',this)">
+        <span class="drawer-item-icon">&#128276;</span>
+        <span class="drawer-item-text">Proposte</span>
+        <span class="drawer-item-badge" id="drawer-badge-proposte" style="display:none;">0</span>
+      </button>
+      <button class="drawer-item" id="di-recensioni" onclick="drawerTab('recensioni',this)">
+        <span class="drawer-item-icon">&#9997;&#65039;</span>
+        <span class="drawer-item-text">Mie Recensioni</span>
+      </button>
+      <button class="drawer-item" id="di-cerca" onclick="drawerTab('cerca',this)">
+        <span class="drawer-item-icon">&#127970;</span>
+        <span class="drawer-item-text">Cerca Azienda</span>
+      </button>
+      <button class="drawer-item" id="di-offerte" onclick="drawerTab('offerte',this)">
+        <span class="drawer-item-icon">&#128188;</span>
+        <span class="drawer-item-text">Offerte Lavoro</span>
+      </button>
+      <div class="drawer-divider"></div>
+      <button class="drawer-item danger" onclick="logout()">
+        <span class="drawer-item-icon">&#128682;</span>
+        <span class="drawer-item-text">Esci</span>
+      </button>
+    </div>
+  </div>
+
   <script>
     const SUPABASE_URL="https://maeoqoxzjzusjwrdrkbd.supabase.co";
     const SUPABASE_KEY="sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX";
@@ -434,7 +497,14 @@
       const div=document.getElementById('profilo-content');
       const{data:prof}=await supabaseClient.from('esperienze_lavoratori').select('*').eq('user_id',uid).single();
       if(!prof){div.innerHTML=`<p style="color:var(--pietra);">⚠️ Profilo non trovato. <a href="recensione.html" style="color:var(--verde);">Completa il tuo profilo →</a></p>`;return;}
-      if(prof.nome_reale)document.getElementById('nav-nome').innerText=`${prof.nome_reale} ${prof.cognome_reale||''}`;
+      if(prof.nome_reale){
+        const nomeCompleto = prof.nome_reale+' '+(prof.cognome_reale||'');
+        document.getElementById('nav-nome').innerText=nomeCompleto;
+        const dn=document.getElementById('drawer-nome');
+        const ds=document.getElementById('drawer-sub');
+        if(dn)dn.innerText=nomeCompleto;
+        if(ds)ds.innerText=(prof.mansione_principale||'')+(prof.localita_preferita?' · '+prof.localita_preferita:'');
+      }
       const alloggioClass=prof.bisogno_vitto_alloggio?'alloggio-si':'alloggio-no';
       const alloggioTesto=prof.bisogno_vitto_alloggio?'🏠 Richiede Alloggio':'🏠 Indipendente';
       const certs=[prof.cert_haccp&&'HACCP',prof.cert_sicurezza&&'Sicurezza',prof.cert_sommelier&&'Sommelier',prof.cert_barman&&'Barman'].filter(Boolean);
@@ -496,6 +566,7 @@
         // Badge navbar
         document.getElementById('nav-badge-proposte').style.display='inline-flex';
         document.getElementById('nav-badge-num').innerText = notifiche.length;
+        aggiornaDrawerBadge(notifiche.length);
         container.innerHTML=notifiche.map(n=>`
           <div class="notifica-card">
             <div class="notifica-header"><span class="notifica-azienda">🏢 ${n.nome_azienda}</span><span class="notifica-data">${new Date(n.created_at).toLocaleDateString('it-IT')}</span></div>
@@ -742,6 +813,28 @@
       if(!confirm("Vuoi uscire?"))return;
       await supabaseClient.auth.signOut();
       window.location.replace('index.html');
+    }
+
+    function apriDrawer(){
+      document.getElementById('drawer').classList.add('open');
+      document.getElementById('drawer-overlay').classList.add('open');
+      document.body.style.overflow='hidden';
+    }
+    function chiudiDrawer(){
+      document.getElementById('drawer').classList.remove('open');
+      document.getElementById('drawer-overlay').classList.remove('open');
+      document.body.style.overflow='';
+    }
+    function drawerTab(id, btn){
+      chiudiDrawer();
+      const tabBtn = document.getElementById('tab-'+id);
+      if(tabBtn) showTab(id, tabBtn);
+      document.querySelectorAll('.drawer-item').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+    function aggiornaDrawerBadge(n){
+      const badge = document.getElementById('drawer-badge-proposte');
+      if(badge){ badge.style.display=n>0?'inline-block':'none'; badge.innerText=n; }
     }
 
     inizializzaDashboardLavoratore();

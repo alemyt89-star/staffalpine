@@ -126,6 +126,31 @@
     .notifica-lav-card .lav-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
     .lav-tag{background:white;border:1px solid rgba(0,0,0,0.08);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--pietra);}
     @media(max-width:480px){.tab-btn{padding:12px 14px;font-size:12px;}.upgrade-banner{flex-direction:column;}.offerta-card{flex-direction:column;}}
+
+    /* DRAWER MENU */
+    .drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:2000;backdrop-filter:blur(2px);}
+    .drawer-overlay.open{display:block;}
+    .drawer{position:fixed;top:0;right:-100%;width:80%;max-width:310px;height:100%;background:white;z-index:2001;transition:right 0.28s cubic-bezier(0.4,0,0.2,1);display:flex;flex-direction:column;box-shadow:-4px 0 24px rgba(0,0,0,0.15);}
+    .drawer.open{right:0;}
+    .drawer-header{background:var(--scuro);padding:20px 18px 16px;flex-shrink:0;}
+    .drawer-nome{font-size:14px;color:rgba(255,255,255,0.9);font-weight:600;margin-bottom:4px;}
+    .drawer-sub{font-size:11px;color:rgba(255,255,255,0.4);}
+    .drawer-body{flex:1;overflow-y:auto;padding:8px 0;}
+    .drawer-item{display:flex;align-items:center;gap:12px;padding:13px 18px;cursor:pointer;transition:background 0.15s;border:none;background:none;width:100%;font-family:'DM Sans',sans-serif;text-align:left;}
+    .drawer-item:hover{background:var(--grigio);}
+    .drawer-item.active{background:#e8f5e9;border-left:3px solid var(--verde);}
+    .drawer-item.active .drawer-item-text{color:var(--verde);font-weight:600;}
+    .drawer-item-icon{font-size:17px;width:24px;text-align:center;flex-shrink:0;}
+    .drawer-item-text{font-size:13px;color:var(--testo);flex:1;}
+    .drawer-item-badge{background:var(--rosso);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;}
+    .drawer-divider{height:1px;background:var(--grigio);margin:6px 0;}
+    .drawer-item.danger .drawer-item-text{color:var(--rosso);}
+    .hamburger-btn{display:none;flex-direction:column;gap:5px;padding:8px;cursor:pointer;background:none;border:none;}
+    .hamburger-btn span{display:block;width:20px;height:2px;background:rgba(255,255,255,0.8);border-radius:2px;}
+    @media(max-width:768px){
+      .hamburger-btn{display:flex;}
+      .tab-bar{display:none;}
+    }
     /* MODALE PROFILO LAVORATORE */
     .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(5px);z-index:10000;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px;}
     .modal-overlay.open{display:flex;}
@@ -221,6 +246,51 @@
     </div>
   </div>
 
+  <!-- DRAWER MENU -->
+  <div class="drawer-overlay" id="drawer-overlay" onclick="chiudiDrawer()"></div>
+  <div class="drawer" id="drawer">
+    <div class="drawer-header">
+      <div class="drawer-nome" id="drawer-nome-az">La mia Azienda</div>
+      <div class="drawer-sub" id="drawer-sub-az">StaffAlpine Business</div>
+    </div>
+    <div class="drawer-body">
+      <button class="drawer-item active" id="di-panoramica" onclick="drawerTab('panoramica',this)">
+        <span class="drawer-item-icon">&#128202;</span>
+        <span class="drawer-item-text">Panoramica</span>
+      </button>
+      <button class="drawer-item" id="di-notifiche" onclick="drawerTab('notifiche',this)">
+        <span class="drawer-item-icon">&#128276;</span>
+        <span class="drawer-item-text">Lavoratori</span>
+        <span class="drawer-item-badge" id="drawer-badge-lav" style="display:none;">0</span>
+      </button>
+      <button class="drawer-item" id="di-mie-offerte" onclick="drawerTab('mie-offerte',this)">
+        <span class="drawer-item-icon">&#128203;</span>
+        <span class="drawer-item-text">Le Mie Offerte</span>
+      </button>
+      <button class="drawer-item" id="di-offerte" onclick="drawerTab('offerte',this)">
+        <span class="drawer-item-icon">&#128226;</span>
+        <span class="drawer-item-text">Pubblica Offerta</span>
+      </button>
+      <button class="drawer-item" id="di-profilo-az" onclick="drawerTab('profilo-az',this)">
+        <span class="drawer-item-icon">&#127970;</span>
+        <span class="drawer-item-text">Il Mio Profilo</span>
+      </button>
+      <button class="drawer-item" id="di-talenti" onclick="drawerTab('talenti',this)">
+        <span class="drawer-item-icon">&#128269;</span>
+        <span class="drawer-item-text">Database Talenti</span>
+      </button>
+      <button class="drawer-item" id="di-mercato" onclick="drawerTab('mercato',this)">
+        <span class="drawer-item-icon">&#128203;</span>
+        <span class="drawer-item-text">Recensioni Mercato</span>
+      </button>
+      <div class="drawer-divider"></div>
+      <button class="drawer-item danger" onclick="logout()">
+        <span class="drawer-item-icon">&#128682;</span>
+        <span class="drawer-item-text">Esci</span>
+      </button>
+    </div>
+  </div>
+
   <!-- ONBOARDING MODAL -->
   <div id="onboarding-overlay" class="onboarding-overlay" style="display:none;">
     <div class="onboarding-modal">
@@ -243,7 +313,8 @@
     <div class="nav-right">
       <span class="nav-azienda" id="nav-nome-az"></span>
       <span class="premium-pill pill-base" id="nav-premium-pill">BASE</span>
-      <button class="nav-logout" onclick="logout()">Esci</button>
+      <button class="nav-logout" onclick="logout()" id="btn-esci-nav" style="display:none;">Esci</button>
+      <button class="hamburger-btn" onclick="apriDrawer()" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>
   </nav>
 
@@ -530,6 +601,10 @@
 
       // Aggiorna navbar
       document.getElementById('nav-nome-az').innerText=_nomeAzienda;
+      const dn=document.getElementById('drawer-nome-az');
+      const ds=document.getElementById('drawer-sub-az');
+      if(dn)dn.innerText=_nomeAzienda;
+      if(ds)ds.innerText=_isPremium?'StaffAlpine · Premium':'StaffAlpine · Piano Base';
       const pill=document.getElementById('nav-premium-pill');
       pill.innerText=_isPremium?'⭐ PREMIUM':'BASE';
       pill.className='premium-pill '+(_isPremium?'pill-premium':'pill-base');
@@ -1123,6 +1198,7 @@
       if(compatibili.length > 0){
         badge.style.display = 'inline';
         badge.innerText = compatibili.length;
+        aggiornaDrawerBadgeLav(compatibili.length);
       }
 
       if(compatibili.length === 0){
@@ -1162,6 +1238,28 @@
       if(!confirm("Vuoi uscire?"))return;
       await supabaseClient.auth.signOut();
       window.location.replace('index.html');
+    }
+
+    function apriDrawer(){
+      document.getElementById('drawer').classList.add('open');
+      document.getElementById('drawer-overlay').classList.add('open');
+      document.body.style.overflow='hidden';
+    }
+    function chiudiDrawer(){
+      document.getElementById('drawer').classList.remove('open');
+      document.getElementById('drawer-overlay').classList.remove('open');
+      document.body.style.overflow='';
+    }
+    function drawerTab(id, btn){
+      chiudiDrawer();
+      const tabBtn = document.querySelector('.tab-btn[onclick*="'+id+'"]');
+      if(tabBtn) showTab(id, tabBtn);
+      document.querySelectorAll('.drawer-item').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+    function aggiornaDrawerBadgeLav(n){
+      const badge = document.getElementById('drawer-badge-lav');
+      if(badge){ badge.style.display=n>0?'inline-block':'none'; badge.innerText=n; }
     }
 
     // ══ ONBOARDING ══
