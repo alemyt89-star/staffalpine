@@ -238,7 +238,7 @@
 
     /* OTP 6 caselle */
     .otp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:20px;}
-    .otp-cell{height:48px;width:100%;border-radius:10px;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.15);color:#ffffff;font-size:20px;font-weight:700;font-family:'DM Sans',sans-serif;text-align:center;outline:none;transition:border-color 0.2s,background 0.2s;-webkit-appearance:none;-webkit-text-fill-color:#ffffff;caret-color:var(--verde-chiaro);padding:0;box-sizing:border-box;}
+    .otp-cell{height:56px;border-radius:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:white;font-size:24px;font-weight:700;font-family:'Playfair Display',serif;text-align:center;outline:none;transition:border-color 0.2s,background 0.2s;-webkit-appearance:none;caret-color:transparent;}
     .otp-cell:focus{border-color:var(--verde-chiaro);background:rgba(82,183,136,0.1);}
     .otp-cell.filled{border-color:var(--verde-chiaro);}
     /* Timer */
@@ -408,8 +408,19 @@
         <!-- STEP 2 — OTP 6 caselle -->
         <div id="step-2" style="display:none;">
           <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:16px;line-height:1.5;">Inserisci il codice a 6 cifre ricevuto via email. Controlla anche la cartella spam.</p>
+          <!-- Input nascosto per il suggerimento automatico iOS/Android -->
+          <input
+            id="otp-hidden"
+            type="text"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            maxlength="6"
+            style="position:absolute;opacity:0;width:1px;height:1px;pointer-events:none;"
+            tabindex="-1"
+            aria-hidden="true"
+          >
           <div class="otp-grid" id="otp-grid">
-            <input class="otp-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code">
+            <input class="otp-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
             <input class="otp-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
             <input class="otp-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
             <input class="otp-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
@@ -537,7 +548,13 @@
           document.getElementById('dot-2').classList.add('active');
           inizializzaCelleOTP();
           avviaCountdown();
-          document.querySelectorAll('.otp-cell')[0].focus();
+          // Su mobile porta il focus sull'input nascosto per attivare il suggerimento OTP
+          const hiddenOtp = document.getElementById('otp-hidden');
+          if(hiddenOtp && /iPhone|iPad|Android/i.test(navigator.userAgent)){
+            hiddenOtp.focus();
+          } else {
+            document.querySelectorAll('.otp-cell')[0].focus();
+          }
         }
       }
     }
@@ -573,6 +590,27 @@
 
     // Inizializza le 6 celle OTP
     function inizializzaCelleOTP(){
+      // Input nascosto per suggerimento automatico OTP (iOS/Android)
+      const hiddenInput = document.getElementById('otp-hidden');
+      if(hiddenInput){
+        hiddenInput.addEventListener('input', () => {
+          const val = hiddenInput.value.replace(/[^0-9]/g,'').slice(0,6);
+          const cells = document.querySelectorAll('.otp-cell');
+          cells.forEach((c,i) => {
+            c.value = val[i] || '';
+            c.classList.toggle('filled', !!val[i]);
+          });
+          hiddenInput.value = '';
+          const btnVerifica = document.getElementById('btn-verifica');
+          btnVerifica.disabled = val.length < 6;
+          if(val.length === 6) setTimeout(verificaCodice, 80);
+        });
+        // Quando la prima cella riceve focus, passa il focus all input nascosto su mobile
+        const cells = document.querySelectorAll('.otp-cell');
+        // Su iOS il suggerimento appare solo se l input con autocomplete=one-time-code e visibile al momento del focus
+        // Usiamo un approccio ibrido: l input nascosto cattura il suggerimento, le celle catturano la digitazione manuale
+      }
+    // --- resto della funzione ---
       const cells = document.querySelectorAll('.otp-cell');
       const btnVerifica = document.getElementById('btn-verifica');
 
