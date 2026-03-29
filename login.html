@@ -236,15 +236,17 @@
       box-shadow: 0 0 0 3px rgba(82,183,136,0.15);
     }
 
-    /* OTP input speciale */
-    #otp-code {
-      text-align: center;
-      font-size: 28px;
-      letter-spacing: 10px;
-      padding: 18px 15px;
-      font-weight: 700;
-      font-family: 'Playfair Display', serif;
-    }
+    /* OTP 6 caselle */
+    .otp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:20px;}
+    .otp-cell{height:48px;width:100%;border-radius:10px;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.15);color:#ffffff;font-size:20px;font-weight:700;font-family:'DM Sans',sans-serif;text-align:center;outline:none;transition:border-color 0.2s,background 0.2s;-webkit-appearance:none;-webkit-text-fill-color:#ffffff;caret-color:var(--verde-chiaro);padding:0;box-sizing:border-box;}
+    .otp-cell:focus{border-color:var(--verde-chiaro);background:rgba(82,183,136,0.1);}
+    .otp-cell.filled{border-color:var(--verde-chiaro);}
+    /* Timer */
+    .otp-timer{text-align:center;font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:14px;}
+    .otp-timer b{color:var(--oro-chiaro);}
+    .otp-resend{text-align:center;font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:16px;}
+    .otp-resend button{background:none;border:none;color:var(--verde-chiaro);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:0;}
+    .otp-resend button:disabled{color:rgba(255,255,255,0.2);cursor:not-allowed;text-decoration:none;}
 
     /* Bottone */
     .btn-login {
@@ -275,6 +277,7 @@
     .btn-login:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(82,183,136,0.35); }
     .btn-login span { position: relative; z-index: 1; }
     .btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    @keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-8px);}40%{transform:translateX(8px);}60%{transform:translateX(-5px);}80%{transform:translateX(5px);}}
 
     .secondary-link {
       text-align: center;
@@ -369,34 +372,68 @@
           <div class="step-dot" id="dot-2"></div>
         </div>
 
-        <div id="role-badge" class="role-badge">💼 Stai accedendo come Azienda</div>
+        <div id="role-badge" class="role-badge" style="display:none;">&#128188; Accesso Business — per Hotel, Ristoranti e strutture ricettive</div>
+        <div id="role-badge-lav" style="display:none;background:rgba(82,183,136,0.15);border:1px solid rgba(82,183,136,0.3);color:#52b788;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:600;text-align:center;margin-bottom:16px;">&#128100; Accesso Lavoratori — per chi cerca lavoro nel settore hospitality</div>
 
-        <h2 class="card-title">Accedi con<br><em>la tua email</em></h2>
-        <p id="instruction-text">Nessuna password. Ti mandiamo un codice sicuro via email.</p>
+        <h2 class="card-title" id="card-title-main">Accedi con<br><em>la tua email</em></h2>
+        <p id="instruction-text">Nessuna password. Scegli come vuoi accedere.</p>
 
         <!-- STEP 1 -->
         <div id="step-1">
+
+          <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:18px;line-height:1.5;">Nessuna password. Inserisci la tua email e ti mandiamo un codice sicuro a 6 cifre.</p>
+
           <div class="input-wrap">
             <span class="input-icon">✉️</span>
             <input type="email" id="email" placeholder="la-tua@email.com" autocomplete="email">
           </div>
+
+          <!-- RICORDAMI -->
+          <label style="display:flex;align-items:center;gap:10px;margin-bottom:14px;cursor:pointer;font-size:12px;color:rgba(255,255,255,0.5);">
+            <input type="checkbox" id="check-ricordami" checked style="accent-color:#52b788;width:15px;height:15px;flex-shrink:0;">
+            <span>Ricordami per 30 giorni su questo dispositivo</span>
+          </label>
+
           <!-- CONSENSO PRIVACY -->
           <label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;cursor:pointer;font-size:12px;color:rgba(255,255,255,0.5);line-height:1.5;">
             <input type="checkbox" id="check-consenso" style="margin-top:2px;accent-color:#52b788;width:15px;height:15px;flex-shrink:0;">
-            <span>Ho letto e accetto l'<a href="informativa-privacy.html" target="_blank" style="color:#52b788;">Informativa Privacy</a> e i <a href="termini.html" target="_blank" style="color:#52b788;">Termini di Servizio</a> di StaffAlpine. Acconsento al trattamento dei miei dati personali.</span>
+            <span>Ho letto e accetto l'<a href="informativa-privacy.html" target="_blank" style="color:#52b788;">Informativa Privacy</a> e i <a href="termini.html" target="_blank" style="color:#52b788;">Termini di Servizio</a> di StaffAlpine.</span>
           </label>
-          <button class="btn-login" onclick="inviaCodice()">
-            <span>Invia Codice Accesso →</span>
+
+          <button class="btn-login" id="btn-invia-accesso" onclick="inviaCodice()">
+            <span>Invia Codice →</span>
           </button>
         </div>
 
-        <!-- STEP 2 -->
+        <!-- STEP 2 — OTP 6 caselle -->
         <div id="step-2" style="display:none;">
-          <input type="text" id="otp-code" placeholder="· · · · · ·" maxlength="6" autocomplete="one-time-code">
-          <button class="btn-login" onclick="verificaCodice()" style="margin-top:16px;">
+          <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:16px;line-height:1.5;">Inserisci il codice a 6 cifre ricevuto via email. Controlla anche la cartella spam.</p>
+          <div class="otp-grid" id="otp-grid">
+            <input class="otp-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code">
+            <input class="otp-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+            <input class="otp-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+            <input class="otp-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+            <input class="otp-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+            <input class="otp-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+          </div>
+          <div class="otp-timer" id="otp-timer">Il codice scade tra <b id="otp-countdown">10:00</b></div>
+          <div class="otp-resend">
+            Non hai ricevuto il codice?
+            <button id="btn-resend" onclick="rinviaCodice()" disabled>Rinvia codice</button>
+          </div>
+          <button class="btn-login" id="btn-verifica" onclick="verificaCodice()" disabled>
             <span>Verifica e Accedi →</span>
           </button>
           <div class="secondary-link" onclick="location.reload()"><span>← Cambia email</span></div>
+        </div>
+
+        <!-- STEP 2 — MAGIC LINK (messaggio attesa) -->
+        <div id="step-2-magic" style="display:none;text-align:center;padding:10px 0;">
+          <div style="font-size:48px;margin-bottom:16px;">📬</div>
+          <div style="font-size:16px;color:white;font-weight:600;margin-bottom:8px;">Controlla la tua email!</div>
+          <p style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:20px;" id="magic-desc">Abbiamo inviato un link di accesso. Toccalo per entrare direttamente.</p>
+          <p style="font-size:11px;color:rgba(255,255,255,0.3);">Controlla anche la cartella spam se non lo trovi.</p>
+          <div class="secondary-link" style="margin-top:20px;" onclick="location.reload()"><span>← Cambia email</span></div>
         </div>
 
         <div class="card-footer">
@@ -413,62 +450,213 @@
     const SUPABASE_KEY = "sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX";
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Mostra badge se arriva da Area Business
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('role') === 'business') {
       document.getElementById('role-badge').style.display = 'block';
+    } else {
+      const rlav = document.getElementById('role-badge-lav');
+      if(rlav) rlav.style.display = 'block';
+    }
+
+    let _metodo = 'otp';
+
+    function setMetodo(m){
+      _metodo = m;
+      const btnMagic = document.getElementById('btn-toggle-magic');
+      const btnOtp = document.getElementById('btn-toggle-otp');
+      const desc = document.getElementById('metodo-desc');
+      const btnInvia = document.getElementById('btn-invia-accesso');
+      if(m === 'magic'){
+        btnMagic.style.background = 'var(--verde-chiaro)';
+        btnMagic.style.color = 'white';
+        btnOtp.style.background = 'transparent';
+        btnOtp.style.color = 'rgba(255,255,255,0.5)';
+        desc.innerText = 'Riceverai un link via email. Toccalo e sei dentro — nessun codice da copiare.';
+        btnInvia.querySelector('span').innerText = 'Invia Link Magico →';
+      } else {
+        btnOtp.style.background = 'var(--verde-chiaro)';
+        btnOtp.style.color = 'white';
+        btnMagic.style.background = 'transparent';
+        btnMagic.style.color = 'rgba(255,255,255,0.5)';
+        desc.innerText = 'Riceverai un codice a 6 cifre via email da inserire qui.';
+        btnInvia.querySelector('span').innerText = 'Invia Codice OTP →';
+      }
     }
 
     async function inviaCodice() {
       const email = document.getElementById('email').value;
       const consenso = document.getElementById('check-consenso');
-      const btn = document.querySelector('#step-1 .btn-login');
+      const ricordami = document.getElementById('check-ricordami');
+      const btn = document.getElementById('btn-invia-accesso');
       if (!email) return alert("Inserisci un indirizzo email!");
       if (consenso && !consenso.checked) return alert("Devi accettare l'Informativa Privacy e i Termini di Servizio per continuare.");
 
       btn.disabled = true;
       btn.querySelector('span').innerText = 'Invio in corso...';
 
-      document.getElementById('step-1').style.display = 'none';
-      document.getElementById('step-2').style.display = 'block';
-      document.getElementById('instruction-text').innerText = `Abbiamo inviato un codice a ${email}. Controlla la posta.`;
-      document.getElementById('dot-1').classList.remove('active');
-      document.getElementById('dot-2').classList.add('active');
-      document.getElementById('otp-code').focus();
+      // Imposta durata sessione
+      const sessionDuration = ricordami && ricordami.checked ? 60*60*24*30 : 60*60;
+      supabaseClient.auth.setSession && null; // placeholder
 
-      const { error } = await supabaseClient.auth.signInWithOtp({
-        email,
-        options: { shouldCreateUser: true }
-      });
-
-      if (error) {
-        alert("Errore nell'invio: " + error.message);
-        document.getElementById('step-1').style.display = 'block';
-        document.getElementById('step-2').style.display = 'none';
-        document.getElementById('instruction-text').innerText = "Inserisci l'email per accedere al tuo profilo.";
-        document.getElementById('dot-1').classList.add('active');
-        document.getElementById('dot-2').classList.remove('active');
-        btn.disabled = false;
-        btn.querySelector('span').innerText = 'Invia Codice Accesso →';
+      if(_metodo === 'magic'){
+        // Magic Link — redirect automatico
+        const redirectUrl = window.location.origin + '/login.html' + (urlParams.get('role')==='business' ? '?role=business' : '');
+        const { error } = await supabaseClient.auth.signInWithOtp({
+          email,
+          options: {
+            shouldCreateUser: true,
+            emailRedirectTo: redirectUrl
+          }
+        });
+        if(error){
+          alert("Errore: " + error.message);
+          btn.disabled = false;
+          btn.querySelector('span').innerText = 'Invia Link Magico →';
+        } else {
+          document.getElementById('step-1').style.display = 'none';
+          document.getElementById('step-2-magic').style.display = 'block';
+          document.getElementById('magic-desc').innerText = 'Abbiamo inviato un link a ' + email + '. Toccalo per entrare direttamente.';
+          document.getElementById('dot-1').classList.remove('active');
+          document.getElementById('dot-2').classList.add('active');
+        }
+      } else {
+        // OTP classico
+        const { error } = await supabaseClient.auth.signInWithOtp({
+          email,
+          options: { shouldCreateUser: true }
+        });
+        if(error){
+          alert("Errore: " + error.message);
+          btn.disabled = false;
+          btn.querySelector('span').innerText = 'Invia Codice OTP →';
+        } else {
+          document.getElementById('step-1').style.display = 'none';
+          document.getElementById('step-2').style.display = 'block';
+          document.getElementById('instruction-text').innerText = 'Codice inviato a ' + email + '. Controlla anche la cartella spam.';
+          document.getElementById('dot-1').classList.remove('active');
+          document.getElementById('dot-2').classList.add('active');
+          inizializzaCelleOTP();
+          avviaCountdown();
+          document.querySelectorAll('.otp-cell')[0].focus();
+        }
       }
     }
 
     async function verificaCodice() {
       const email = document.getElementById('email').value;
-      const token = document.getElementById('otp-code').value;
-      const btn = document.querySelector('#step-2 .btn-login');
+      const cells = document.querySelectorAll('.otp-cell');
+      const token = [...cells].map(c=>c.value).join('');
+      const btn = document.getElementById('btn-verifica');
+      if(token.length < 6) return;
 
       btn.disabled = true;
       btn.querySelector('span').innerText = 'Verifica in corso...';
+      cells.forEach(c=>c.disabled=true);
 
       const { data, error } = await supabaseClient.auth.verifyOtp({ email, token, type: 'email' });
 
       if (error) {
-        alert("Codice errato o scaduto.");
+        // Shake e reset celle
+        const grid = document.getElementById('otp-grid');
+        grid.style.animation = 'shake 0.4s ease';
+        setTimeout(()=>{ grid.style.animation=''; }, 400);
+        cells.forEach(c=>{ c.value=''; c.disabled=false; c.classList.remove('filled'); });
+        cells[0].focus();
         btn.disabled = false;
         btn.querySelector('span').innerText = 'Verifica e Accedi →';
+        document.getElementById('otp-timer').innerHTML = 'Codice errato o scaduto. <b style="color:#e88080;">Riprova</b> o rinvia il codice.';
       } else if (data.user) {
+        btn.querySelector('span').innerText = '✅ Accesso completato!';
         smistaUtente(data.user);
+      }
+    }
+
+    // Inizializza le 6 celle OTP
+    function inizializzaCelleOTP(){
+      const cells = document.querySelectorAll('.otp-cell');
+      const btnVerifica = document.getElementById('btn-verifica');
+
+      cells.forEach((cell, idx) => {
+        cell.addEventListener('input', e => {
+          cell.value = cell.value.replace(/[^0-9]/g,'').slice(-1);
+          if(cell.value) {
+            cell.classList.add('filled');
+            if(idx < cells.length-1) cells[idx+1].focus();
+          } else {
+            cell.classList.remove('filled');
+          }
+          // Abilita bottone se tutte piene
+          const token = [...cells].map(c=>c.value).join('');
+          btnVerifica.disabled = token.length < 6;
+          if(token.length === 6) verificaCodice();
+        });
+        cell.addEventListener('keydown', e => {
+          if(e.key==='Backspace' && !cell.value && idx>0){
+            cells[idx-1].focus();
+            cells[idx-1].value='';
+            cells[idx-1].classList.remove('filled');
+          }
+          if(e.key==='ArrowLeft' && idx>0) cells[idx-1].focus();
+          if(e.key==='ArrowRight' && idx<cells.length-1) cells[idx+1].focus();
+        });
+        // Gestisce incolla
+        cell.addEventListener('paste', e => {
+          e.preventDefault();
+          const pasted = (e.clipboardData||window.clipboardData).getData('text').replace(/[^0-9]/g,'').slice(0,6);
+          pasted.split('').forEach((ch, i) => {
+            if(cells[i]){ cells[i].value=ch; cells[i].classList.add('filled'); }
+          });
+          const last = Math.min(pasted.length, cells.length-1);
+          cells[last].focus();
+          const token = [...cells].map(c=>c.value).join('');
+          btnVerifica.disabled = token.length < 6;
+          if(token.length === 6) setTimeout(verificaCodice, 100);
+        });
+      });
+    }
+
+    // Countdown timer
+    let _countdownInterval = null;
+    function avviaCountdown(){
+      let secondi = 600; // 10 minuti
+      const el = document.getElementById('otp-countdown');
+      const btnResend = document.getElementById('btn-resend');
+      if(_countdownInterval) clearInterval(_countdownInterval);
+      _countdownInterval = setInterval(()=>{
+        secondi--;
+        const m = Math.floor(secondi/60);
+        const s = secondi%60;
+        if(el) el.innerText = m+':'+(s<10?'0':'')+s;
+        if(secondi <= 60 && el) el.style.color='#e88080';
+        if(secondi <= 0){
+          clearInterval(_countdownInterval);
+          if(el) el.parentElement.innerText = 'Il codice è scaduto. Rinvia un nuovo codice.';
+          if(btnResend) btnResend.disabled=false;
+        }
+        // Abilita rinvia dopo 30 secondi
+        if(secondi === 570 && btnResend) btnResend.disabled=false;
+      }, 1000);
+    }
+
+    async function rinviaCodice(){
+      const email = document.getElementById('email').value;
+      const btnResend = document.getElementById('btn-resend');
+      btnResend.disabled=true;
+      btnResend.innerText='Invio...';
+      const { error } = await supabaseClient.auth.signInWithOtp({ email, options:{ shouldCreateUser:true } });
+      if(!error){
+        // Reset celle
+        document.querySelectorAll('.otp-cell').forEach(c=>{ c.value=''; c.classList.remove('filled'); c.disabled=false; });
+        document.querySelectorAll('.otp-cell')[0].focus();
+        document.getElementById('btn-verifica').disabled=true;
+        document.getElementById('otp-timer').innerHTML = 'Nuovo codice inviato. Scade tra <b id="otp-countdown">10:00</b>';
+        document.getElementById('otp-timer').style.color='';
+        avviaCountdown();
+        setTimeout(()=>{ btnResend.innerText='Rinvia codice'; }, 30000);
+      } else {
+        alert('Errore: '+error.message);
+        btnResend.disabled=false;
+        btnResend.innerText='Rinvia codice';
       }
     }
 
@@ -487,6 +675,24 @@
       } else {
         window.location.href = 'recensione.html';
       }
+    }
+
+    // Gestisce il ritorno dal magic link
+    async function gestisciMagicLinkReturn(){
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if(session && session.user){
+        smistaUtente(session.user);
+      }
+    }
+    // Controlla se c'e' una sessione attiva al caricamento (da magic link)
+    const hashParams = new URLSearchParams(window.location.hash.replace('#',''));
+    if(hashParams.get('access_token') || window.location.hash.includes('access_token')){
+      gestisciMagicLinkReturn();
+    } else {
+      // Controlla sessione esistente normale
+      supabaseClient.auth.getSession().then(({ data: { session } }) => {
+        if(session && session.user) smistaUtente(session.user);
+      });
     }
 
     async function mostraTastoAdminSeAutorizzato() {
