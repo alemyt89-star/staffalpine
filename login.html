@@ -301,6 +301,9 @@
     }
 
     /* Role badge — mostra se arrivato da business */
+    .lang-toggle{display:flex;gap:4px;justify-content:center;margin-bottom:16px;}
+    .lang-btn{background:none;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.5);padding:5px 10px;border-radius:6px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+    .lang-btn.active{background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.4);}
     .role-badge {
       display: none;
       background: rgba(201,168,76,0.15);
@@ -391,7 +394,7 @@
           <!-- RICORDAMI -->
           <label style="display:flex;align-items:center;gap:10px;margin-bottom:14px;cursor:pointer;font-size:12px;color:rgba(255,255,255,0.5);">
             <input type="checkbox" id="check-ricordami" checked style="accent-color:#52b788;width:15px;height:15px;flex-shrink:0;">
-            <span>Ricordami per 30 giorni su questo dispositivo</span>
+            <span data-it="Ricordami per 30 giorni su questo dispositivo" data-fr="Se souvenir de moi 30 jours">Ricordami per 30 giorni su questo dispositivo</span>
           </label>
 
           <!-- CONSENSO PRIVACY -->
@@ -401,13 +404,13 @@
           </label>
 
           <button class="btn-login" id="btn-invia-accesso" onclick="inviaCodice()">
-            <span>Invia Codice →</span>
+            <span data-it="Invia Codice →" data-fr="Envoyer le Code →">Invia Codice →</span>
           </button>
         </div>
 
         <!-- STEP 2 — OTP 6 caselle -->
         <div id="step-2" style="display:none;">
-          <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:16px;line-height:1.5;">Inserisci il codice a 6 cifre ricevuto via email. Controlla anche la cartella spam.</p>
+          <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:16px;line-height:1.5;" data-it="Inserisci il codice a 6 cifre ricevuto via email. Controlla anche la cartella spam." data-fr="Entrez le code à 6 chiffres reçu par email. Vérifiez aussi les spams.">Inserisci il codice a 6 cifre ricevuto via email. Controlla anche la cartella spam.</p>
           <div class="otp-grid" id="otp-grid">
             <input class="otp-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
             <input class="otp-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
@@ -419,12 +422,12 @@
           <div class="otp-timer" id="otp-timer">Il codice scade tra <b id="otp-countdown">10:00</b></div>
           <div class="otp-resend">
             Non hai ricevuto il codice?
-            <button id="btn-resend" onclick="rinviaCodice()" disabled>Rinvia codice</button>
+            <button id="btn-resend" onclick="rinviaCodice()" disabled data-it="Rinvia codice" data-fr="Renvoyer le code">Rinvia codice</button>
           </div>
           <button class="btn-login" id="btn-verifica" onclick="verificaCodice()" disabled>
-            <span>Verifica e Accedi →</span>
+            <span data-it="Verifica e Accedi →" data-fr="Vérifier et Accéder →">Verifica e Accedi →</span>
           </button>
-          <div class="secondary-link" onclick="location.reload()"><span>← Cambia email</span></div>
+          <div class="secondary-link" onclick="location.reload()"><span data-it="← Cambia email" data-fr="← Changer d'email">← Cambia email</span></div>
         </div>
 
         <!-- STEP 2 — MAGIC LINK (messaggio attesa) -->
@@ -433,11 +436,11 @@
           <div style="font-size:16px;color:white;font-weight:600;margin-bottom:8px;">Controlla la tua email!</div>
           <p style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:20px;" id="magic-desc">Abbiamo inviato un link di accesso. Toccalo per entrare direttamente.</p>
           <p style="font-size:11px;color:rgba(255,255,255,0.3);">Controlla anche la cartella spam se non lo trovi.</p>
-          <div class="secondary-link" style="margin-top:20px;" onclick="location.reload()"><span>← Cambia email</span></div>
+          <div class="secondary-link" style="margin-top:20px;" onclick="location.reload()"><span data-it="← Cambia email" data-fr="← Changer d'email">← Cambia email</span></div>
         </div>
 
         <div class="card-footer">
-          © 2026 StaffAlpine · Sicuro · Anonimo · Trasparente
+          <span data-it="© 2026 StaffAlpine · Sicuro · Anonimo · Trasparente" data-fr="© 2026 StaffAlpine · Sécurisé · Anonyme · Transparent">© 2026 StaffAlpine · Sicuro · Anonimo · Trasparente</span>
         </div>
 
       </div>
@@ -445,6 +448,7 @@
 
   </div>
 
+  <script src="lang.js"></script>
   <script>
     const SUPABASE_URL = "https://maeoqoxzjzusjwrdrkbd.supabase.co";
     const SUPABASE_KEY = "sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX";
