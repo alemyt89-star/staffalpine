@@ -28,9 +28,6 @@
 
     /* NAVBAR */
     .main-nav{background:var(--scuro);padding:14px 5%;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1000;box-shadow:0 2px 20px rgba(0,0,0,0.2);}
-    .lang-toggle{display:flex;gap:4px;align-items:center;}
-    .lang-btn{background:none;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.5);padding:3px 7px;border-radius:6px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
-    .lang-btn.active{background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.4);}
     .nav-logo{font-family:'Playfair Display',serif;font-size:20px;color:var(--oro-chiaro);letter-spacing:1px;text-decoration:none;display:flex;align-items:center;gap:8px;}.nav-logo img{width:24px;height:24px;flex-shrink:0;}
     .nav-right{display:flex;align-items:center;gap:12px;}
     .nav-azienda{font-size:13px;color:rgba(255,255,255,0.6);}
@@ -259,37 +256,37 @@
     <div class="drawer-body">
       <button class="drawer-item active" id="di-panoramica" onclick="drawerTab('panoramica',this)">
         <span class="drawer-item-icon">&#128202;</span>
-        <span class="drawer-item-text" data-it="Panoramica" data-fr="Vue d'ensemble">Panoramica</span>
+        <span class="drawer-item-text">Panoramica</span>
       </button>
       <button class="drawer-item" id="di-notifiche" onclick="drawerTab('notifiche',this)">
         <span class="drawer-item-icon">&#128276;</span>
-        <span class="drawer-item-text" data-it="Lavoratori" data-fr="Travailleurs">Lavoratori</span>
+        <span class="drawer-item-text">Lavoratori</span>
         <span class="drawer-item-badge" id="drawer-badge-lav" style="display:none;">0</span>
       </button>
       <button class="drawer-item" id="di-mie-offerte" onclick="drawerTab('mie-offerte',this)">
         <span class="drawer-item-icon">&#128203;</span>
-        <span class="drawer-item-text" data-it="Le Mie Offerte" data-fr="Mes Offres">Le Mie Offerte</span>
+        <span class="drawer-item-text">Le Mie Offerte</span>
       </button>
       <button class="drawer-item" id="di-offerte" onclick="drawerTab('offerte',this)">
         <span class="drawer-item-icon">&#128226;</span>
-        <span class="drawer-item-text" data-it="Pubblica Offerta" data-fr="Publier une Offre">Pubblica Offerta</span>
+        <span class="drawer-item-text">Pubblica Offerta</span>
       </button>
       <button class="drawer-item" id="di-profilo-az" onclick="drawerTab('profilo-az',this)">
         <span class="drawer-item-icon">&#127970;</span>
-        <span class="drawer-item-text" data-it="Il Mio Profilo" data-fr="Mon Profil">Il Mio Profilo</span>
+        <span class="drawer-item-text">Il Mio Profilo</span>
       </button>
       <button class="drawer-item" id="di-talenti" onclick="drawerTab('talenti',this)">
         <span class="drawer-item-icon">&#128269;</span>
-        <span class="drawer-item-text" data-it="Database Talenti" data-fr="Base de Talents">Database Talenti</span>
+        <span class="drawer-item-text">Database Talenti</span>
       </button>
       <button class="drawer-item" id="di-mercato" onclick="drawerTab('mercato',this)">
         <span class="drawer-item-icon">&#128203;</span>
-        <span class="drawer-item-text" data-it="Recensioni Mercato" data-fr="Avis du Marché">Recensioni Mercato</span>
+        <span class="drawer-item-text">Recensioni Mercato</span>
       </button>
       <div class="drawer-divider"></div>
       <button class="drawer-item danger" onclick="logout()">
         <span class="drawer-item-icon">&#128682;</span>
-        <span class="drawer-item-text" data-it="Esci" data-fr="Sortir">Esci</span>
+        <span class="drawer-item-text">Esci</span>
       </button>
     </div>
   </div>
@@ -316,24 +313,20 @@
     <div class="nav-right">
       <span class="nav-azienda" id="nav-nome-az"></span>
       <span class="premium-pill pill-base" id="nav-premium-pill">BASE</span>
-      <button class="nav-logout" onclick="logout()" id="btn-esci-nav" style="display:none;" data-it="Esci" data-fr="Sortir">Esci</button>
+      <button class="nav-logout" onclick="logout()" id="btn-esci-nav" style="display:none;">Esci</button>
       <button class="hamburger-btn" onclick="apriDrawer()" aria-label="Menu"><span></span><span></span><span></span></button>
-      <div class="lang-toggle">
-        <button class="lang-btn active" data-lang="it" onclick="setLingua('it')">&#127470;&#127481;</button>
-        <button class="lang-btn" data-lang="fr" onclick="setLingua('fr')">&#127467;&#127479;</button>
-      </div>
     </div>
   </nav>
 
   <!-- TAB BAR -->
   <div class="tab-bar">
-    <button class="tab-btn active" onclick="showTab('panoramica',this)" data-it="📊 Panoramica" data-fr="📊 Vue d'ensemble">📊 Panoramica</button>
-    <button class="tab-btn" onclick="showTab('notifiche',this)" data-it="🔔 Lavoratori" data-fr="🔔 Travailleurs">🔔 Lavoratori <span id="badge-notifiche" style="background:var(--rosso);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;display:none;">0</span></button>
-    <button class="tab-btn" onclick="showTab('mie-offerte',this)" data-it="📋 Le Mie Offerte" data-fr="📋 Mes Offres">📋 Le Mie Offerte</button>
-    <button class="tab-btn" onclick="showTab('offerte',this)" data-it="📢 Pubblica Offerta" data-fr="📢 Publier une Offre" data-it="📢 Pubblica Offerta" data-fr="📢 Publier une Offre">📢 Pubblica Offerta</button>
-    <button class="tab-btn" onclick="showTab('profilo-az',this)" data-it="🏢 Il Mio Profilo" data-fr="🏢 Mon Profil">🏢 Il Mio Profilo</button>
-    <button class="tab-btn" onclick="showTab('talenti',this)" data-it="🔍 Database Talenti" data-fr="🔍 Base de Talents">🔍 Database Talenti</button>
-    <button class="tab-btn" onclick="showTab('mercato',this)" data-it="📋 Recensioni Mercato" data-fr="📋 Avis du Marché">📋 Recensioni Mercato</button>
+    <button class="tab-btn active" onclick="showTab('panoramica',this)">📊 Panoramica</button>
+    <button class="tab-btn" onclick="showTab('notifiche',this)">🔔 Lavoratori <span id="badge-notifiche" style="background:var(--rosso);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;display:none;">0</span></button>
+    <button class="tab-btn" onclick="showTab('mie-offerte',this)">📋 Le Mie Offerte</button>
+    <button class="tab-btn" onclick="showTab('offerte',this)">📢 Pubblica Offerta</button>
+    <button class="tab-btn" onclick="showTab('profilo-az',this)">🏢 Il Mio Profilo</button>
+    <button class="tab-btn" onclick="showTab('talenti',this)">🔍 Database Talenti</button>
+    <button class="tab-btn" onclick="showTab('mercato',this)">📋 Recensioni Mercato</button>
   </div>
 
   <div class="container">
@@ -557,7 +550,7 @@
         </div>
         <div style="display:flex;gap:10px;margin-top:6px;">
           <button class="btn-primary" onclick="salvaProfiloAzienda()">💾 Salva Profilo</button>
-          <button class="btn-secondary" id="btn-annulla-profilo" onclick="mostraViewProfilo()" style="display:none;" data-it="Annulla" data-fr="Annuler">Annulla</button>
+          <button class="btn-secondary" id="btn-annulla-profilo" onclick="mostraViewProfilo()" style="display:none;">Annulla</button>
         </div>
       </div>
       </div>
@@ -581,7 +574,6 @@
 
   </div>
 
-  <script src="lang.js"></script>
   <script>
     const SUPABASE_URL="https://maeoqoxzjzusjwrdrkbd.supabase.co";
     const SUPABASE_KEY="sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX";
@@ -793,8 +785,8 @@
           <label style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--pietra);font-weight:600;display:block;margin-top:12px;margin-bottom:4px;">Il tuo contatto (email o telefono)</label>
           <input type="text" id="ml-contatto" placeholder="es. info@hotel.it oppure +39 333 123456" value="${valContatto}">
           <div class="proposta-actions">
-            <button class="btn-ghost" onclick="document.getElementById('modal-lavoratore').classList.remove('open');document.body.style.overflow='';" data-it="Annulla" data-fr="Annuler">Annulla</button>
-            <button class="btn-primary" onclick="inviaPropostaDaModale()" data-it="📩 Invia Proposta" data-fr="📩 Envoyer Proposition">📩 Invia Proposta</button>
+            <button class="btn-ghost" onclick="document.getElementById('modal-lavoratore').classList.remove('open');document.body.style.overflow='';">Annulla</button>
+            <button class="btn-primary" onclick="inviaPropostaDaModale()">📩 Invia Proposta</button>
           </div>
         </div>`;
       document.getElementById('modal-lavoratore').classList.add('open');
@@ -883,8 +875,8 @@
           <label style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--pietra);font-weight:600;display:block;margin-top:12px;margin-bottom:4px;">Il tuo contatto (email o telefono)</label>
           <input type="text" id="ml-contatto" placeholder="es. info@hotel.it oppure +39 333 123456" value="${valContatto}">
           <div class="proposta-actions">
-            <button class="btn-ghost" onclick="document.getElementById('modal-lavoratore').classList.remove('open');document.body.style.overflow='';" data-it="Annulla" data-fr="Annuler">Annulla</button>
-            <button class="btn-primary" onclick="inviaPropostaDaModale()" data-it="📩 Invia Proposta" data-fr="📩 Envoyer Proposition">📩 Invia Proposta</button>
+            <button class="btn-ghost" onclick="document.getElementById('modal-lavoratore').classList.remove('open');document.body.style.overflow='';">Annulla</button>
+            <button class="btn-primary" onclick="inviaPropostaDaModale()">📩 Invia Proposta</button>
           </div>
         </div>`;
       document.getElementById('modal-lavoratore').classList.add('open');
@@ -1225,7 +1217,7 @@
             ${l.lingua_francese && l.lingua_francese !== 'Nessuno' ? `<span class="lav-tag">🇫🇷 ${l.lingua_francese}</span>` : ''}
             ${l.lingua_inglese && l.lingua_inglese !== 'Nessuno' ? `<span class="lav-tag">🇬🇧 ${l.lingua_inglese}</span>` : ''}
           </div>
-          ${_isPremium ? `<button class="btn-primary" style="margin-top:12px;padding:8px 16px;font-size:13px;" onclick="apriModalePropostaDiretta('${l.user_id}','${(l.mansione_principale||'').replace(/'/g,"\\'")}','${(l.settore||'').replace(/'/g,"\\'")}','${(l.localita_preferita||'').replace(/'/g,"\\'")}')" data-it="📩 Invia Proposta" data-fr="📩 Envoyer Proposition">📩 Invia Proposta</button>` : '<p style="font-size:12px;color:var(--pietra);margin-top:10px;">🔒 Attiva Premium per contattare il lavoratore</p>'}
+          ${_isPremium ? `<button class="btn-primary" style="margin-top:12px;padding:8px 16px;font-size:13px;" onclick="apriModalePropostaDiretta('${l.user_id}','${(l.mansione_principale||'').replace(/'/g,"\\'")}','${(l.settore||'').replace(/'/g,"\\'")}','${(l.localita_preferita||'').replace(/'/g,"\\'")}')">📩 Invia Proposta</button>` : '<p style="font-size:12px;color:var(--pietra);margin-top:10px;">🔒 Attiva Premium per contattare il lavoratore</p>'}
         </div>
       `).join('');
     }
