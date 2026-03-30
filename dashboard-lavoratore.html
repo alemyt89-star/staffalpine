@@ -200,8 +200,8 @@
     <div id="cerca" class="section">
       <h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--scuro);margin-bottom:20px;" data-it="🏢 Cerca un'Azienda" data-fr="🏢 Chercher une Entreprise">🏢 Cerca un'Azienda</h2>
       <div class="search-row">
-        <input type="text" id="input-cerca-az" placeholder="Inserisci il nome dell'azienda..." oninput="filtraAziende(this.value)">
-        <button class="btn-primary" onclick="filtraAziende(document.getElementById('input-cerca-az').value)">Cerca →</button>
+        <input type="text" id="input-cerca-az" placeholder="Inserisci il nome dell'azienda..." data-it-placeholder="Inserisci il nome dell'azienda..." data-fr-placeholder="Entrez le nom de l'entreprise..." oninput="filtraAziende(this.value)">
+        <button class="btn-primary" onclick="filtraAziende(document.getElementById('input-cerca-az').value)" data-it="Cerca →" data-fr="Chercher →">Cerca →</button>
       </div>
       <div id="risultato-ricerca-az">
         <div class="empty-state"><span class="empty-icon">⏳</span><h3>Caricamento...</h3></div>
@@ -504,7 +504,7 @@
     async function caricaProfilo(uid){
       const div=document.getElementById('profilo-content');
       const{data:prof}=await supabaseClient.from('esperienze_lavoratori').select('*').eq('user_id',uid).single();
-      if(!prof){div.innerHTML=`<p style="color:var(--pietra);">⚠️ Profilo non trovato. <a href="recensione.html" style="color:var(--verde);">Completa il tuo profilo →</a></p>`;return;}
+      if(!prof){div.innerHTML=`<p style="color:var(--pietra);">⚠️ ${t('Profilo non trovato.')} <a href="recensione.html" style="color:var(--verde);">${t('Completa il tuo profilo →')}</a></p>`;return;}
       if(prof.nome_reale){
         const nomeCompleto = prof.nome_reale+' '+(prof.cognome_reale||'');
         document.getElementById('nav-nome').innerText=nomeCompleto;
@@ -514,7 +514,7 @@
         if(ds)ds.innerText=(prof.mansione_principale||'')+(prof.localita_preferita?' · '+prof.localita_preferita:'');
       }
       const alloggioClass=prof.bisogno_vitto_alloggio?'alloggio-si':'alloggio-no';
-      const alloggioTesto=prof.bisogno_vitto_alloggio?'🏠 Richiede Alloggio':'🏠 Indipendente';
+      const alloggioTesto=prof.bisogno_vitto_alloggio?t('🏠 Richiede Alloggio'):t('🏠 Indipendente');
       const certs=[prof.cert_haccp&&'HACCP',prof.cert_sicurezza&&'Sicurezza',prof.cert_sommelier&&'Sommelier',prof.cert_barman&&'Barman'].filter(Boolean);
       div.innerHTML=`
         <div class="profilo-header">
@@ -522,15 +522,15 @@
           <span class="alloggio-tag ${alloggioClass}">${alloggioTesto}</span>
         </div>
         <div class="profilo-grid">
-          <div class="profilo-item"><div class="profilo-item-label">Zona</div><div class="profilo-item-val">${prof.localita_preferita||'N/D'}</div></div>
-          <div class="profilo-item"><div class="profilo-item-label">Contratto</div><div class="profilo-item-val">${prof.tipo_disponibilita||'N/D'}</div></div>
-          <div class="profilo-item"><div class="profilo-item-label">Disponibile dal</div><div class="profilo-item-val">${prof.disponibile_dal?new Date(prof.disponibile_dal).toLocaleDateString('it-IT',{month:'long',year:'numeric'}):'N/D'}</div></div>
-          <div class="profilo-item"><div class="profilo-item-label">Alloggio</div><div class="profilo-item-val">${prof.bisogno_vitto_alloggio?'Richiesto':'Non richiesto'}</div></div>
+          <div class="profilo-item"><div class="profilo-item-label">${t('Zona')}</div><div class="profilo-item-val">${prof.localita_preferita||'N/D'}</div></div>
+          <div class="profilo-item"><div class="profilo-item-label">${t('Contratto')}</div><div class="profilo-item-val">${prof.tipo_disponibilita||'N/D'}</div></div>
+          <div class="profilo-item"><div class="profilo-item-label">${t('Disponibile dal')}</div><div class="profilo-item-val">${prof.disponibile_dal?new Date(prof.disponibile_dal).toLocaleDateString(window._lang==='fr'?'fr-FR':'it-IT',{month:'long',year:'numeric'}):'N/D'}</div></div>
+          <div class="profilo-item"><div class="profilo-item-label">${t('Alloggio')}</div><div class="profilo-item-val">${prof.bisogno_vitto_alloggio?t('Richiesto'):t('Non richiesto')}</div></div>
         </div>
 
         <!-- LINGUE -->
         <div style="margin-bottom:14px;">
-          <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pietra);margin-bottom:8px;font-weight:600;">Lingue</div>
+          <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pietra);margin-bottom:8px;font-weight:600;">${t('Lingue')}</div>
           <div style="display:flex;flex-wrap:wrap;gap:6px;">
             ${prof.lingua_francese&&prof.lingua_francese!=='Nessuno'?`<span class="badge-cert">🇫🇷 FR — ${prof.lingua_francese}</span>`:''}
             ${prof.lingua_inglese&&prof.lingua_inglese!=='Nessuno'?`<span class="badge-cert">🇬🇧 EN — ${prof.lingua_inglese}</span>`:''}
@@ -543,7 +543,7 @@
         <!-- STORICO ESPERIENZE -->
         ${(prof.exp1_mansione||prof.exp2_mansione)?`
         <div style="margin-bottom:14px;">
-          <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pietra);margin-bottom:8px;font-weight:600;">Esperienze</div>
+          <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pietra);margin-bottom:8px;font-weight:600;">${t('Esperienze')}</div>
           <div style="display:flex;flex-direction:column;gap:8px;">
             ${prof.exp1_mansione?`
             <div style="background:var(--grigio);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
@@ -559,7 +559,7 @@
         </div>`:''}
 
         <!-- CERTIFICAZIONI -->
-        ${certs.length>0?`<div>${certs.map(c=>`<span class="badge-cert">${c}</span>`).join('')}</div>`:'<p style="font-size:12px;color:var(--pietra);">Nessuna certificazione</p>'}
+        ${certs.length>0?`<div>${certs.map(c=>`<span class="badge-cert">${c}</span>`).join('')}</div>`:`<p style="font-size:12px;color:var(--pietra);">${t('Nessuna certificazione')}</p>`}
       `;
     }
 
@@ -579,9 +579,9 @@
           <div class="notifica-card">
             <div class="notifica-header"><span class="notifica-azienda">🏢 ${n.nome_azienda}</span><span class="notifica-data">${new Date(n.created_at).toLocaleDateString('it-IT')}</span></div>
             <div class="notifica-messaggio">"${n.messaggio}"</div>
-            <div class="notifica-contatto">📞 Contatto: <b>${n.contatto_azienda||'Non specificato'}</b></div>
+            <div class="notifica-contatto">📞 ${t('Contatto')}: <b>${n.contatto_azienda||t('Non specificato')}</b></div>
             <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
-              <button class="btn-secondary" onclick="window.location.href='dettaglio-azienda.html?nome=${encodeURIComponent(n.nome_azienda)}'">⭐ Vedi Recensioni Azienda</button>
+              <button class="btn-secondary" onclick="window.location.href='dettaglio-azienda.html?nome=${encodeURIComponent(n.nome_azienda)}'">${t('⭐ Vedi Recensioni Azienda')}</button>
             </div>
           </div>`).join('');
       } else {
@@ -662,9 +662,9 @@
             ${a.offerte>0?`<span style="background:#d1f0e0;color:var(--verde);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;">💼 ${a.offerte} offerta${a.offerte>1?'e':''} attiva${a.offerte>1?'':'e'}</span>`:''}
           </div>
           <div class="az-voti">
-            <span>📋 <b>${a.count}</b> recension${a.count===1?'e':'i'}</span>
-            <span>💰 Paga: <b>${media(a.voti_paga)}/5</b></span>
-            <span>🤝 Rispetto: <b>${media(a.voti_rispetto)}/5</b></span>
+            <span>📋 <b>${a.count}</b> ${t(a.count===1?'recensione':'recensioni')}</span>
+            <span>💰 ${t('Paga:')} <b>${media(a.voti_paga)}/5</b></span>
+            <span>🤝 ${t('Rispetto:')} <b>${media(a.voti_rispetto)}/5</b></span>
           </div>
         </div>`).join('');
     }
@@ -685,10 +685,10 @@
               <h3 style="font-family:'Playfair Display',serif;color:var(--scuro);margin-bottom:4px;">🏢 ${r.AZIENDA}</h3>
               <p style="font-size:13px;color:var(--pietra);">Paga: <b>${r.VOTO_PAGA}/5</b> · Ambiente: <b>${r.RISPETTO_TITOLARE}/5</b></p>
             </div>
-            <span class="status-pill ${r.VERIFICATA?'pill-ok':'pill-wait'}">${r.VERIFICATA?'✅ Verificata':'⏳ In attesa'}</span>
+            <span class="status-pill ${r.VERIFICATA?'pill-ok':'pill-wait'}">${r.VERIFICATA?t('✅ Verificata'):t('⏳ In attesa')}</span>
           </div>
           <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="btn-secondary" style="font-size:12px;padding:6px 14px;" onclick="window.location.href='dettaglio-azienda.html?nome=${encodeURIComponent(r.AZIENDA)}'">📊 Vedi Scheda Azienda</button>
+            <button class="btn-secondary" style="font-size:12px;padding:6px 14px;" onclick="window.location.href='dettaglio-azienda.html?nome=${encodeURIComponent(r.AZIENDA)}'">${t('📊 Vedi Scheda Azienda')}</button>
           </div>
         </div>`).join('');
     }
