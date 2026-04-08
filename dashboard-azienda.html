@@ -608,6 +608,9 @@
       const pill=document.getElementById('nav-premium-pill');
       pill.innerText=_isPremium?'⭐ PREMIUM':'BASE';
       pill.className='premium-pill '+(_isPremium?'pill-premium':'pill-base');
+      
+      const btnEsci = document.getElementById('btn-esci-nav');
+if(btnEsci) btnEsci.style.display = '';
 
       // Mostra/nascondi banner upgrade
       document.getElementById('banner-upgrade').style.display=_isPremium?'none':'flex';
