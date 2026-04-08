@@ -534,10 +534,14 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
+    .nav-mobile-cf { display: none; }
+
     /* ── MOBILE ── */
     @media (max-width: 768px) {
       .navbar { padding: 15px 5%; }
       .nav-links { display: none; }
+      .nav-mobile-cf { display: inline-block; color: rgba(255,255,255,0.85); text-decoration: none; font-size: 13px; font-weight: 500; letter-spacing: 0.5px; transition: color 0.3s; }
+      .nav-mobile-cf:hover { color: var(--oro-chiaro); }
       .hero h1 { font-size: 3rem; }
       .hero-subtitle { font-size: 1rem; }
       .stats-bar { gap: 30px; }
@@ -567,6 +571,7 @@
       <a href="login.html?role=business">Per le Aziende</a>
       <a href="login.html" class="nav-cta">Accedi →</a>
     </div>
+    <a href="come-funziona.html" class="nav-mobile-cf">Come Funziona</a>
   </nav>
 
   <!-- HERO -->
