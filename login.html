@@ -436,6 +436,17 @@
           <div class="secondary-link" style="margin-top:20px;" onclick="location.reload()"><span>← Cambia email</span></div>
         </div>
 
+        <!-- DEMO TESTER — visibile solo con ?demo=true -->
+        <div id="demo-panel" style="display:none;margin-top:20px;padding:16px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);border-radius:12px;">
+          <p style="font-size:11px;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:12px;letter-spacing:1px;text-transform:uppercase;">👁 Accesso Demo — Solo per revisori</p>
+          <button class="btn-login" onclick="accediDemo('lavoratore')" style="margin-bottom:8px;background:linear-gradient(135deg,#2d6a4f,#52b788);">
+            <span>👷 Accedi come Lavoratore Demo</span>
+          </button>
+          <button class="btn-login" onclick="accediDemo('azienda')" style="background:linear-gradient(135deg,#7a5c1e,#c9a84c);">
+            <span>🏨 Accedi come Azienda Demo</span>
+          </button>
+        </div>
+
         <div class="card-footer">
           © 2026 StaffAlpine · Sicuro · Anonimo · Trasparente
         </div>
@@ -456,6 +467,30 @@
     } else {
       const rlav = document.getElementById('role-badge-lav');
       if(rlav) rlav.style.display = 'block';
+    }
+
+    // Mostra pannello demo solo con ?demo=true
+    if (urlParams.get('demo') === 'true') {
+      const dp = document.getElementById('demo-panel');
+      if(dp) dp.style.display = 'block';
+    }
+
+    async function accediDemo(tipo) {
+      const email = tipo === 'lavoratore'
+        ? 'demo.lavoratore@staffalpine.it'
+        : 'demo.azienda@staffalpine.it';
+      const password = 'StaffAlpineDemo2026!';
+      const btn = event.currentTarget;
+      btn.disabled = true;
+      btn.querySelector('span').innerText = 'Accesso in corso...';
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) {
+        alert('Errore accesso demo: ' + error.message);
+        btn.disabled = false;
+        btn.querySelector('span').innerText = tipo === 'lavoratore' ? '👷 Accedi come Lavoratore Demo' : '🏨 Accedi come Azienda Demo';
+      } else if (data.user) {
+        smistaUtente(data.user);
+      }
     }
 
     let _metodo = 'otp';
