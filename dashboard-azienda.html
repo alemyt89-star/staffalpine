@@ -313,7 +313,6 @@
     <div class="nav-right">
       <span class="nav-azienda" id="nav-nome-az"></span>
       <span class="premium-pill pill-base" id="nav-premium-pill">BASE</span>
-      <button class="nav-logout" onclick="logout()" id="btn-esci-nav" style="display:none;">Esci</button>
       <button class="hamburger-btn" onclick="apriDrawer()" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>
   </nav>
@@ -425,6 +424,13 @@
             <label class="form-label">Descrizione Offerta</label>
             <textarea id="j-desc" class="form-control" placeholder="Descrivi il ruolo, la stagione, eventuali benefit..."></textarea>
             <p style="font-size:11px;color:var(--pietra);margin-top:6px;">ℹ️ Verrà aggiunta automaticamente la dicitura di legge sulle pari opportunità (L. 903/77, D.Lgs. 198/2006, 215/03, 216/03).</p>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Località</label>
+            <select id="j-localita" class="form-control">
+              <option value="">— Seleziona il comune —</option>
+              <option value="Allein">Allein</option><option value="Antey-Saint-André">Antey-Saint-André</option><option value="Aoste / Aosta">Aoste / Aosta</option><option value="Arnad">Arnad</option><option value="Arvier">Arvier</option><option value="Avise">Avise</option><option value="Ayas">Ayas</option><option value="Aymavilles">Aymavilles</option><option value="Bard">Bard</option><option value="Bionaz">Bionaz</option><option value="Brissogne">Brissogne</option><option value="Brusson">Brusson</option><option value="Challand-Saint-Anselme">Challand-Saint-Anselme</option><option value="Challand-Saint-Victor">Challand-Saint-Victor</option><option value="Chambave">Chambave</option><option value="Chamois">Chamois</option><option value="Champdepraz">Champdepraz</option><option value="Champorcher">Champorcher</option><option value="Charvensod">Charvensod</option><option value="Châtillon">Châtillon</option><option value="Cogne">Cogne</option><option value="Courmayeur">Courmayeur</option><option value="Donnas">Donnas</option><option value="Doues">Doues</option><option value="Emarèse">Emarèse</option><option value="Etroubles">Etroubles</option><option value="Fénis">Fénis</option><option value="Fontainemore">Fontainemore</option><option value="Gaby">Gaby</option><option value="Gignod">Gignod</option><option value="Gran San Bernardo">Gran San Bernardo</option><option value="Gressan">Gressan</option><option value="Gressoney-La-Trinité">Gressoney-La-Trinité</option><option value="Gressoney-Saint-Jean">Gressoney-Saint-Jean</option><option value="Hône">Hône</option><option value="Introd">Introd</option><option value="Issime">Issime</option><option value="Issogne">Issogne</option><option value="La Magdeleine">La Magdeleine</option><option value="La Salle">La Salle</option><option value="La Thuile">La Thuile</option><option value="Lillianes">Lillianes</option><option value="Montjovet">Montjovet</option><option value="Morgex">Morgex</option><option value="Nus">Nus</option><option value="Ollomont">Ollomont</option><option value="Oyace">Oyace</option><option value="Perloz">Perloz</option><option value="Pollein">Pollein</option><option value="Pontboset">Pontboset</option><option value="Pontey">Pontey</option><option value="Pont-Saint-Martin">Pont-Saint-Martin</option><option value="Pré-Saint-Didier">Pré-Saint-Didier</option><option value="Quart">Quart</option><option value="Rhêmes-Notre-Dame">Rhêmes-Notre-Dame</option><option value="Rhêmes-Saint-Georges">Rhêmes-Saint-Georges</option><option value="Roisan">Roisan</option><option value="Saint-Christophe">Saint-Christophe</option><option value="Saint-Denis">Saint-Denis</option><option value="Saint-Marcel">Saint-Marcel</option><option value="Saint-Nicolas">Saint-Nicolas</option><option value="Saint-Oyen">Saint-Oyen</option><option value="Saint-Pierre">Saint-Pierre</option><option value="Saint-Rhémy-en-Bosses">Saint-Rhémy-en-Bosses</option><option value="Saint-Vincent">Saint-Vincent</option><option value="Sarre">Sarre</option><option value="Torgnon">Torgnon</option><option value="Valgrisenche">Valgrisenche</option><option value="Valpelline">Valpelline</option><option value="Valsavarenche">Valsavarenche</option><option value="Valtournenche">Valtournenche</option><option value="Verrayes">Verrayes</option><option value="Verrès">Verrès</option><option value="Villeneuve">Villeneuve</option>
+            </select>
           </div>
           <!-- CALENDARIO DISPONIBILITÀ -->
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
@@ -541,16 +547,22 @@
             <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" id="lng-fr"> Francese</label>
             <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" id="lng-en"> Inglese</label>
             <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" id="lng-de"> Tedesco</label>
-            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" id="lng-es"> Spagnolo</label>
+          </div>
+          <div style="margin-top:8px;">
+            <input type="text" id="lng-altra" class="form-control" placeholder="Altra lingua (es. Russo, Cinese...)">
           </div>
         </div>
         <div class="form-group">
           <label class="form-label">Sito Web (opzionale)</label>
           <input type="url" id="az-sito" class="form-control" placeholder="https://www.tuohotel.it">
         </div>
-        <div style="display:flex;gap:10px;margin-top:6px;">
+        <div style="display:flex;gap:10px;margin-top:6px;flex-wrap:wrap;">
           <button class="btn-primary" onclick="salvaProfiloAzienda()">💾 Salva Profilo</button>
           <button class="btn-secondary" id="btn-annulla-profilo" onclick="mostraViewProfilo()" style="display:none;">Annulla</button>
+        </div>
+        <div style="margin-top:28px;padding-top:20px;border-top:1px solid rgba(0,0,0,0.07);">
+          <p style="font-size:13px;color:var(--pietra);margin-bottom:12px;">⚠️ Eliminando il profilo pubblico, i lavoratori non potranno più trovare la tua azienda sulla piattaforma.</p>
+          <button style="background:#fde8e8;color:var(--rosso);border:1px solid #fca5a5;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="eliminaProfiloAzienda()">🗑️ Elimina Profilo Pubblico</button>
         </div>
       </div>
       </div>
@@ -608,9 +620,6 @@
       const pill=document.getElementById('nav-premium-pill');
       pill.innerText=_isPremium?'⭐ PREMIUM':'BASE';
       pill.className='premium-pill '+(_isPremium?'pill-premium':'pill-base');
-      
-      const btnEsci = document.getElementById('btn-esci-nav');
-if(btnEsci) btnEsci.style.display = '';
 
       // Mostra/nascondi banner upgrade
       document.getElementById('banner-upgrade').style.display=_isPremium?'none':'flex';
@@ -656,12 +665,35 @@ if(btnEsci) btnEsci.style.display = '';
 
       div.innerHTML=`
         <p style="font-size:12px;color:var(--pietra);margin-bottom:16px;">Basato su <b>${recs.length}</b> recension${recs.length===1?'e':'i'} verificat${recs.length===1?'a':'e'}</p>
-        <div class="stats-grid">
-          <div class="stat-item"><span class="stat-label">Paga</span><span class="stat-value">${mediaVal(recs,'VOTO_PAGA')}<small style="font-size:0.5em;color:var(--pietra)">/5</small></span></div>
-          <div class="stat-item"><span class="stat-label">Rispetto</span><span class="stat-value">${mediaVal(recs,'RISPETTO_TITOLARE')}<small style="font-size:0.5em;color:var(--pietra)">/5</small></span></div>
-          <div class="stat-item"><span class="stat-label">Alloggio</span><span class="stat-value">${mediaVal(recs,'QUALITA_ALLOGGIO')}<small style="font-size:0.5em;color:var(--pietra)">/5</small></span></div>
-          <div class="stat-item"><span class="stat-label">Vitto</span><span class="stat-value">${mediaVal(recs,'QUALITA_VITTO')}<small style="font-size:0.5em;color:var(--pietra)">/5</small></span></div>
+
+        <!-- Le 3 categorie principali -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+          <div style="background:linear-gradient(135deg,#e8f5e9,#f1f8e9);border-radius:14px;padding:16px;text-align:center;border:1px solid #c8e6c9;">
+            <div style="font-size:22px;margin-bottom:6px;">💰</div>
+            <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pietra);margin-bottom:4px;">Retribuzione</div>
+            <div style="font-size:1.8rem;font-weight:700;color:var(--scuro);font-family:'Playfair Display',serif;">${mediaVal(recs,'VOTO_PAGA')}<small style="font-size:0.45em;color:var(--pietra)">/5</small></div>
+          </div>
+          <div style="background:linear-gradient(135deg,#e3f2fd,#f0f8ff);border-radius:14px;padding:16px;text-align:center;border:1px solid #bbdefb;">
+            <div style="font-size:22px;margin-bottom:6px;">🤝</div>
+            <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pietra);margin-bottom:4px;">Ambiente</div>
+            <div style="font-size:1.8rem;font-weight:700;color:var(--scuro);font-family:'Playfair Display',serif;">${mediaVal(recs,'RISPETTO_TITOLARE')}<small style="font-size:0.45em;color:var(--pietra)">/5</small></div>
+          </div>
+          <div style="background:linear-gradient(135deg,#fff8e1,#fffde7);border-radius:14px;padding:16px;text-align:center;border:1px solid #ffe082;">
+            <div style="font-size:22px;margin-bottom:6px;">🏠</div>
+            <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pietra);margin-bottom:4px;">Vitto/Alloggio</div>
+            <div style="font-size:1.8rem;font-weight:700;color:var(--scuro);font-family:'Playfair Display',serif;">${(()=>{
+              const va=[...recs.map(r=>parseFloat(r.QUALITA_ALLOGGIO)).filter(v=>!isNaN(v)), ...recs.map(r=>parseFloat(r.QUALITA_VITTO)).filter(v=>!isNaN(v))];
+              return va.length?(va.reduce((a,b)=>a+b,0)/va.length).toFixed(1):'--';
+            })()}<small style="font-size:0.45em;color:var(--pietra)">/5</small></div>
+          </div>
         </div>
+
+        <!-- Dettaglio vitto/alloggio -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+          <div class="stat-item"><span class="stat-label">Qualità Alloggio</span><span class="stat-value">${mediaVal(recs,'QUALITA_ALLOGGIO')}<small style="font-size:0.5em;color:var(--pietra)">/5</small></span></div>
+          <div class="stat-item"><span class="stat-label">Qualità Vitto</span><span class="stat-value">${mediaVal(recs,'QUALITA_VITTO')}<small style="font-size:0.5em;color:var(--pietra)">/5</small></span></div>
+        </div>
+
         <h4 style="font-family:'Playfair Display',serif;color:var(--scuro);margin-bottom:12px;">🛠️ Gestione Operativa</h4>
         <div class="ops-list">
           <div class="ops-row"><span>Puntualità paghe</span><span>${prevalenza(recs,'PAGA_PUNTUALITA')}</span></div>
@@ -907,7 +939,8 @@ if(btnEsci) btnEsci.style.display = '';
       const dal=document.getElementById('j-dal').value;
       const al=document.getElementById('j-al').value;
       const tipo=document.getElementById('j-tipo').value;
-      if(!ruolo||!desc||!contatti)return alert("Compila tutti i campi!");
+      const localita=document.getElementById('j-localita').value;
+      if(!ruolo||!desc||!contatti||!localita)return alert("Compila tutti i campi obbligatori, inclusa la Località!");
 
       const DISCLAIMER="\n\n---\nL'offerta è rivolta a candidati di entrambi i sessi (L. 903/77 e D.Lgs. 198/2006) e a persone di tutte le età e nazionalità (D.Lgs. 215/03 e 216/03).";
       const descCompleta = desc + DISCLAIMER;
@@ -917,18 +950,18 @@ if(btnEsci) btnEsci.style.display = '';
       const{error}=await supabaseClient.from('offerte_lavoro').insert([{
         azienda_id:user.id,
         nome_azienda:profilo?profilo.nome_azienda:'Azienda',
-        localita:profilo?profilo.zona:"Valle d'Aosta",
+        localita: localita,
         ruolo,descrizione:descCompleta,contatti,is_attiva:true,
         settore:tipo,
         periodo_dal:dal||null,
         periodo_al:al||null
       }]);
       if(!error){
-        // Pulisci form
         ['j-ruolo','j-desc','j-contatto','j-dal','j-al'].forEach(id=>{
           const el=document.getElementById(id);
           if(el)el.value='';
         });
+        document.getElementById('j-localita').value='';
         alert("✅ Offerta pubblicata!");
         caricaMieOfferte();
         showTab('mie-offerte',document.querySelector('.tab-btn:nth-child(3)'));
@@ -961,7 +994,7 @@ if(btnEsci) btnEsci.style.display = '';
       const tags=[];
       if(profilo.num_dipendenti)tags.push(`👥 ${profilo.num_dipendenti} dipendenti`);
       try{ const ct=JSON.parse(profilo.tipi_contratto||'[]'); ct.forEach(c=>tags.push('📋 '+c)); }catch(e){}
-      try{ const lng=JSON.parse(profilo.lingue_richieste||'[]'); lng.forEach(l=>{ const map={fr:'🇫🇷 Francese',en:'🇬🇧 Inglese',de:'🇩🇪 Tedesco',es:'🇪🇸 Spagnolo'}; tags.push(map[l]||l); }); }catch(e){}
+      try{ const lng=JSON.parse(profilo.lingue_richieste||'[]'); lng.forEach(l=>{ const map={fr:'🇫🇷 Francese',en:'🇬🇧 Inglese',de:'🇩🇪 Tedesco'}; tags.push(map[l]||'🌐 '+l); }); }catch(e){}
       document.getElementById('view-tags').innerHTML=tags.map(t=>`<span style="background:var(--grigio);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--pietra);">${t}</span>`).join('');
     }
 
@@ -994,7 +1027,8 @@ if(btnEsci) btnEsci.style.display = '';
       if(lng.includes('fr')) document.getElementById('lng-fr').checked=true;
       if(lng.includes('en')) document.getElementById('lng-en').checked=true;
       if(lng.includes('de')) document.getElementById('lng-de').checked=true;
-      if(lng.includes('es')) document.getElementById('lng-es').checked=true;
+      const altraLng = lng.find(l=>l!=='fr'&&l!=='en'&&l!=='de');
+      if(altraLng) document.getElementById('lng-altra').value=altraLng;
       // Mostra view se il profilo è compilato
       if(profilo.descrizione || profilo.zona || profilo.foto_url){
         aggiornaViewProfilo(profilo);
@@ -1030,7 +1064,8 @@ if(btnEsci) btnEsci.style.display = '';
       if(lng.includes('fr'))document.getElementById('lng-fr').checked=true;
       if(lng.includes('en'))document.getElementById('lng-en').checked=true;
       if(lng.includes('de'))document.getElementById('lng-de').checked=true;
-      if(lng.includes('es'))document.getElementById('lng-es').checked=true;
+      const altraLng2 = lng.find(l=>l!=='fr'&&l!=='en'&&l!=='de');
+      if(altraLng2) document.getElementById('lng-altra').value=altraLng2;
     }
 
     async function salvaProfiloAzienda(){
@@ -1044,7 +1079,8 @@ if(btnEsci) btnEsci.style.display = '';
       if(document.getElementById('lng-fr').checked)lng.push('fr');
       if(document.getElementById('lng-en').checked)lng.push('en');
       if(document.getElementById('lng-de').checked)lng.push('de');
-      if(document.getElementById('lng-es').checked)lng.push('es');
+      const altraLingua = document.getElementById('lng-altra').value.trim();
+      if(altraLingua) lng.push(altraLingua);
 
       const aggiornamenti = {
         descrizione: document.getElementById('az-descrizione').value,
@@ -1103,8 +1139,9 @@ if(btnEsci) btnEsci.style.display = '';
             <span class="rec-data">${new Date(r.created_at).toLocaleDateString('it-IT')}</span>
           </div>
           <div class="rec-voti">
-            <span>💰 Paga: <b>${r.VOTO_PAGA}/5</b></span>
-            <span>🤝 Rispetto: <b>${r.RISPETTO_TITOLARE}/5</b></span>
+            <span>💰 Retribuzione: <b>${r.VOTO_PAGA}/5</b></span>
+            <span>🤝 Ambiente: <b>${r.RISPETTO_TITOLARE}/5</b></span>
+            <span>🏠 Vitto/Alloggio: <b>${((parseFloat(r.QUALITA_ALLOGGIO)||0)+(parseFloat(r.QUALITA_VITTO)||0))/2>0?((((parseFloat(r.QUALITA_ALLOGGIO)||0)+(parseFloat(r.QUALITA_VITTO)||0))/2).toFixed(1)):'--'}/5</b></span>
           </div>
         </div>
       `).join('');
@@ -1340,6 +1377,19 @@ if(btnEsci) btnEsci.style.display = '';
       document.getElementById('onboarding-overlay').style.display = 'none';
       // Vai direttamente al tab profilo al primo accesso
       showTab('profilo-az', document.querySelector('.tab-btn[onclick*="profilo-az"]'));
+    }
+
+    async function eliminaProfiloAzienda(){
+      if(!confirm("Sei sicuro di voler eliminare il profilo pubblico? Le informazioni visibili ai lavoratori verranno rimosse.")) return;
+      const{data:{user}}=await supabaseClient.auth.getUser();
+      const{error}=await supabaseClient.from('profili_aziende').update({
+        descrizione: null, zona: null, foto_url: null, sito_web: null,
+        tipi_contratto: null, lingue_richieste: null, num_dipendenti: null
+      }).eq('id',user.id);
+      if(!error){
+        alert("✅ Profilo pubblico eliminato.");
+        location.reload();
+      } else alert("Errore: "+error.message);
     }
 
     inizializzaDashboard();
