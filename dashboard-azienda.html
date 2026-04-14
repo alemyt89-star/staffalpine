@@ -127,6 +127,27 @@
     .lav-tag{background:white;border:1px solid rgba(0,0,0,0.08);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--pietra);}
     @media(max-width:480px){.tab-btn{padding:12px 14px;font-size:12px;}.upgrade-banner{flex-direction:column;}.offerta-card{flex-direction:column;}}
 
+    /* PANORAMICA — distribuzione voti */
+    .voti-breakdown-title{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pietra);font-weight:600;margin-bottom:8px;}
+    .voto-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+    .voto-row-label{font-size:11px;color:var(--pietra);width:26px;text-align:right;flex-shrink:0;}
+    .voto-bar-wrap{flex:1;height:7px;background:var(--grigio);border-radius:4px;overflow:hidden;}
+    .voto-bar-fill{height:100%;border-radius:4px;}
+    .voto-row-count{font-size:11px;color:var(--pietra);width:52px;text-align:right;flex-shrink:0;white-space:nowrap;}
+    /* PANORAMICA — barre percentuale gestione */
+    .perc-section{margin-bottom:20px;}
+    .perc-title{font-size:13px;font-weight:700;color:var(--scuro);margin-bottom:10px;}
+    .perc-row{display:flex;align-items:center;gap:10px;margin-bottom:7px;}
+    .perc-row-label{font-size:12px;color:var(--pietra);flex:1;min-width:100px;}
+    .perc-bar-wrap2{flex:2;height:10px;background:var(--grigio);border-radius:5px;overflow:hidden;}
+    .perc-bar-fill2{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--verde),var(--verde-chiaro));}
+    .perc-pct{font-size:11px;font-weight:700;color:var(--verde);width:36px;text-align:right;flex-shrink:0;}
+    /* toggle dettaglio punteggi */
+    .toggle-pano-btn{background:none;border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:7px 16px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--pietra);cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin-bottom:16px;transition:all 0.2s;}
+    .toggle-pano-btn:hover{background:var(--grigio);}
+    .toggle-pano-sec{display:none;}
+    .toggle-pano-sec.open{display:block;}
+
     /* DRAWER MENU */
     .drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:2000;backdrop-filter:blur(2px);}
     .drawer-overlay.open{display:block;}
@@ -644,8 +665,7 @@
 
     async function caricaDatiRecensioni(nomeAz){
       const div=document.getElementById('stats-content');
-      // Normalizza il nome per la ricerca — case insensitive, trim spazi
-      const nomeNorm = nomeAz.trim();
+      const nomeNorm=nomeAz.trim();
       const{data:recs}=await supabaseClient.from('RECENSIONI').select('*').ilike('AZIENDA',`%${nomeNorm}%`).eq('VERIFICATA',true);
 
       if(!recs||recs.length===0){
@@ -653,54 +673,106 @@
         return;
       }
 
-      const mediaVal=(arr,col)=>{
-        const validi=arr.map(r=>parseFloat(r[col])).filter(v=>!isNaN(v));
-        return validi.length?(validi.reduce((a,v)=>a+v,0)/validi.length).toFixed(1):'--';
+      // ── helpers ──
+      const mediaVal=(col)=>{
+        const validi=recs.map(r=>parseFloat(r[col])).filter(v=>!isNaN(v));
+        return validi.length?(validi.reduce((a,b)=>a+b,0)/validi.length).toFixed(1):null;
       };
-      const prevalenza=(arr,col)=>{
-        const counts={};
-        arr.forEach(r=>{if(r[col])counts[r[col]]=(counts[r[col]]||0)+1;});
-        const keys=Object.keys(counts);
-        return keys.length?keys.reduce((a,b)=>counts[a]>counts[b]?a:b):'--';
+
+      const distribuzioneVoti=(col)=>{
+        const counts={1:0,2:0,3:0,4:0,5:0};
+        recs.forEach(r=>{const v=Math.round(parseFloat(r[col]));if(v>=1&&v<=5)counts[v]++;});
+        const tot=recs.length;
+        let html='';
+        for(let i=5;i>=1;i--){
+          const pct=tot>0?Math.round((counts[i]/tot)*100):0;
+          const color=i>=4?'#52b788':i===3?'#e9c46a':'#e88080';
+          html+=`<div class="voto-row">
+            <span class="voto-row-label">⭐${i}</span>
+            <div class="voto-bar-wrap"><div class="voto-bar-fill" style="width:${pct}%;background:${color};"></div></div>
+            <span class="voto-row-count">${counts[i]} (${pct}%)</span>
+          </div>`;
+        }
+        return html;
       };
+
+      const percRisposte=(col,titolo,emoji)=>{
+        const counts={};let tot=0;
+        recs.forEach(r=>{const v=r[col]?r[col].toString().trim():null;if(v){counts[v]=(counts[v]||0)+1;tot++;}});
+        if(!tot)return '';
+        const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+        const righe=sorted.map(([val,n])=>{
+          const pct=Math.round((n/tot)*100);
+          return `<div class="perc-row">
+            <span class="perc-row-label">${val}</span>
+            <div class="perc-bar-wrap2"><div class="perc-bar-fill2" style="width:${pct}%;"></div></div>
+            <span class="perc-pct">${pct}%</span>
+          </div>`;
+        }).join('');
+        return `<div class="perc-section"><div class="perc-title">${emoji} ${titolo}</div>${righe}</div>`;
+      };
+
+      // ── calcoli ──
+      const mp=mediaVal('VOTO_PAGA');
+      const mr=mediaVal('RISPETTO_TITOLARE');
+      const ma=mediaVal('QUALITA_ALLOGGIO');
+      const mv=mediaVal('QUALITA_VITTO');
+      const vaVals=[ma,mv].map(v=>parseFloat(v)).filter(v=>!isNaN(v));
+      const mediaVA=vaVals.length?(vaVals.reduce((a,b)=>a+b,0)/vaVals.length).toFixed(1):null;
+      const allVals=[mp,mr,ma,mv].map(v=>parseFloat(v)).filter(v=>!isNaN(v));
+      const mediaGen=allVals.length?(allVals.reduce((a,b)=>a+b,0)/allVals.length).toFixed(1):null;
+      const scoreColor=(v)=>v?(parseFloat(v)>=4?'#2d6a4f':parseFloat(v)>=3?'#c9a84c':'#c0392b'):'var(--pietra)';
+
+      const gestione=
+        percRisposte('PAGA_PUNTUALITA','Puntualità Pagamenti','💳')+
+        percRisposte('STRAORDINARI','Straordinari','⏰')+
+        percRisposte('MANCE','Gestione Mance','💵')+
+        percRisposte('RIPOSO','Giorno di Riposo','🗓️');
 
       div.innerHTML=`
-        <p style="font-size:12px;color:var(--pietra);margin-bottom:16px;">Basato su <b>${recs.length}</b> recension${recs.length===1?'e':'i'} verificat${recs.length===1?'a':'e'}</p>
+        <p style="font-size:12px;color:var(--pietra);margin-bottom:16px;">Basato su <b>${recs.length}</b> recension${recs.length===1?'e':'i'} verificat${recs.length===1?'a':'e'}
+          ${mediaGen?` · Media generale: <b style="color:${scoreColor(mediaGen)}">${mediaGen}/5</b>`:''}
+        </p>
 
-        <!-- Le 3 categorie principali -->
+        <!-- Le 3 categorie -->
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
           <div style="background:linear-gradient(135deg,#e8f5e9,#f1f8e9);border-radius:14px;padding:16px;text-align:center;border:1px solid #c8e6c9;">
-            <div style="font-size:22px;margin-bottom:6px;">💰</div>
+            <div style="font-size:20px;margin-bottom:6px;">💰</div>
             <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pietra);margin-bottom:4px;">Retribuzione</div>
-            <div style="font-size:1.8rem;font-weight:700;color:var(--scuro);font-family:'Playfair Display',serif;">${mediaVal(recs,'VOTO_PAGA')}<small style="font-size:0.45em;color:var(--pietra)">/5</small></div>
+            <div style="font-size:1.8rem;font-weight:700;color:${scoreColor(mp)};font-family:'Playfair Display',serif;">${mp||'--'}<small style="font-size:0.45em;color:var(--pietra)">/5</small></div>
           </div>
           <div style="background:linear-gradient(135deg,#e3f2fd,#f0f8ff);border-radius:14px;padding:16px;text-align:center;border:1px solid #bbdefb;">
-            <div style="font-size:22px;margin-bottom:6px;">🤝</div>
+            <div style="font-size:20px;margin-bottom:6px;">🤝</div>
             <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pietra);margin-bottom:4px;">Ambiente</div>
-            <div style="font-size:1.8rem;font-weight:700;color:var(--scuro);font-family:'Playfair Display',serif;">${mediaVal(recs,'RISPETTO_TITOLARE')}<small style="font-size:0.45em;color:var(--pietra)">/5</small></div>
+            <div style="font-size:1.8rem;font-weight:700;color:${scoreColor(mr)};font-family:'Playfair Display',serif;">${mr||'--'}<small style="font-size:0.45em;color:var(--pietra)">/5</small></div>
           </div>
           <div style="background:linear-gradient(135deg,#fff8e1,#fffde7);border-radius:14px;padding:16px;text-align:center;border:1px solid #ffe082;">
-            <div style="font-size:22px;margin-bottom:6px;">🏠</div>
+            <div style="font-size:20px;margin-bottom:6px;">🏠</div>
             <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pietra);margin-bottom:4px;">Vitto/Alloggio</div>
-            <div style="font-size:1.8rem;font-weight:700;color:var(--scuro);font-family:'Playfair Display',serif;">${(()=>{
-              const va=[...recs.map(r=>parseFloat(r.QUALITA_ALLOGGIO)).filter(v=>!isNaN(v)), ...recs.map(r=>parseFloat(r.QUALITA_VITTO)).filter(v=>!isNaN(v))];
-              return va.length?(va.reduce((a,b)=>a+b,0)/va.length).toFixed(1):'--';
-            })()}<small style="font-size:0.45em;color:var(--pietra)">/5</small></div>
+            <div style="font-size:1.8rem;font-weight:700;color:${scoreColor(mediaVA)};font-family:'Playfair Display',serif;">${mediaVA||'--'}<small style="font-size:0.45em;color:var(--pietra)">/5</small></div>
+          </div>
+        </div>
+
+        <!-- Toggle distribuzione punteggi -->
+        <button class="toggle-pano-btn" onclick="(function(btn){const sec=document.getElementById('pano-dettaglio');const isOpen=sec.classList.contains('open');sec.classList.toggle('open');btn.innerHTML=isOpen?'▸ Vedi distribuzione punteggi per stelle':'▾ Nascondi distribuzione';})(this)">▸ Vedi distribuzione punteggi per stelle</button>
+        <div class="toggle-pano-sec" id="pano-dettaglio">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:18px;margin-bottom:16px;padding-bottom:4px;">
+            <div><div class="voti-breakdown-title">💰 Retribuzione</div>${distribuzioneVoti('VOTO_PAGA')}</div>
+            <div><div class="voti-breakdown-title">🤝 Rispetto Titolare</div>${distribuzioneVoti('RISPETTO_TITOLARE')}</div>
+            <div><div class="voti-breakdown-title">🏠 Qualità Alloggio</div>${distribuzioneVoti('QUALITA_ALLOGGIO')}</div>
+            <div><div class="voti-breakdown-title">🍽️ Qualità Vitto</div>${distribuzioneVoti('QUALITA_VITTO')}</div>
           </div>
         </div>
 
         <!-- Dettaglio vitto/alloggio -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
-          <div class="stat-item"><span class="stat-label">Qualità Alloggio</span><span class="stat-value">${mediaVal(recs,'QUALITA_ALLOGGIO')}<small style="font-size:0.5em;color:var(--pietra)">/5</small></span></div>
-          <div class="stat-item"><span class="stat-label">Qualità Vitto</span><span class="stat-value">${mediaVal(recs,'QUALITA_VITTO')}<small style="font-size:0.5em;color:var(--pietra)">/5</small></span></div>
+          <div class="stat-item"><span class="stat-label">Qualità Alloggio</span><span class="stat-value" style="color:${scoreColor(ma)}">${ma||'--'}<small style="font-size:0.5em;color:var(--pietra)">/5</small></span></div>
+          <div class="stat-item"><span class="stat-label">Qualità Vitto</span><span class="stat-value" style="color:${scoreColor(mv)}">${mv||'--'}<small style="font-size:0.5em;color:var(--pietra)">/5</small></span></div>
         </div>
 
-        <h4 style="font-family:'Playfair Display',serif;color:var(--scuro);margin-bottom:12px;">🛠️ Gestione Operativa</h4>
-        <div class="ops-list">
-          <div class="ops-row"><span>Puntualità paghe</span><span>${prevalenza(recs,'PAGA_PUNTUALITA')}</span></div>
-          <div class="ops-row"><span>Straordinari</span><span>${prevalenza(recs,'STRAORDINARI')}</span></div>
-          <div class="ops-row"><span>Giorno di riposo</span><span>${prevalenza(recs,'RIPOSO')}</span></div>
-        </div>
+        <!-- Gestione operativa con % -->
+        <h4 style="font-family:'Playfair Display',serif;color:var(--scuro);margin-bottom:16px;">🛠️ Gestione Operativa</h4>
+        ${gestione||'<p style="font-size:13px;color:var(--pietra);">Nessun dato operativo disponibile.</p>'}
       `;
     }
 
