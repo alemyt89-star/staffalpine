@@ -546,6 +546,35 @@
       .btn-primary, .btn-secondary { width: 260px; justify-content: center; }
       .cta-btns { flex-direction: column; align-items: center; }
     }
+    /* Link "Come Funziona" visibile solo su mobile accanto al logo */
+    .nav-come-funziona {
+      display: none;
+      color: rgba(255,255,255,0.75);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 5px 11px;
+      border-radius: 6px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .nav-come-funziona:hover { color: var(--oro-chiaro); border-color: rgba(233,196,106,0.4); }
+    /* Hamburger */
+    .hamburger-btn { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 6px; }
+    .hamburger-btn span { display: block; width: 22px; height: 2px; background: rgba(255,255,255,0.8); border-radius: 2px; }
+    /* Mobile drawer */
+    .mobile-nav-overlay { display: none; position: fixed; inset: 0; background: rgba(26,46,26,0.98); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; gap: 30px; }
+    .mobile-nav-overlay.open { display: flex; }
+    .mobile-nav-overlay a { color: white; text-decoration: none; font-family: 'Playfair Display', serif; font-size: 1.4rem; opacity: 0.9; transition: color 0.2s; }
+    .mobile-nav-overlay a:hover { color: var(--oro-chiaro); }
+    .mobile-nav-overlay .mob-cta { background: var(--verde-chiaro); color: white !important; font-family: 'DM Sans', sans-serif; font-size: 1rem; padding: 12px 30px; border-radius: 10px; font-weight: 600; }
+    .mobile-nav-close { position: absolute; top: 22px; right: 22px; background: none; border: none; color: rgba(255,255,255,0.6); font-size: 32px; cursor: pointer; line-height: 1; }
+    @media (max-width: 768px) {
+      .nav-come-funziona { display: inline-flex; align-items: center; }
+      .hamburger-btn { display: flex; }
+    }
   </style>
 </head>
 <body>
@@ -561,13 +590,26 @@
       <img src="stella-alpina.svg" alt="" style="width:28px;height:28px;">
       <div>StaffAlpine<span>Valle d'Aosta</span></div>
     </a>
+    <a href="come-funziona.html" class="nav-come-funziona">Come Funziona</a>
     <div class="nav-links">
       <a href="come-funziona.html">Come Funziona</a>
       <a href="login.html">Per i Lavoratori</a>
       <a href="login.html?role=business">Per le Aziende</a>
       <a href="login.html" class="nav-cta">Accedi →</a>
     </div>
+    <button class="hamburger-btn" onclick="apriMenuMobile()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
   </nav>
+
+  <!-- MOBILE NAV OVERLAY -->
+  <div class="mobile-nav-overlay" id="mobile-nav">
+    <button class="mobile-nav-close" onclick="chiudiMenuMobile()">×</button>
+    <a href="come-funziona.html">Come Funziona</a>
+    <a href="login.html">Per i Lavoratori</a>
+    <a href="login.html?role=business">Per le Aziende</a>
+    <a href="login.html" class="mob-cta">Accedi →</a>
+  </div>
 
   <!-- HERO -->
   <section class="hero">
@@ -678,7 +720,7 @@
   <!-- CTA -->
   <section class="cta-section">
     <h2>Pronto a fare<br><em>la differenza?</em></h2>
-    <p>Unisciti alla community che sta rendendo il lavoro stagionale in Valle d'Aosta più trasparente.</p>
+    <p>Unisciti alla community che sta rendendo il lavoro nell'hospitality in Valle d'Aosta più trasparente.</p>
     <div class="cta-btns">
       <a href="login.html" class="btn-primary">Inizia Ora — È Gratuito</a>
       <a href="login.html?role=business" class="btn-secondary">Registra la tua Azienda</a>
@@ -690,7 +732,7 @@
     <div class="footer-grid">
       <div class="footer-brand">
         <h3>StaffAlpine</h3>
-        <p>La piattaforma di trasparenza per il lavoro stagionale in Valle d'Aosta. Recensioni reali, dati verificati.</p>
+        <p>La piattaforma di trasparenza per il lavoro nell'hospitality in Valle d'Aosta. Recensioni reali, dati verificati.</p>
       </div>
       <div class="footer-col">
         <h4>Piattaforma</h4>
@@ -850,6 +892,16 @@
     </p>
     <button onclick="chiudiBanner()" style="background:linear-gradient(135deg,#2d6a4f,#52b788);color:white;border:none;padding:10px 22px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">Ho capito</button>
   </div>
+  <script>
+    function apriMenuMobile(){
+      document.getElementById('mobile-nav').classList.add('open');
+      document.body.style.overflow='hidden';
+    }
+    function chiudiMenuMobile(){
+      document.getElementById('mobile-nav').classList.remove('open');
+      document.body.style.overflow='';
+    }
+  </script>
 
 </body>
 </html>
