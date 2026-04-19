@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a2e1a">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cookie Policy — StaffAlpine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{--verde:#2d6a4f;--verde-chiaro:#52b788;--oro:#c9a84c;--oro-chiaro:#e9c46a;--scuro:#1a2e1a;--pietra:#6b705c;--grigio:#f0f2ee;--testo:#2c3e2d;}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--grigio);color:var(--testo);min-height:100vh;}
+    .navbar{background:var(--scuro);padding:14px 5%;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1000;box-shadow:0 2px 20px rgba(0,0,0,0.2);}
+    .nav-logo{font-family:'Playfair Display',serif;font-size:20px;color:var(--oro-chiaro);letter-spacing:1px;text-decoration:none;display:flex;align-items:center;gap:8px;}
+    .nav-logo img{width:24px;height:24px;}
+    .nav-back{color:rgba(255,255,255,0.6);font-size:13px;text-decoration:none;transition:color 0.2s;}
+    .nav-back:hover{color:white;}
+    .hero{background:linear-gradient(135deg,var(--scuro),#0d1f0d);padding:48px 5% 40px;text-align:center;}
+    .hero h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.6rem);color:white;margin-bottom:8px;}
+    .hero p{color:rgba(255,255,255,0.5);font-size:13px;}
+    .container{max-width:780px;margin:0 auto;padding:40px 5% 60px;}
+    .doc-card{background:white;border-radius:16px;padding:36px;box-shadow:0 2px 12px rgba(0,0,0,0.05);margin-bottom:20px;}
+    .toc{background:var(--grigio);border-radius:12px;padding:20px 24px;margin-bottom:28px;}
+    .toc-title{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pietra);font-weight:700;margin-bottom:12px;}
+    .toc a{display:block;font-size:13px;color:var(--verde);text-decoration:none;padding:3px 0;}
+    .toc a:hover{color:var(--scuro);}
+    h2{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--scuro);margin:32px 0 10px;padding-bottom:8px;border-bottom:2px solid var(--grigio);}
+    h2:first-child{margin-top:0;}
+    h3{font-size:1rem;color:var(--verde);margin:16px 0 6px;font-weight:700;}
+    p{font-size:14px;line-height:1.8;color:var(--testo);margin-bottom:10px;}
+    ul{font-size:14px;line-height:1.8;color:var(--testo);margin:8px 0 10px;padding-left:20px;}
+    ul li{margin-bottom:4px;}
+    .highlight{background:#e8f5e9;border-left:4px solid var(--verde-chiaro);border-radius:0 8px 8px 0;padding:12px 16px;margin:14px 0;font-size:13px;color:var(--verde);}
+    .highlight-warn{background:#fff8e1;border-left:4px solid var(--oro);border-radius:0 8px 8px 0;padding:12px 16px;margin:14px 0;font-size:13px;color:#7d6608;}
+    .info-box{background:var(--grigio);border-radius:10px;padding:16px;font-size:13px;margin:12px 0;}
+    .info-box strong{display:block;margin-bottom:4px;color:var(--scuro);}
+    table{width:100%;border-collapse:collapse;font-size:13px;margin:14px 0;}
+    th{background:var(--grigio);color:var(--scuro);font-weight:700;text-align:left;padding:10px 14px;font-size:11px;letter-spacing:1px;text-transform:uppercase;}
+    td{padding:10px 14px;border-bottom:1px solid var(--grigio);color:var(--testo);line-height:1.5;vertical-align:top;}
+    tr:last-child td{border-bottom:none;}
+    .badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+    .badge-tecnico{background:#e8f5e9;color:var(--verde);}
+    .badge-terze{background:#fff8e1;color:#8a6d00;}
+    .updated{font-size:11px;color:var(--pietra);text-align:center;margin-top:28px;padding-top:20px;border-top:1px solid var(--grigio);}
+    footer{background:var(--scuro);padding:24px 5%;text-align:center;}
+    footer p{color:rgba(255,255,255,0.3);font-size:12px;}
+    footer a{color:rgba(255,255,255,0.4);text-decoration:none;}
+    @media(max-width:600px){.doc-card{padding:22px 18px;}table{display:block;overflow-x:auto;}}
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo"><img src="stella-alpina.svg" alt="">StaffAlpine</a>
+    <a href="index.html" class="nav-back">← Torna alla home</a>
+  </nav>
+
+  <div class="hero">
+    <h1>Cookie Policy</h1>
+    <p>Informativa sull'uso dei cookie e delle tecnologie di tracciamento</p>
+  </div>
+
+  <div class="container">
+    <div class="doc-card">
+
+      <div class="toc">
+        <div class="toc-title">Indice</div>
+        <a href="#c1">1. Cosa sono i cookie</a>
+        <a href="#c2">2. Tipologie di cookie utilizzati</a>
+        <a href="#c3">3. Cookie tecnici di prima parte</a>
+        <a href="#c4">4. Tecnologie di terze parti</a>
+        <a href="#c5">5. Cookie non utilizzati</a>
+        <a href="#c6">6. Come gestire i cookie</a>
+        <a href="#c7">7. Service Worker e PWA</a>
+        <a href="#c8">8. Aggiornamenti</a>
+        <a href="#c9">9. Contatti</a>
+      </div>
+
+      <div class="highlight">
+        ✅ StaffAlpine utilizza esclusivamente cookie tecnici strettamente necessari al funzionamento della piattaforma. Non utilizziamo cookie di profilazione, marketing o tracciamento comportamentale. Non è quindi richiesto il tuo consenso ai cookie per utilizzare il sito.
+      </div>
+
+      <h2 id="c1">1. Cosa sono i cookie</h2>
+      <p>I cookie sono piccoli file di testo che i siti web inviano al browser dell'utente durante la navigazione. Vengono memorizzati nel dispositivo e ritrasmessi al sito nelle visite successive. Servono a far funzionare le pagine web, a ricordare le preferenze dell'utente o — nel caso di cookie di profilazione — a tracciare il comportamento degli utenti a fini pubblicitari.</p>
+      <p>Oltre ai cookie veri e propri, esistono tecnologie simili come il <strong>localStorage</strong> e il <strong>sessionStorage</strong>, che memorizzano dati localmente nel browser senza inviarli automaticamente ai server, e i <strong>Service Worker</strong>, utilizzati per le funzionalità offline delle Progressive Web App (PWA).</p>
+
+      <h2 id="c2">2. Tipologie di cookie utilizzati</h2>
+      <p>La presente Cookie Policy si riferisce al sito <strong>staffalpine.it</strong> e alla relativa PWA. In conformità al Provvedimento del Garante per la Protezione dei Dati Personali dell'8 ottobre 2014 e alle Linee Guida del 10 giugno 2021, i cookie si distinguono in:</p>
+      <ul>
+        <li><strong>Cookie tecnici</strong> — necessari al funzionamento del sito; non richiedono consenso</li>
+        <li><strong>Cookie analitici di terze parti anonimizzati</strong> — assimilati ai tecnici se l'IP è mascherato; non richiedono consenso</li>
+        <li><strong>Cookie di profilazione</strong> — richiedono consenso esplicito prima dell'installazione</li>
+      </ul>
+      <p>StaffAlpine utilizza esclusivamente cookie tecnici e tecnologie assimilate. Non installiamo cookie di profilazione.</p>
+
+      <h2 id="c3">3. Cookie tecnici di prima parte</h2>
+
+      <table>
+        <tr>
+          <th>Nome / Tecnologia</th>
+          <th>Tipo</th>
+          <th>Finalità</th>
+          <th>Durata</th>
+        </tr>
+        <tr>
+          <td><code>sb-&lt;project&gt;-auth-token</code></td>
+          <td><span class="badge badge-tecnico">Tecnico</span></td>
+          <td>Sessione di autenticazione Supabase. Mantiene l'utente connesso dopo il login tramite OTP. Senza questo cookie non è possibile accedere all'area riservata.</td>
+          <td>Sessione / max 7 giorni</td>
+        </tr>
+        <tr>
+          <td><code>localStorage</code> — <code>staffalpine_ob_*</code></td>
+          <td><span class="badge badge-tecnico">Tecnico</span></td>
+          <td>Memorizza localmente se l'utente ha completato il flusso di onboarding introduttivo. Nessun dato personale. Non viene inviato a server esterni.</td>
+          <td>Persistente (fino a cancellazione manuale)</td>
+        </tr>
+        <tr>
+          <td><code>localStorage</code> — preferenze UI</td>
+          <td><span class="badge badge-tecnico">Tecnico</span></td>
+          <td>Memorizza eventuali preferenze di visualizzazione dell'interfaccia. Nessun dato personale.</td>
+          <td>Persistente (fino a cancellazione manuale)</td>
+        </tr>
+      </table>
+
+      <h2 id="c4">4. Tecnologie di terze parti</h2>
+
+      <h3>4.1 Google Fonts</h3>
+      <p>La piattaforma carica i font tipografici (Playfair Display, DM Sans) dai server di Google LLC tramite il servizio Google Fonts. Ogni caricamento della pagina comporta una richiesta ai server di Google, che può comportare la raccolta dell'indirizzo IP del visitatore. Google dichiara di non utilizzare questi dati per finalità di profilazione.</p>
+
+      <table>
+        <tr><th>Dato trasmesso</th><th>Destinatario</th><th>Garanzia trasferimento</th></tr>
+        <tr>
+          <td>Indirizzo IP, browser, pagina richiesta</td>
+          <td>Google LLC (USA)</td>
+          <td>Standard Contractual Clauses (SCC)</td>
+        </tr>
+      </table>
+
+      <div class="highlight-warn">
+        ⚠️ Se desideri impedire la trasmissione di dati a Google Fonts, puoi bloccare le richieste verso <code>fonts.googleapis.com</code> e <code>fonts.gstatic.com</code> tramite le impostazioni del tuo browser o un'estensione come uBlock Origin. Il sito continuerà a funzionare con i font di sistema del dispositivo.
+      </div>
+
+      <h3>4.2 Cloudflare</h3>
+      <p>Il sito è protetto da Cloudflare Inc., che agisce come proxy tra il browser dell'utente e i nostri server. Cloudflare elabora i dati di traffico (incluso l'IP) per finalità di sicurezza (protezione DDoS, Web Application Firewall). Cloudflare non utilizza questi dati per pubblicità.</p>
+      <p>Cloudflare può impostare i seguenti cookie tecnici:</p>
+      <table>
+        <tr><th>Nome</th><th>Finalità</th><th>Durata</th></tr>
+        <tr><td><code>__cf_bm</code></td><td>Protezione bot e sicurezza della rete Cloudflare</td><td>30 minuti</td></tr>
+        <tr><td><code>cf_clearance</code></td><td>Superamento challenge di sicurezza Cloudflare (attivato solo in caso di traffico anomalo)</td><td>30 minuti / 1 anno</td></tr>
+      </table>
+      <p>Questi cookie sono tecnici e di sicurezza: non richiedono consenso. Per maggiori informazioni: <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener" style="color:var(--verde);">Privacy Policy Cloudflare</a>.</p>
+
+      <h2 id="c5">5. Cookie non utilizzati</h2>
+      <p>StaffAlpine <strong>non utilizza</strong> e <strong>non installa</strong>:</p>
+      <ul>
+        <li>Cookie di profilazione o marketing (Google Ads, Facebook Pixel, ecc.)</li>
+        <li>Cookie di analisi comportamentale (Google Analytics, Hotjar, Mixpanel, ecc.)</li>
+        <li>Cookie di social network (pulsanti di condivisione con tracciamento)</li>
+        <li>Cookie di retargeting pubblicitario</li>
+        <li>Fingerprinting del browser o tecniche di tracciamento alternative ai cookie</li>
+      </ul>
+
+      <h2 id="c6">6. Come gestire i cookie</h2>
+      <p>Poiché StaffAlpine utilizza solo cookie tecnici necessari, il blocco dei cookie potrebbe impedire il corretto funzionamento dell'autenticazione e di altre funzionalità essenziali.</p>
+      <p>Puoi comunque gestire i cookie tramite le impostazioni del tuo browser:</p>
+      <table>
+        <tr><th>Browser</th><th>Come accedere alle impostazioni cookie</th></tr>
+        <tr><td>Google Chrome</td><td>Impostazioni → Privacy e sicurezza → Cookie e altri dati dei siti</td></tr>
+        <tr><td>Mozilla Firefox</td><td>Impostazioni → Privacy e sicurezza → Cookie e dati dei siti</td></tr>
+        <tr><td>Safari (iOS/macOS)</td><td>Impostazioni → Safari → Privacy → Blocca tutti i cookie</td></tr>
+        <tr><td>Microsoft Edge</td><td>Impostazioni → Cookie e autorizzazioni del sito → Cookie</td></tr>
+      </table>
+      <p>Per eliminare i dati salvati nel localStorage del browser relativi a StaffAlpine: apri gli Strumenti per sviluppatori (F12) → Applicazione → Archiviazione locale → staffalpine.it → cancella le voci presenti.</p>
+
+      <h2 id="c7">7. Service Worker e PWA</h2>
+      <p>Se installi StaffAlpine come Progressive Web App (PWA), il browser registra un <strong>Service Worker</strong> — uno script che viene eseguito in background e consente il funzionamento offline e la gestione della cache. Il Service Worker:</p>
+      <ul>
+        <li>Memorizza in cache le risorse statiche dell'applicazione (HTML, CSS, JS, immagini) per il funzionamento senza connessione</li>
+        <li>Non raccoglie né trasmette dati personali a server esterni in modo autonomo</li>
+        <li>Può essere rimosso disinstallando la PWA o tramite le impostazioni del browser (Impostazioni → Privacy → Service Worker)</li>
+        <li>Viene aggiornato automaticamente quando è disponibile una nuova versione della piattaforma</li>
+      </ul>
+      <p>La versione attuale del Service Worker è identificata come <strong>v5</strong>. Ogni aggiornamento della piattaforma può richiedere il re-download delle risorse in cache.</p>
+
+      <h2 id="c8">8. Aggiornamenti</h2>
+      <p>La presente Cookie Policy può essere aggiornata in caso di modifiche tecnologiche o normative. La versione aggiornata con la data di ultima modifica è sempre disponibile su questa pagina. Modifiche sostanziali saranno comunicate agli utenti registrati via email.</p>
+
+      <h2 id="c9">9. Contatti</h2>
+      <p>Per qualsiasi domanda relativa all'uso dei cookie su StaffAlpine:</p>
+      <div class="info-box">
+        <strong>Team StaffAlpine</strong>
+        Località Grand Chemin 93, Saint-Christophe (AO) — 11020<br>
+        P.IVA: 01275120077<br>
+        Email: <a href="mailto:info@staffalpine.it" style="color:var(--verde);">info@staffalpine.it</a>
+      </div>
+
+      <p class="updated">Ultimo aggiornamento: Aprile 2026</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2026 StaffAlpine — Valle d'Aosta · <a href="informativa-privacy.html">Privacy</a> · <a href="termini.html">Termini</a> · <a href="cookie-policy.html">Cookie</a></p>
+  </footer>
+
+</body>
+</html>

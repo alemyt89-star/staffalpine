@@ -22,16 +22,24 @@
     .hero p{color:rgba(255,255,255,0.5);font-size:13px;}
     .container{max-width:780px;margin:0 auto;padding:40px 5% 60px;}
     .doc-card{background:white;border-radius:16px;padding:36px;box-shadow:0 2px 12px rgba(0,0,0,0.05);margin-bottom:20px;}
-    h2{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--scuro);margin:28px 0 10px;padding-bottom:8px;border-bottom:2px solid var(--grigio);}
+    .toc{background:var(--grigio);border-radius:12px;padding:20px 24px;margin-bottom:28px;}
+    .toc-title{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pietra);font-weight:700;margin-bottom:12px;}
+    .toc a{display:block;font-size:13px;color:var(--verde);text-decoration:none;padding:3px 0;transition:color 0.2s;}
+    .toc a:hover{color:var(--scuro);}
+    h2{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--scuro);margin:32px 0 10px;padding-bottom:8px;border-bottom:2px solid var(--grigio);}
     h2:first-child{margin-top:0;}
     h3{font-size:1rem;color:var(--verde);margin:16px 0 6px;font-weight:700;}
     p{font-size:14px;line-height:1.8;color:var(--testo);margin-bottom:10px;}
     ul{font-size:14px;line-height:1.8;color:var(--testo);margin:8px 0 10px;padding-left:20px;}
     ul li{margin-bottom:4px;}
     .highlight{background:#fff8e1;border-left:4px solid var(--oro);border-radius:0 8px 8px 0;padding:12px 16px;margin:14px 0;font-size:13px;color:#7d6608;}
-    .updated{font-size:11px;color:var(--pietra);text-align:center;margin-top:24px;}
+    .info-box{background:var(--grigio);border-radius:10px;padding:16px;font-size:13px;margin:12px 0;}
+    .info-box strong{display:block;margin-bottom:4px;color:var(--scuro);}
+    .updated{font-size:11px;color:var(--pietra);text-align:center;margin-top:28px;padding-top:20px;border-top:1px solid var(--grigio);}
     footer{background:var(--scuro);padding:24px 5%;text-align:center;}
     footer p{color:rgba(255,255,255,0.3);font-size:12px;}
+    footer a{color:rgba(255,255,255,0.4);text-decoration:none;}
+    @media(max-width:600px){.doc-card{padding:22px 18px;}}
   </style>
 </head>
 <body>
@@ -49,99 +57,159 @@
   <div class="container">
     <div class="doc-card">
 
-      <h2>1. Accettazione dei Termini</h2>
-      <p>Accedendo e utilizzando StaffAlpine (di seguito "la Piattaforma"), gestita da Team StaffAlpine, P.IVA 01275120077, con sede in Località Grand Chemin 93, Saint-Christophe (AO), l'utente accetta integralmente i presenti Termini di Servizio. Se non accetti questi termini, non puoi utilizzare la Piattaforma.</p>
+      <div class="toc">
+        <div class="toc-title">Indice</div>
+        <a href="#art1">1. Accettazione dei Termini</a>
+        <a href="#art2">2. Descrizione del Servizio</a>
+        <a href="#art3">3. Registrazione e Account</a>
+        <a href="#art4">4. Recensioni — Regole e Responsabilità</a>
+        <a href="#art5">5. Utilizzo dei Dati e Profili</a>
+        <a href="#art6">6. Comportamenti Vietati</a>
+        <a href="#art7">7. Piani e Pagamenti</a>
+        <a href="#art8">8. PWA e Installazione dell'Applicazione</a>
+        <a href="#art9">9. Limitazione di Responsabilità</a>
+        <a href="#art10">10. Proprietà Intellettuale</a>
+        <a href="#art11">11. Cookie e Tecnologie di Tracciamento</a>
+        <a href="#art12">12. Risoluzione delle Controversie — ODR</a>
+        <a href="#art13">13. Modifiche al Servizio e ai Termini</a>
+        <a href="#art14">14. Sospensione e Cancellazione dell'Account</a>
+        <a href="#art15">15. Legge Applicabile e Foro Competente</a>
+        <a href="#art16">16. Contatti</a>
+      </div>
 
-      <h2>2. Descrizione del Servizio</h2>
-      <p>StaffAlpine è una piattaforma digitale che connette lavoratori e aziende del settore hospitality nella Valle d'Aosta. I servizi offerti includono:</p>
+      <h2 id="art1">1. Accettazione dei Termini</h2>
+      <p>Accedendo e utilizzando StaffAlpine (di seguito "la Piattaforma"), gestita da Team StaffAlpine, P.IVA 01275120077, con sede in Località Grand Chemin 93, Saint-Christophe (AO), l'utente accetta integralmente i presenti Termini di Servizio. Se non accetti questi termini, non puoi utilizzare la Piattaforma.</p>
+      <p>I presenti Termini si applicano a tutti gli utenti della Piattaforma, inclusi lavoratori, aziende e visitatori non registrati.</p>
+
+      <h2 id="art2">2. Descrizione del Servizio</h2>
+      <p>StaffAlpine è una piattaforma digitale che connette lavoratori e aziende del settore hospitality nella Valle d'Aosta, attiva tutto l'anno. I servizi offerti includono:</p>
       <ul>
         <li>Sistema di recensioni anonime e verificate sulle aziende del settore</li>
         <li>Database di profili professionali dei lavoratori (visibile alle aziende Premium)</li>
         <li>Pubblicazione e consultazione di offerte di lavoro</li>
         <li>Sistema di proposte dirette tra aziende e lavoratori</li>
+        <li>Analisi del mercato del lavoro hospitality locale</li>
       </ul>
+      <p>La Piattaforma è accessibile via browser web e come Progressive Web App (PWA) installabile su dispositivi mobili e desktop.</p>
 
-      <h2>3. Registrazione e Account</h2>
+      <h2 id="art3">3. Registrazione e Account</h2>
       <h3>3.1 Lavoratori</h3>
-      <p>La registrazione è gratuita. L'accesso avviene tramite codice OTP inviato all'indirizzo email fornito. L'utente è responsabile della correttezza delle informazioni inserite nel proprio profilo.</p>
+      <p>La registrazione è gratuita. L'accesso avviene tramite codice OTP (One-Time Password) inviato all'indirizzo email fornito. L'utente è responsabile della correttezza delle informazioni inserite nel proprio profilo e della sicurezza del proprio account.</p>
 
       <h3>3.2 Aziende</h3>
-      <p>La registrazione richiede la Partita IVA e l'email aziendale. Ogni registrazione è soggetta ad approvazione da parte del team di StaffAlpine entro 24-48 ore lavorative. Ci riserviamo il diritto di rifiutare o revocare l'accesso ad aziende che non rispettino i presenti termini.</p>
+      <p>La registrazione richiede la Partita IVA e l'email aziendale. Ogni registrazione è soggetta ad approvazione da parte del team di StaffAlpine entro 24-48 ore lavorative. Ci riserviamo il diritto di rifiutare o revocare l'accesso ad aziende che non rispettino i presenti termini o la cui attività non sia verificabile.</p>
 
-      <h2>4. Recensioni — Regole e Responsabilità</h2>
+      <h3>3.3 Unicità dell'Account</h3>
+      <p>Ogni persona fisica o giuridica può registrare un solo account per categoria. La creazione di account multipli per aggirare le verifiche o le limitazioni della piattaforma è espressamente vietata.</p>
+
+      <h2 id="art4">4. Recensioni — Regole e Responsabilità</h2>
       <div class="highlight">
-        ⚠️ Le recensioni devono essere veritiere e basate su esperienze reali di lavoro. Recensioni false o diffamatorie possono comportare la rimozione dell'account e azioni legali.
+        ⚠️ Le recensioni devono essere veritiere e basate su esperienze lavorative reali. Recensioni false o diffamatorie possono comportare la rimozione dell'account e azioni legali ai sensi degli artt. 595-596 c.p.
       </div>
       <ul>
-        <li>Le recensioni devono riguardare esperienze lavorative reali e verificabili</li>
+        <li>Le recensioni devono riguardare esclusivamente esperienze lavorative reali e personali</li>
         <li>È vietato inserire informazioni false, diffamatorie o lesive della reputazione altrui</li>
         <li>È vietato recensire aziende per cui non si è effettivamente lavorato</li>
-        <li>Le recensioni vengono verificate dal team prima della pubblicazione</li>
-        <li>StaffAlpine si riserva il diritto di rimuovere recensioni che violino questi termini</li>
-        <li>Il lavoratore è l'unico responsabile del contenuto delle proprie recensioni</li>
+        <li>Le recensioni vengono verificate dal team StaffAlpine prima della pubblicazione</li>
+        <li>StaffAlpine si riserva il diritto di rimuovere recensioni che violino questi termini o risultino non verificabili</li>
+        <li>Il lavoratore è l'unico responsabile del contenuto delle proprie recensioni ai sensi dell'art. 15 D.Lgs. 70/2003</li>
+        <li>In caso di contestazione da parte dell'azienda, StaffAlpine può sospendere temporaneamente la recensione in attesa di verifica</li>
       </ul>
 
-      <h2>5. Utilizzo dei Dati e Profili</h2>
+      <h2 id="art5">5. Utilizzo dei Dati e Profili</h2>
       <h3>5.1 Profilo Lavoratore</h3>
-      <p>Il profilo professionale del lavoratore è reso visibile alle aziende Premium in forma anonima (senza nome, cognome o contatti diretti). Il lavoratore può eliminare il proprio profilo in qualsiasi momento dalla sezione "Area Personale".</p>
+      <p>Il profilo professionale del lavoratore è reso visibile alle aziende Premium in forma anonima (senza nome, cognome o contatti diretti). Il lavoratore può eliminare il proprio profilo in qualsiasi momento dalla sezione "Area Personale". La cancellazione del profilo non comporta la cancellazione delle recensioni già pubblicate, che rimangono anonime.</p>
 
       <h3>5.2 Profilo Azienda</h3>
-      <p>Il profilo pubblico dell'azienda (descrizione, foto, zona) è visibile a tutti gli utenti della piattaforma. Le informazioni devono essere accurate e aggiornate.</p>
+      <p>Il profilo pubblico dell'azienda (descrizione, foto, zona, tipi di contratto) è visibile a tutti gli utenti della piattaforma, inclusi i visitatori non registrati. Le informazioni devono essere accurate, aggiornate e conformi al vero.</p>
 
-      <h2>6. Comportamenti Vietati</h2>
+      <h3>5.3 Offerte di Lavoro</h3>
+      <p>Le offerte pubblicate dalle aziende sono visibili a tutti gli utenti registrati. Ogni offerta deve riportare informazioni veritiere sul ruolo e le condizioni di lavoro, e deve essere conforme alla normativa sulle pari opportunità (L. 903/77, D.Lgs. 198/2006, D.Lgs. 215/03, D.Lgs. 216/03).</p>
+
+      <h2 id="art6">6. Comportamenti Vietati</h2>
       <p>È espressamente vietato:</p>
       <ul>
         <li>Creare account falsi o multipli per aggirare le verifiche</li>
-        <li>Utilizzare la piattaforma per attività di spam o contatti non richiesti</li>
+        <li>Utilizzare la piattaforma per attività di spam o contatti commerciali non richiesti</li>
         <li>Tentare di identificare i lavoratori che hanno lasciato recensioni anonime</li>
-        <li>Pubblicare offerte di lavoro false o ingannevoli</li>
+        <li>Pubblicare offerte di lavoro false, ingannevoli o non conformi alla normativa vigente</li>
         <li>Violare le leggi sul lavoro italiane nell'utilizzo della piattaforma</li>
-        <li>Effettuare reverse engineering o tentativi di accesso non autorizzato</li>
+        <li>Effettuare reverse engineering, scraping automatizzato o tentativi di accesso non autorizzato</li>
+        <li>Raccogliere dati personali di altri utenti a fini commerciali o non autorizzati</li>
+        <li>Caricare contenuti che violino diritti di terzi, leggi vigenti o il buon costume</li>
       </ul>
 
-      <h2>7. Piani e Pagamenti</h2>
+      <h2 id="art7">7. Piani e Pagamenti</h2>
       <h3>7.1 Piano Base (Gratuito)</h3>
-      <p>Include: scheda pubblica azienda, 1 offerta di lavoro, analisi delle proprie recensioni.</p>
+      <p>Include: scheda pubblica azienda, pubblicazione di offerte di lavoro, analisi delle proprie recensioni verificate.</p>
 
       <h3>7.2 Piano Premium</h3>
-      <p>Accesso al database talenti completo, offerte illimitate, analisi del mercato locale, proposte dirette ai lavoratori. Il piano Premium è attivabile su richiesta e prevede un costo concordato con il team StaffAlpine.</p>
+      <p>Accesso al database completo dei lavoratori disponibili, offerte illimitate, analisi approfondita del mercato locale, proposte dirette ai lavoratori. Il piano Premium è attivabile su richiesta e prevede un costo concordato con il team StaffAlpine prima dell'attivazione.</p>
 
-      <h2>8. Limitazione di Responsabilità</h2>
+      <h3>7.3 Rimborsi</h3>
+      <p>In caso di malfunzionamenti documentati della piattaforma che abbiano impedito l'utilizzo del servizio Premium per un periodo superiore a 7 giorni consecutivi, l'azienda ha diritto a un rimborso proporzionale. Le richieste vanno inviate a info@staffalpine.it entro 30 giorni dall'evento.</p>
+
+      <h2 id="art8">8. PWA e Installazione dell'Applicazione</h2>
+      <p>StaffAlpine è disponibile come Progressive Web App (PWA) installabile gratuitamente su dispositivi mobili iOS/Android e desktop. Installando la PWA l'utente accetta che:</p>
+      <ul>
+        <li>L'applicazione utilizzi il Service Worker del browser per funzionalità offline e notifiche (se attivate)</li>
+        <li>I dati di sessione vengano memorizzati localmente nel dispositivo tramite localStorage e cookie tecnici</li>
+        <li>Gli aggiornamenti dell'applicazione vengano applicati automaticamente</li>
+        <li>La disinstallazione della PWA non cancella automaticamente i dati dell'account sul server</li>
+      </ul>
+
+      <h2 id="art9">9. Limitazione di Responsabilità</h2>
       <p>StaffAlpine è una piattaforma di intermediazione. Non è parte dei rapporti di lavoro che si instaurano tra lavoratori e aziende e non garantisce:</p>
       <ul>
         <li>L'esito positivo delle ricerche di lavoro o di personale</li>
         <li>La veridicità assoluta di tutte le informazioni inserite dagli utenti</li>
-        <li>La continuità del servizio senza interruzioni</li>
+        <li>La continuità del servizio senza interruzioni tecniche</li>
+        <li>La compatibilità con tutti i browser o dispositivi</li>
       </ul>
-      <p>La responsabilità massima di StaffAlpine è limitata al corrispettivo eventualmente pagato dall'utente negli ultimi 12 mesi.</p>
+      <p>StaffAlpine non è responsabile per danni diretti o indiretti derivanti dall'utilizzo della piattaforma, salvo i casi di dolo o colpa grave. La responsabilità massima è limitata al corrispettivo eventualmente pagato dall'utente negli ultimi 12 mesi.</p>
 
-      <h2>9. Proprietà Intellettuale</h2>
-      <p>Il marchio StaffAlpine, il logo stella alpina e tutti i contenuti originali della piattaforma sono di proprietà esclusiva di Team StaffAlpine. È vietata la riproduzione senza autorizzazione scritta. Le recensioni inserite dagli utenti rimangono di proprietà dell'autore, che concede a StaffAlpine una licenza non esclusiva per la pubblicazione sulla piattaforma.</p>
+      <h2 id="art10">10. Proprietà Intellettuale</h2>
+      <p>Il marchio StaffAlpine, il logo stella alpina e tutti i contenuti originali della piattaforma sono di proprietà esclusiva di Team StaffAlpine. È vietata qualsiasi riproduzione o utilizzo commerciale senza autorizzazione scritta.</p>
+      <p>Le recensioni inserite dagli utenti rimangono di proprietà dell'autore, che concede a StaffAlpine una licenza non esclusiva, gratuita e a tempo indeterminato per la pubblicazione e aggregazione anonima sulla piattaforma.</p>
 
-      <h2>10. Modifiche al Servizio e ai Termini</h2>
-      <p>Ci riserviamo il diritto di modificare i presenti termini in qualsiasi momento. Le modifiche sostanziali saranno comunicate agli utenti registrati via email con almeno 15 giorni di preavviso. L'utilizzo continuato della piattaforma dopo la modifica costituisce accettazione dei nuovi termini.</p>
+      <h2 id="art11">11. Cookie e Tecnologie di Tracciamento</h2>
+      <p>La Piattaforma utilizza esclusivamente cookie tecnici necessari al funzionamento. Non utilizziamo cookie di profilazione o marketing. Per l'informativa completa consulta la nostra <a href="cookie-policy.html" style="color:var(--verde);">Cookie Policy</a>.</p>
 
-      <h2>11. Sospensione e Cancellazione dell'Account</h2>
+      <h2 id="art12">12. Risoluzione delle Controversie — ODR</h2>
+      <p>Ai sensi dell'art. 14 del Regolamento UE 524/2013, la Commissione Europea ha istituito una piattaforma online per la risoluzione alternativa delle controversie (ODR) accessibile all'indirizzo <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener" style="color:var(--verde);">ec.europa.eu/consumers/odr</a>.</p>
+      <p>Prima di ricorrere all'autorità giudiziaria, l'utente è invitato a contattare StaffAlpine a info@staffalpine.it per una risoluzione bonaria.</p>
+
+      <h2 id="art13">13. Modifiche al Servizio e ai Termini</h2>
+      <p>Ci riserviamo il diritto di modificare i presenti termini in qualsiasi momento. Le modifiche sostanziali saranno comunicate via email con almeno 15 giorni di preavviso. L'utilizzo continuato della piattaforma dopo la modifica costituisce accettazione. In caso di disaccordo, l'utente può cancellare il proprio account.</p>
+
+      <h2 id="art14">14. Sospensione e Cancellazione dell'Account</h2>
       <p>StaffAlpine può sospendere o cancellare un account in caso di:</p>
       <ul>
         <li>Violazione dei presenti Termini di Servizio</li>
         <li>Inserimento di recensioni false o contenuti illeciti</li>
         <li>Comportamenti fraudolenti o abusivi</li>
+        <li>Inattività prolungata superiore a 24 mesi (previa comunicazione email)</li>
         <li>Richiesta dell'utente stesso</li>
       </ul>
+      <p>In caso di sospensione per violazione, l'utente verrà informato via email con indicazione del motivo. È possibile presentare ricorso entro 15 giorni scrivendo a info@staffalpine.it.</p>
 
-      <h2>12. Legge Applicabile e Foro Competente</h2>
-      <p>I presenti Termini sono regolati dalla legge italiana. Per qualsiasi controversia derivante dall'utilizzo della piattaforma è competente in via esclusiva il Tribunale di Aosta.</p>
+      <h2 id="art15">15. Legge Applicabile e Foro Competente</h2>
+      <p>I presenti Termini sono regolati dalla legge italiana. Per qualsiasi controversia è competente in via esclusiva il Tribunale di Aosta, fatta salva la competenza inderogabile del giudice del luogo di residenza o domicilio del consumatore ai sensi del D.Lgs. 206/2005 (Codice del Consumo).</p>
 
-      <h2>13. Contatti</h2>
-      <p>Per qualsiasi questione relativa ai presenti Termini contattaci a: <a href="mailto:info@staffalpine.it" style="color:var(--verde);">info@staffalpine.it</a></p>
+      <h2 id="art16">16. Contatti</h2>
+      <div class="info-box">
+        <strong>Team StaffAlpine</strong>
+        Località Grand Chemin 93, Saint-Christophe (AO)<br>
+        P.IVA: 01275120077<br>
+        Email: <a href="mailto:info@staffalpine.it" style="color:var(--verde);">info@staffalpine.it</a>
+      </div>
 
-      <p class="updated">Ultimo aggiornamento: Marzo 2026</p>
+      <p class="updated">Ultimo aggiornamento: Aprile 2026</p>
     </div>
   </div>
 
   <footer>
-    <p>© 2026 StaffAlpine — Valle d'Aosta · <a href="privacy.html" style="color:rgba(255,255,255,0.4);">Privacy</a> · <a href="termini.html" style="color:rgba(255,255,255,0.4);">Termini</a></p>
+    <p>© 2026 StaffAlpine — Valle d'Aosta · <a href="informativa-privacy.html">Privacy</a> · <a href="termini.html">Termini</a> · <a href="cookie-policy.html">Cookie</a></p>
   </footer>
 
 </body>
