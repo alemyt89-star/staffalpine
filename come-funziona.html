@@ -88,10 +88,33 @@
     /* FOOTER */
     footer{background:#0d1a0d;padding:30px 5%;text-align:center;}
     footer p{color:rgba(255,255,255,0.3);font-size:12px;}
+    footer a{color:rgba(255,255,255,0.4);text-decoration:none;}
 
-    @media(max-width:540px){
-      .nav-links{gap:12px;}
-      .nav-links a:not(.nav-cta){display:none;}
+    /* MOBILE */
+    .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:6px;}
+    .hamburger span{display:block;width:22px;height:2px;background:rgba(255,255,255,0.8);border-radius:2px;}
+    .mobile-menu{display:none;position:fixed;inset:0;background:rgba(26,46,26,0.98);z-index:9000;flex-direction:column;align-items:center;justify-content:center;gap:28px;}
+    .mobile-menu.open{display:flex;}
+    .mobile-menu a{color:white;text-decoration:none;font-size:1.2rem;font-weight:600;font-family:'Playfair Display',serif;}
+    .mobile-menu .close-btn{position:absolute;top:20px;right:20px;background:none;border:none;color:white;font-size:28px;cursor:pointer;}
+    .mobile-menu .nav-cta-mob{background:var(--verde-chiaro);padding:12px 28px;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:1rem !important;}
+
+    @media(max-width:640px){
+      .nav-links{display:none;}
+      .hamburger{display:flex;}
+      .section{padding:48px 5%;}
+      .hero{padding:60px 5% 70px;}
+      .hero h1{font-size:1.8rem;}
+      .hero p{font-size:14px;}
+      .hero-btns{flex-direction:column;align-items:center;}
+      .hero-btns a{width:100%;max-width:300px;text-align:center;}
+      .steps-grid{grid-template-columns:1fr 1fr;}
+      .cta-section{padding:52px 5%;}
+      .cta-btns{flex-direction:column;align-items:center;}
+      .cta-btns a{width:100%;max-width:300px;text-align:center;}
+    }
+    @media(max-width:400px){
+      .steps-grid{grid-template-columns:1fr;}
     }
   </style>
 </head>
@@ -109,7 +132,19 @@
       <a href="login.html?role=business">Per le Aziende</a>
       <a href="login.html" class="nav-cta">Accedi →</a>
     </div>
+    <button class="hamburger" onclick="apriMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
   </nav>
+
+  <!-- MOBILE MENU -->
+  <div class="mobile-menu" id="mobile-menu">
+    <button class="close-btn" onclick="chiudiMenu()">×</button>
+    <a href="come-funziona.html" style="color:var(--oro-chiaro);">Come Funziona</a>
+    <a href="login.html">Per i Lavoratori</a>
+    <a href="login.html?role=business">Per le Aziende</a>
+    <a href="login.html" class="nav-cta-mob">Accedi →</a>
+  </div>
 
   <!-- HERO -->
   <section class="hero">
@@ -148,7 +183,7 @@
           <p style="font-size:13px;color:var(--pietra);margin-bottom:16px;line-height:1.6;">Registra la tua azienda e inizia subito a trovare i migliori talenti.</p>
           <ul class="block-list">
             <li>Crea la tua scheda pubblica con foto e descrizione</li>
-            <li>Pubblica fino a 1 offerta di lavoro (piano base)</li>
+            <li>Pubblica offerte di lavoro</li>
           </ul>
         </div>
       </div>
@@ -232,7 +267,7 @@
   <!-- CTA FINALE -->
   <section class="cta-section">
     <h2>Pronto a fare<br><em>la differenza?</em></h2>
-    <p>Unisciti alla community che sta rendendo il lavoro stagionale in Valle d'Aosta più trasparente.</p>
+    <p>Unisciti alla community che sta rendendo il lavoro nell'hospitality in Valle d'Aosta più trasparente.</p>
     <div class="cta-btns">
       <a href="login.html" class="btn-primary">Registrati Gratis</a>
       <a href="login.html?role=business" class="btn-secondary">Registra la tua Azienda</a>
@@ -240,8 +275,17 @@
   </section>
 
   <footer>
-    <p>© 2026 StaffAlpine — Valle d'Aosta · Sicuro · Anonimo · Trasparente</p>
+    <p>© 2026 StaffAlpine — Valle d'Aosta · <a href="informativa-privacy.html">Privacy</a> · <a href="termini.html">Termini</a> · <a href="cookie-policy.html">Cookie</a></p>
   </footer>
+
+  <!-- COOKIE BANNER -->
+  <div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9998;background:rgba(26,46,26,0.97);backdrop-filter:blur(8px);border-top:1px solid rgba(82,183,136,0.2);padding:14px 5%;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 -4px 24px rgba(0,0,0,0.2);">
+    <p style="font-size:13px;color:rgba(255,255,255,0.8);margin:0;flex:1;min-width:200px;line-height:1.6;">
+      🍪 Questo sito utilizza esclusivamente <strong style="color:white;">cookie tecnici</strong> necessari al funzionamento. Nessun cookie di profilazione o marketing.
+      <a href="cookie-policy.html" style="color:#52b788;text-decoration:none;margin-left:6px;white-space:nowrap;">Scopri di più →</a>
+    </p>
+    <button onclick="chiudiBanner()" style="background:linear-gradient(135deg,#2d6a4f,#52b788);color:white;border:none;padding:10px 22px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">Ho capito</button>
+  </div>
 
   <script>
     function toggleFaq(el){
@@ -251,17 +295,15 @@
       document.querySelectorAll('.faq-q').forEach(q => q.classList.remove('open'));
       if(!isOpen){ answer.classList.add('open'); el.classList.add('open'); }
     }
-  </script>
-
-  <!-- COOKIE BANNER -->
-  <div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:99998;background:rgba(26,46,26,0.97);backdrop-filter:blur(8px);border-top:1px solid rgba(82,183,136,0.2);padding:14px 5%;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;box-shadow:0 -4px 24px rgba(0,0,0,0.2);">
-    <p style="font-size:13px;color:rgba(255,255,255,0.75);margin:0;flex:1;min-width:200px;line-height:1.5;">
-      🍪 Questo sito utilizza esclusivamente <strong style="color:white;">cookie tecnici</strong> necessari al funzionamento. Nessun cookie di profilazione o marketing.
-      <a href="cookie-policy.html" style="color:#52b788;text-decoration:none;margin-left:6px;">Scopri di più →</a>
-    </p>
-    <button onclick="chiudiBanner()" style="background:linear-gradient(135deg,#2d6a4f,#52b788);color:white;border:none;padding:9px 20px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">Ho capito</button>
-  </div>
-  <script>
+    function apriMenu(){
+      document.getElementById('mobile-menu').classList.add('open');
+      document.body.style.overflow='hidden';
+    }
+    function chiudiMenu(){
+      document.getElementById('mobile-menu').classList.remove('open');
+      document.body.style.overflow='';
+    }
+    // Cookie banner
     (function(){
       if(!localStorage.getItem('staffalpine_cookie_ok')){
         document.getElementById('cookie-banner').style.display='flex';
@@ -272,5 +314,6 @@
       document.getElementById('cookie-banner').style.display='none';
     }
   </script>
+
 </body>
 </html>
