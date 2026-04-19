@@ -148,7 +148,7 @@
           <p style="font-size:13px;color:var(--pietra);margin-bottom:16px;line-height:1.6;">Registra la tua azienda e inizia subito a trovare i migliori talenti.</p>
           <ul class="block-list">
             <li>Crea la tua scheda pubblica con foto e descrizione</li>
-            <li>Pubblica offerte di lavoro</li>
+            <li>Pubblica fino a 1 offerta di lavoro (piano base)</li>
           </ul>
         </div>
       </div>
@@ -223,7 +223,7 @@
         </div>
         <div class="faq-item">
           <div class="faq-q" onclick="toggleFaq(this)">StaffAlpine è solo per la Valle d'Aosta?</div>
-          <div class="faq-a">Sì, per ora ci concentriamo esclusivamente sul territorio valdostano — da Courmayeur a Gressoney, passando per Aosta e tutta la Bassa Valle, tutto l'anno.</div>
+          <div class="faq-a">Sì, per ora ci concentriamo esclusivamente sul territorio valdostano — dalla stagione invernale di Courmayeur a quella estiva di Gressoney, passando per Aosta e tutta la Bassa Valle.</div>
         </div>
       </div>
     </div>
@@ -232,7 +232,7 @@
   <!-- CTA FINALE -->
   <section class="cta-section">
     <h2>Pronto a fare<br><em>la differenza?</em></h2>
-    <p>Unisciti alla community che sta rendendo il lavoro nell'hospitality in Valle d'Aosta più trasparente.</p>
+    <p>Unisciti alla community che sta rendendo il lavoro stagionale in Valle d'Aosta più trasparente.</p>
     <div class="cta-btns">
       <a href="login.html" class="btn-primary">Registrati Gratis</a>
       <a href="login.html?role=business" class="btn-secondary">Registra la tua Azienda</a>
@@ -240,7 +240,7 @@
   </section>
 
   <footer>
-    <p>© 2026 StaffAlpine — Valle d'Aosta · <a href="informativa-privacy.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Privacy</a> · <a href="termini.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Termini</a> · <a href="cookie-policy.html" style="color:rgba(255,255,255,0.4);text-decoration:none;">Cookie</a></p>
+    <p>© 2026 StaffAlpine — Valle d'Aosta · Sicuro · Anonimo · Trasparente</p>
   </footer>
 
   <script>
@@ -253,5 +253,24 @@
     }
   </script>
 
+  <!-- COOKIE BANNER -->
+  <div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:99998;background:rgba(26,46,26,0.97);backdrop-filter:blur(8px);border-top:1px solid rgba(82,183,136,0.2);padding:14px 5%;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;box-shadow:0 -4px 24px rgba(0,0,0,0.2);">
+    <p style="font-size:13px;color:rgba(255,255,255,0.75);margin:0;flex:1;min-width:200px;line-height:1.5;">
+      🍪 Questo sito utilizza esclusivamente <strong style="color:white;">cookie tecnici</strong> necessari al funzionamento. Nessun cookie di profilazione o marketing.
+      <a href="cookie-policy.html" style="color:#52b788;text-decoration:none;margin-left:6px;">Scopri di più →</a>
+    </p>
+    <button onclick="chiudiBanner()" style="background:linear-gradient(135deg,#2d6a4f,#52b788);color:white;border:none;padding:9px 20px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">Ho capito</button>
+  </div>
+  <script>
+    (function(){
+      if(!localStorage.getItem('staffalpine_cookie_ok')){
+        document.getElementById('cookie-banner').style.display='flex';
+      }
+    })();
+    function chiudiBanner(){
+      localStorage.setItem('staffalpine_cookie_ok','1');
+      document.getElementById('cookie-banner').style.display='none';
+    }
+  </script>
 </body>
 </html>
