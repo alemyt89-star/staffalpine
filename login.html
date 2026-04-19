@@ -397,7 +397,7 @@
           <!-- CONSENSO PRIVACY -->
           <label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;cursor:pointer;font-size:12px;color:rgba(255,255,255,0.5);line-height:1.5;">
             <input type="checkbox" id="check-consenso" style="margin-top:2px;accent-color:#52b788;width:15px;height:15px;flex-shrink:0;">
-            <span>Ho letto e accetto l'<a href="informativa-privacy.html" target="_blank" style="color:#52b788;">Informativa Privacy</a> e i <a href="termini.html" target="_blank" style="color:#52b788;">Termini di Servizio</a> di StaffAlpine.</span>
+            <span>Ho letto e accetto l'<a href="informativa-privacy.html" target="_blank" style="color:#52b788;">Informativa Privacy</a>, i <a href="termini.html" target="_blank" style="color:#52b788;">Termini di Servizio</a> e la <a href="cookie-policy.html" target="_blank" style="color:#52b788;">Cookie Policy</a> di StaffAlpine.</span>
           </label>
 
           <button class="btn-login" id="btn-invia-accesso" onclick="inviaCodice()">
@@ -436,19 +436,8 @@
           <div class="secondary-link" style="margin-top:20px;" onclick="location.reload()"><span>← Cambia email</span></div>
         </div>
 
-        <!-- DEMO TESTER — visibile solo con ?demo=true -->
-        <div id="demo-panel" style="display:none;margin-top:20px;padding:16px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);border-radius:12px;">
-          <p style="font-size:11px;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:12px;letter-spacing:1px;text-transform:uppercase;">👁 Accesso Demo — Solo per revisori</p>
-          <button class="btn-login" onclick="accediDemo('lavoratore')" style="margin-bottom:8px;background:linear-gradient(135deg,#2d6a4f,#52b788);">
-            <span>👷 Accedi come Lavoratore Demo</span>
-          </button>
-          <button class="btn-login" onclick="accediDemo('azienda')" style="background:linear-gradient(135deg,#7a5c1e,#c9a84c);">
-            <span>🏨 Accedi come Azienda Demo</span>
-          </button>
-        </div>
-
         <div class="card-footer">
-          © 2026 StaffAlpine · Sicuro · Anonimo · Trasparente
+          © 2026 StaffAlpine · <a href="informativa-privacy.html" target="_blank" style="color:rgba(255,255,255,0.4);text-decoration:none;">Privacy</a> · <a href="termini.html" target="_blank" style="color:rgba(255,255,255,0.4);text-decoration:none;">Termini</a> · <a href="cookie-policy.html" target="_blank" style="color:rgba(255,255,255,0.4);text-decoration:none;">Cookie</a>
         </div>
 
       </div>
@@ -467,30 +456,6 @@
     } else {
       const rlav = document.getElementById('role-badge-lav');
       if(rlav) rlav.style.display = 'block';
-    }
-
-    // Mostra pannello demo solo con ?demo=true
-    if (urlParams.get('demo') === 'true') {
-      const dp = document.getElementById('demo-panel');
-      if(dp) dp.style.display = 'block';
-    }
-
-    async function accediDemo(tipo) {
-      const email = tipo === 'lavoratore'
-        ? 'demo.lavoratore@staffalpine.it'
-        : 'demo.azienda@staffalpine.it';
-      const password = 'StaffAlpineDemo2026!';
-      const btn = event.currentTarget;
-      btn.disabled = true;
-      btn.querySelector('span').innerText = 'Accesso in corso...';
-      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-      if (error) {
-        alert('Errore accesso demo: ' + error.message);
-        btn.disabled = false;
-        btn.querySelector('span').innerText = tipo === 'lavoratore' ? '👷 Accedi come Lavoratore Demo' : '🏨 Accedi come Azienda Demo';
-      } else if (data.user) {
-        smistaUtente(data.user);
-      }
     }
 
     let _metodo = 'otp';

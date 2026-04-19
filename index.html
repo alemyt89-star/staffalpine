@@ -534,14 +534,10 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    .nav-mobile-cf { display: none; }
-
     /* ── MOBILE ── */
     @media (max-width: 768px) {
       .navbar { padding: 15px 5%; }
       .nav-links { display: none; }
-      .nav-mobile-cf { display: inline-block; color: rgba(255,255,255,0.85); text-decoration: none; font-size: 13px; font-weight: 500; letter-spacing: 0.5px; transition: color 0.3s; }
-      .nav-mobile-cf:hover { color: var(--oro-chiaro); }
       .hero h1 { font-size: 3rem; }
       .hero-subtitle { font-size: 1rem; }
       .stats-bar { gap: 30px; }
@@ -571,7 +567,6 @@
       <a href="login.html?role=business">Per le Aziende</a>
       <a href="login.html" class="nav-cta">Accedi →</a>
     </div>
-    <a href="come-funziona.html" class="nav-mobile-cf">Come Funziona</a>
   </nav>
 
   <!-- HERO -->
@@ -706,12 +701,12 @@
       <div class="footer-col">
         <h4>Contatti</h4>
         <a href="mailto:info@staffalpine.it" style="color:rgba(255,255,255,0.6);">info@staffalpine.it</a>
-        <a href="https://www.instagram.com/staff.alpine?igsh=ZGkzM3N4bXk5ZGs=&utm_source=ig_contact_invite" target="_blank">Instagram</a>
-        <a href="https://www.facebook.com/share/1HaMTWFjC6/?mibextid=wwXIfr" target="_blank">Facebook</a>
+        <a href="#">Instagram</a>
+        <a href="#">Facebook</a>
       </div>
     </div>
     <div class="footer-bottom">
-      <p>© 2026 StaffAlpine — Valle d'Aosta · <a href='informativa-privacy.html' style='color:rgba(255,255,255,0.4);text-decoration:none;'>Privacy</a> · <a href='termini.html' style='color:rgba(255,255,255,0.4);text-decoration:none;'>Termini</a></p>
+      <p>© 2026 StaffAlpine — Valle d'Aosta · <a href='informativa-privacy.html' style='color:rgba(255,255,255,0.4);text-decoration:none;'>Privacy</a> · <a href='termini.html' style='color:rgba(255,255,255,0.4);text-decoration:none;'>Termini</a> · <a href='cookie-policy.html' style='color:rgba(255,255,255,0.4);text-decoration:none;'>Cookie</a></p>
       <span class="footer-badge">🏔️ MADE IN VDA</span>
       <a href="login.html" style="color: rgba(255,255,255,0.3); font-size:12px; text-decoration:none;">Accesso Staff 🛡️</a>
     </div>
@@ -731,7 +726,7 @@
       <div style="overflow-y:auto; padding:28px; flex:1; font-size:13px; line-height:1.7; color:#2c3e2d;">
 
         <h3 style="font-family:'Playfair Display',serif; color:#1a2e1a; margin-bottom:8px;">1. Trattamento dei Dati Personali (GDPR)</h3>
-        <p style="margin-bottom:16px;">StaffAlpine raccoglie e tratta i dati personali degli utenti (nome, cognome, data di nascita, indirizzo email) esclusivamente per le finalità della piattaforma: verifica dell'identità, pubblicazione di recensioni e gestione del profilo professionale. I dati sono conservati in modo sicuro su Supabase (server EU) e non vengono ceduti a terzi a scopo commerciale. Il titolare del trattamento è <b>Team StaffAlpine</b>. L'utente può richiedere la cancellazione dei propri dati in qualsiasi momento scrivendo a <b><a href="mailto:info@staffalpine.it" style="color:#2d6a4f;">info@staffalpine.it</a></b>.</p>
+        <p style="margin-bottom:16px;">StaffAlpine raccoglie e tratta i dati personali degli utenti (nome, cognome, data di nascita, indirizzo email) esclusivamente per le finalità della piattaforma: verifica dell'identità, pubblicazione di recensioni e gestione del profilo professionale. I dati sono conservati in modo sicuro su Supabase (server EU) e non vengono ceduti a terzi a scopo commerciale. Il titolare del trattamento è <b>Team StaffAlpine</b>. L'utente può richiedere la cancellazione dei propri dati in qualsiasi momento scrivendo a <b><a href="mailto:info@staffalpine.it" style="color:var(--verde-chiaro);">info@staffalpine.it</a></b>.</p>
 
         <h3 style="font-family:'Playfair Display',serif; color:#1a2e1a; margin-bottom:8px;">2. Anonimato delle Recensioni</h3>
         <p style="margin-bottom:16px;">Le recensioni pubblicate su StaffAlpine sono <b>anonime</b> nei confronti delle aziende e degli altri utenti. I dati identificativi del recensore (nome, cognome, data di nascita) sono visibili <b>esclusivamente all'amministratore</b> per la verifica della veridicità delle esperienze. L'utente garantisce che le informazioni inserite nelle recensioni sono veritiere e basate su esperienze lavorative reali. La pubblicazione di informazioni false o diffamatorie è vietata.</p>
@@ -757,7 +752,7 @@
       <div style="padding:20px 28px; border-top:1px solid #f0f2ee; flex-shrink:0; display:flex; flex-direction:column; gap:10px;">
         <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer; font-size:13px; color:#2c3e2d; line-height:1.4;">
           <input type="checkbox" id="check-privacy" style="margin-top:2px; accent-color:#2d6a4f; width:16px; height:16px; flex-shrink:0;">
-          Ho letto e accetto i <a href="termini.html" target="_blank" style="color:#52b788;">Termini di Servizio</a> e l'<a href="informativa-privacy.html" target="_blank" style="color:#52b788;">Informativa sulla Privacy</a> di StaffAlpine.
+          Ho letto e accetto i <a href="termini.html" target="_blank" style="color:#52b788;">Termini di Servizio</a>, l'<a href="informativa-privacy.html" target="_blank" style="color:#52b788;">Informativa sulla Privacy</a> e la <a href="cookie-policy.html" target="_blank" style="color:#52b788;">Cookie Policy</a> di StaffAlpine.
         </label>
         <button id="btn-accetta" onclick="accettaPrivacy()" disabled
           style="width:100%; padding:13px; background:#ccc; color:white; border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:700; cursor:not-allowed; transition:all 0.3s;">
@@ -767,7 +762,7 @@
     </div>
   </div>
 
-  <script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     // Navbar scroll effect
     const navbar = document.getElementById('navbar');
     window.addEventListener('scroll', () => {
@@ -804,4 +799,25 @@
       } else {
         btn.disabled = true;
         btn.style.background = '#ccc';
-        bt
+        btn.style.cursor = 'not-allowed';
+      }
+    });
+
+    function accettaPrivacy() {
+      localStorage.setItem(PRIVACY_KEY, '1');
+      document.getElementById('modal-privacy').style.display = 'none';
+    }
+
+    // Intercetta tutti i link verso login.html
+    document.querySelectorAll('a[href="login.html"], a[href="login.html?role=business"]').forEach(link => {
+      link.addEventListener('click', function(e) {
+        if (!localStorage.getItem(PRIVACY_KEY)) {
+          e.preventDefault();
+          // Salva destinazione e mostra modal
+          sessionStorage.setItem('redirect_after_privacy', this.href);
+          document.getElementById('modal-privacy').style.display = 'flex';
+        }
+      });
+    });
+
+    // Dopo accettazione, vai alla destina
