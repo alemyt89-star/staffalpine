@@ -48,7 +48,6 @@
     .hero-text{flex:1;min-width:200px;}
     .hero-nome{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,4vw,2.4rem);color:white;margin-bottom:6px;line-height:1.1;}
     .hero-zona{color:rgba(255,255,255,0.45);font-size:13px;margin-bottom:8px;}
-    .hero-desc{color:rgba(255,255,255,0.62);font-size:13px;line-height:1.65;max-width:560px;}
     .hero-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
     .hero-tag{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.6);font-size:11px;padding:3px 10px;border-radius:20px;}
 
@@ -119,6 +118,12 @@
     .empty-state .empty-icon{font-size:36px;display:block;margin-bottom:12px;}
     .empty-state p{font-size:14px;}
     .divider{height:1px;background:var(--grigio);margin:22px 0;}
+
+    /* DESCRIZIONE ESPANDIBILE */
+    .hero-desc{color:rgba(255,255,255,0.62);font-size:13px;line-height:1.65;max-width:560px;}
+    .hero-desc-full{display:none;}
+    .hero-desc-toggle{background:none;border:none;color:var(--verde-accento);font-size:12px;cursor:pointer;padding:0;margin-top:4px;font-family:'DM Sans',sans-serif;display:none;}
+    .hero-desc-toggle:hover{opacity:0.8;}
   </style>
 </head>
 <body>
@@ -137,6 +142,7 @@
           <h1 class="hero-nome" id="nome-hotel">Caricamento...</h1>
           <p class="hero-zona" id="hero-zona"></p>
           <p class="hero-desc" id="hero-desc"></p>
+          <button class="hero-desc-toggle" id="hero-desc-toggle" onclick="toggleDesc()"></button>
           <div class="hero-tags" id="hero-tags"></div>
         </div>
       </div>
@@ -245,6 +251,20 @@
       btn.innerHTML=isOpen?'▸ Vedi distribuzione punteggi per stelle':'▾ Nascondi distribuzione';
     }
 
+    function toggleDesc(){
+      const el = document.getElementById('hero-desc');
+      const btn = document.getElementById('hero-desc-toggle');
+      if(el.dataset.expanded === 'false'){
+        el.innerText = el.dataset.full;
+        el.dataset.expanded = 'true';
+        btn.innerText = '▴ Mostra meno';
+      } else {
+        el.innerText = el.dataset.short;
+        el.dataset.expanded = 'false';
+        btn.innerText = '▸ Leggi di più';
+      }
+    }
+
     async function caricaDettagli(){
       if(!nomeAzienda)return;
       document.getElementById('nome-hotel').innerText=nomeAzienda;
@@ -265,17 +285,35 @@
         .maybeSingle();
 
       if(profilo){
-        if(profilo.foto_url){
-          document.getElementById('hero-logo').innerHTML=`<img src="${profilo.foto_url}" alt="">`;
+        // ── FOTO ──
+        const logoEl = document.getElementById('hero-logo');
+        if(profilo.foto_url && profilo.foto_url.trim() !== ''){
+          logoEl.innerHTML = `<img src="${profilo.foto_url}" alt="${nomeAzienda}" onerror="this.parentElement.innerHTML='🏢'">`;
         }
+        // ── ZONA ──
         if(profilo.zona){
           document.getElementById('hero-zona').innerText='📍 '+profilo.zona+' · Valle d\'Aosta';
         } else {
           document.getElementById('hero-zona').innerText="Valle d'Aosta · Hospitality";
         }
-        if(profilo.descrizione){
-          document.getElementById('hero-desc').innerText=profilo.descrizione;
+        // ── DESCRIZIONE con "leggi di più" se > 160 caratteri ──
+        const descEl = document.getElementById('hero-desc');
+        const toggleBtn = document.getElementById('hero-desc-toggle');
+        if(profilo.descrizione && profilo.descrizione.trim()){
+          const desc = profilo.descrizione.trim();
+          const LIMIT = 160;
+          if(desc.length > LIMIT){
+            descEl.innerText = desc.substring(0, LIMIT) + '…';
+            descEl.dataset.full = desc;
+            descEl.dataset.short = desc.substring(0, LIMIT) + '…';
+            descEl.dataset.expanded = 'false';
+            toggleBtn.style.display = 'inline-block';
+            toggleBtn.innerText = '▸ Leggi di più';
+          } else {
+            descEl.innerText = desc;
+          }
         }
+        // ── TAG ──
         const tags=[];
         if(profilo.num_dipendenti)tags.push('👥 '+profilo.num_dipendenti+' dipendenti');
         if(profilo.sito_web)tags.push(`<a href="${profilo.sito_web}" target="_blank" style="color:rgba(255,255,255,0.6);text-decoration:none;">🌐 Sito web</a>`);
