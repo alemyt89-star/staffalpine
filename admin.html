@@ -177,7 +177,7 @@
         if(l.lingua_tedesco&&l.lingua_tedesco!=='Nessuno')lingue.push(`🇩🇪 ${l.lingua_tedesco}`);
         if(l.lingua_spagnolo&&l.lingua_spagnolo!=='Nessuno')lingue.push(`🇪🇸 ${l.lingua_spagnolo}`);
         return `
-        <div class="card" style="margin-bottom:12px;">
+        <div class="card" style="margin-bottom:12px;" data-lav-id="${l.user_id}">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
             <div>
               <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
@@ -204,13 +204,23 @@
     }
 
     async function eliminaLavoratore(userId){
-      if(!confirm('⚠️ Eliminare questo profilo lavoratore?\n\nVerranno cancellati:\n- Profilo e esperienze\n- Notifiche ricevute\n\nL\'utente potrà re-registrarsi con la stessa email.'))return;
+      if(!confirm('⚠️ Eliminare questo profilo lavoratore?\n\nVerranno cancellati:\n- Profilo e esperienze\n- Notifiche ricevute\n- Recensioni scritte\n\n✉️ L\'utente potrà rilogare e ricreare il profilo con la stessa email.'))return;
       try {
         await supabaseClient.from('notifiche_lavoratori').delete().eq('lavoratore_id',userId);
+        await supabaseClient.from('RECENSIONI').delete().eq('USER_HASH',userId);
         const{error}=await supabaseClient.from('esperienze_lavoratori').delete().eq('user_id',userId);
         if(error){alert('Errore: '+error.message);return;}
-        await caricaLavoratori();
-        alert('✅ Profilo lavoratore eliminato.');
+
+        // Rimuovi la card dal DOM senza ricaricare tutto
+        const card=document.querySelector(`[data-lav-id="${userId}"]`);
+        if(card) card.remove();
+
+        // Aggiorna badge contatore
+        const badgeEl=document.getElementById('badge-lav');
+        const current=parseInt(badgeEl.innerText)||0;
+        badgeEl.innerText=Math.max(0,current-1)||'';
+
+        alert('✅ Profilo lavoratore eliminato.\n✉️ L\'utente può rilogare con la stessa email e ricreare il profilo.');
       } catch(e){alert('Errore durante eliminazione: '+e.message);}
     }
 
@@ -401,7 +411,7 @@
         const prem=az.is_premium===true;
         const app=az.is_approvata===true;
         return `
-          <div class="azienda-card">
+          <div class="azienda-card" data-az-id="${az.id}">
             <div class="azienda-card-top">
               <div class="az-info">
                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
@@ -550,15 +560,30 @@
     }
 
     async function eliminaAzienda(id){
-      if(!confirm("⚠️ Eliminare questa azienda?\n\nVerranno cancellati:\n- Profilo azienda\n- Offerte di lavoro\n- Notifiche ai lavoratori\n- Richieste Premium\n\nL'utente potrà re-registrarsi con la stessa email."))return;
+      // Recupera nome azienda per cancellare recensioni collegate
+      const{data:az}=await supabaseClient.from('profili_aziende').select('nome_azienda').eq('id',id).maybeSingle();
+      const nomeAz=az?.nome_azienda||'';
+
+      if(!confirm(`⚠️ Eliminare "${nomeAz}"?\n\nVerranno cancellati:\n- Profilo azienda\n- Offerte di lavoro\n- Notifiche ai lavoratori\n- Richieste Premium\n- Recensioni collegate\n\n✉️ L'utente potrà rilogare e ricreare il profilo con la stessa email.`))return;
+
       try {
         await supabaseClient.from('notifiche_lavoratori').delete().eq('azienda_id',id);
         await supabaseClient.from('offerte_lavoro').delete().eq('azienda_id',id);
         await supabaseClient.from('richieste_premium').delete().eq('azienda_id',id);
+        if(nomeAz) await supabaseClient.from('RECENSIONI').delete().ilike('AZIENDA',nomeAz);
         const{error}=await supabaseClient.from('profili_aziende').delete().eq('id',id);
         if(error){alert('Errore: '+error.message);return;}
-        await caricaAziende();
-        alert('✅ Azienda eliminata.');
+
+        // Rimuovi la card dal DOM senza ricaricare tutto
+        const card=document.querySelector(`[data-az-id="${id}"]`);
+        if(card) card.remove();
+
+        // Aggiorna badge contatore
+        const badgeEl=document.getElementById('badge-az');
+        const current=parseInt(badgeEl.innerText)||0;
+        badgeEl.innerText=Math.max(0,current-1)||'';
+
+        alert(`✅ "${nomeAz}" eliminata.\n✉️ L'utente può rilogare con la stessa email e ricreare il profilo.`);
       } catch(e){alert('Errore durante eliminazione: '+e.message);}
     }
 
