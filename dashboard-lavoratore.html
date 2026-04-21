@@ -741,21 +741,30 @@
     const _fromPage = new URLSearchParams(window.location.search).get('from');
 
     // ── HELPER UPLOAD FILE ──
+    function aggiornaLabelFile(input, n){
+      if(input.files && input.files[0]){
+        if(input.files[0].size > 5*1024*1024){ alert('File troppo grande — max 5MB'); input.value=''; return; }
+        var lbl = document.getElementById('edit-exp' + n + '-doc-label');
+        if(lbl) lbl.innerText = '✅ ' + input.files[0].name;
+      }
+    }
+
     function apriFileInput(n){
       var el = document.getElementById('edit-exp' + n + '-doc');
       if(el) el.click();
     }
 
     function buildUploadAreaHTML(n){
-      return '<div style="font-size:11px;font-weight:700;color:var(--pietra);text-transform:uppercase;letter-spacing:1px;display:block;margin-top:10px;margin-bottom:6px;">📎 Carica documento per ottenere il badge</div>'
-        + '<div class="file-upload-area">'
-        + '<span style="font-size:22px;">📄</span>'
-        + '<span style="font-size:13px;color:var(--pietra);">Busta paga, contratto o cedolino</span>'
-        + '<span style="font-size:11px;color:var(--pietra);">PDF, JPG, PNG · Max 5MB</span>'
-        + '<span style="font-size:12px;color:var(--verde);font-weight:600;min-height:16px;" id="edit-exp' + n + '-doc-label"></span>'
-        + '<input type="file" id="edit-exp' + n + '-doc" accept="image/*,application/pdf" style="display:none;" onchange="mostraFileEditExp(this,'edit-exp' + n + '-doc-label')">'
-        + '<button type="button" class="file-upload-btn" onclick="apriFileInput(' + n + ')">📂 Scegli file</button>'
-        + '</div>';
+      var html = '<div style="font-size:11px;font-weight:700;color:var(--pietra);text-transform:uppercase;letter-spacing:1px;margin-top:10px;margin-bottom:6px;">📎 Carica documento per ottenere il badge</div>';
+      html += '<div class="file-upload-area">';
+      html += '<span style="font-size:22px;">📄</span>';
+      html += '<span style="font-size:13px;color:var(--pietra);">Busta paga, contratto o cedolino</span>';
+      html += '<span style="font-size:11px;color:var(--pietra);">PDF, JPG, PNG · Max 5MB</span>';
+      html += '<span style="font-size:12px;color:var(--verde);font-weight:600;min-height:16px;" id="edit-exp' + n + '-doc-label"></span>';
+      html += '<input type="file" id="edit-exp' + n + '-doc" accept="image/*,application/pdf" style="display:none;" onchange="aggiornaLabelFile(this,' + n + ')">';
+      html += '<button type="button" class="file-upload-btn" onclick="apriFileInput(' + n + ')">📂 Scegli file</button>';
+      html += '</div>';
+      return html;
     }
 
     // ── ESPERIENZE DINAMICHE ──
