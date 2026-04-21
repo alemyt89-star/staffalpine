@@ -229,9 +229,24 @@
     .ob-btn-skip{flex:1;background:none;border:1px solid rgba(0,0,0,0.1);color:var(--pietra);padding:12px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;}
     .ob-btn-next{flex:2;background:linear-gradient(135deg,var(--verde),var(--verde-chiaro));color:white;border:none;padding:12px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.3s;}
     .ob-btn-next:hover{transform:translateY(-1px);}
+
+    /* COOKIE BANNER */
+    #cookie-banner{position:fixed;bottom:0;left:0;right:0;background:var(--scuro);color:rgba(255,255,255,0.85);padding:14px 5%;display:flex;align-items:center;justify-content:space-between;gap:16px;z-index:9998;flex-wrap:wrap;box-shadow:0 -4px 20px rgba(0,0,0,0.2);}
+    #cookie-banner p{font-size:12px;line-height:1.5;flex:1;min-width:220px;}
+    #cookie-banner a{color:var(--oro-chiaro);text-decoration:underline;}
+    #cookie-banner .cookie-btn{background:var(--verde-chiaro);color:white;border:none;padding:9px 20px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+    #cookie-banner .cookie-btn:hover{opacity:0.9;}
   </style>
 </head>
 <body>
+
+  <!-- COOKIE BANNER -->
+  <div id="cookie-banner" style="display:none;">
+    <p>🍪 Usiamo cookie tecnici essenziali per il funzionamento della piattaforma. Nessun cookie pubblicitario.
+      <a href="cookie-policy.html" target="_blank">Cookie Policy</a> · <a href="informativa-privacy.html" target="_blank">Privacy</a>
+    </p>
+    <button class="cookie-btn" onclick="accettaCookie()">Ho capito ✓</button>
+  </div>
 
   <!-- MODALE PROFILO LAVORATORE -->
   <div id="modal-lavoratore" class="modal-overlay" onclick="chiudiModaleLavoratore(event)">
@@ -1463,6 +1478,15 @@
         alert("✅ Profilo pubblico eliminato.");
         location.reload();
       } else alert("Errore: "+error.message);
+    }
+
+    // ══ COOKIE BANNER ══
+    function accettaCookie(){
+      localStorage.setItem('staffalpine_cookie_ok','1');
+      document.getElementById('cookie-banner').style.display='none';
+    }
+    if(!localStorage.getItem('staffalpine_cookie_ok')){
+      document.getElementById('cookie-banner').style.display='flex';
     }
 
     inizializzaDashboard();

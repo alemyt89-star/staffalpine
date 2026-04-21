@@ -547,8 +547,21 @@
 
     async function approvaAzienda(id){
       const{error}=await supabaseClient.from('profili_aziende').update({is_approvata:true}).eq('id',id);
-      if(error)alert("Errore: "+error.message);
-      else caricaAziende();
+      if(error){alert("Errore: "+error.message);return;}
+
+      // Recupera email e nome azienda per mandare la notifica
+      try {
+        const{data:az}=await supabaseClient.from('profili_aziende').select('nome_azienda,email').eq('id',id).maybeSingle();
+        if(az?.email){
+          await fetch('/api/conferma-azienda-approvata', {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({ nomeAzienda: az.nome_azienda||'Azienda', email: az.email })
+          });
+        }
+      } catch(e){ console.log('Email approvazione non inviata:',e); }
+
+      caricaAziende();
     }
 
     async function togglePremium(id,attuale){
