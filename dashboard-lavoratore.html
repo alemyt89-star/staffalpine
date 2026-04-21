@@ -730,6 +730,23 @@
     let _expCount = 2; // fisse 1+2, quelle extra partono da 3
 
     function buildExpExtraHTML(n, dati = {}){
+      // Area verifica: badge già verificato, pending, o form upload
+      let verificaHTML = '';
+      if(dati.verificata){
+        verificaHTML = `<p style="font-size:12px;color:var(--verde);font-weight:700;margin-top:8px;">✅ Esperienza verificata</p>`;
+      } else if(dati.pending){
+        verificaHTML = `<p style="font-size:12px;color:var(--oro);font-weight:700;margin-top:8px;">⏳ Documento in attesa di verifica</p>`;
+      } else {
+        verificaHTML = `
+          <label style="font-size:11px;font-weight:700;color:var(--pietra);text-transform:uppercase;letter-spacing:1px;display:block;margin-top:10px;margin-bottom:6px;">📎 Carica documento per ottenere il badge</label>
+          <label class="file-wrap-modal" for="edit-exp${n}-doc">
+            <span style="font-size:22px;">📄</span>
+            <span style="font-size:13px;color:var(--pietra);">Busta paga, contratto o cedolino</span>
+            <span style="font-size:11px;color:var(--pietra);">PDF, JPG, PNG · Max 5MB</span>
+            <span style="font-size:12px;color:var(--verde);font-weight:600;" id="edit-exp${n}-doc-label"></span>
+            <input type="file" id="edit-exp${n}-doc" accept="image/*,application/pdf" onchange="mostraFileEditExp(this,'edit-exp${n}-doc-label')">
+          </label>`;
+      }
       return `
         <div class="exp-extra-block" id="exp-extra-block-${n}">
           <button class="btn-remove-exp" onclick="rimuoviEsperienza(${n})">✕ Rimuovi</button>
@@ -746,6 +763,7 @@
             <div class="form-group"><label class="form-label">Dal</label><input type="month" id="edit-exp${n}-dal" class="form-control" value="${dati.dal||''}"></div>
             <div class="form-group"><label class="form-label">Al</label><input type="month" id="edit-exp${n}-al" class="form-control" value="${dati.al||''}"></div>
           </div>
+          <div id="edit-exp${n}-verifica-area">${verificaHTML}</div>
         </div>`;
     }
 
@@ -769,10 +787,20 @@
           b.id = `exp-extra-block-${nuovo}`;
           b.querySelector('div[style*="Esperienza"]').innerText = `Esperienza ${nuovo}`;
           b.querySelector('.btn-remove-exp').setAttribute('onclick', `rimuoviEsperienza(${nuovo})`);
-          ['mansione','azienda','zona','dal','al'].forEach(f => {
+          ['mansione','azienda','zona','dal','al','verifica-area','doc-label'].forEach(f => {
             const el = b.querySelector(`[id="edit-exp${vecchio}-${f}"]`);
             if(el) el.id = `edit-exp${nuovo}-${f}`;
           });
+          // Aggiorna anche l'input file e la label for
+          const fileInput = b.querySelector(`input[type="file"]`);
+          if(fileInput){
+            fileInput.id = `edit-exp${nuovo}-doc`;
+            fileInput.setAttribute('onchange', `mostraFileEditExp(this,'edit-exp${nuovo}-doc-label')`);
+          }
+          const fileLabel = b.querySelector(`label[for]`);
+          if(fileLabel && fileLabel.getAttribute('for').startsWith('edit-exp')){
+            fileLabel.setAttribute('for', `edit-exp${nuovo}-doc`);
+          }
         }
       });
       aggiornaStatoTasto();
@@ -859,10 +887,12 @@
             _expCount = n;
             const container = document.getElementById('extra-esperienze-container');
             container.insertAdjacentHTML('beforeend', buildExpExtraHTML(n, {
-              mansione: prof[`exp${n}_mansione`]||'',
-              azienda:  prof[`exp${n}_azienda`]||'',
-              dal:      prof[`exp${n}_dal`]||'',
-              al:       prof[`exp${n}_al`]||''
+              mansione:   prof[`exp${n}_mansione`]||'',
+              azienda:    prof[`exp${n}_azienda`]||'',
+              dal:        prof[`exp${n}_dal`]||'',
+              al:         prof[`exp${n}_al`]||'',
+              verificata: prof[`exp${n}_verificata`]||false,
+              pending:    prof[`exp${n}_verifica_pending`]||false
             }));
             // Imposta la località dopo inserimento DOM
             setTimeout(()=>{
@@ -898,6 +928,9 @@
 
       const exp1DocPath = await uploadDoc('edit-exp1-doc', `${user.id}/exp1`);
       const exp2DocPath = await uploadDoc('edit-exp2-doc', `${user.id}/exp2`);
+      const exp3DocPath = await uploadDoc('edit-exp3-doc', `${user.id}/exp3`);
+      const exp4DocPath = await uploadDoc('edit-exp4-doc', `${user.id}/exp4`);
+      const exp5DocPath = await uploadDoc('edit-exp5-doc', `${user.id}/exp5`);
 
       // Raccoglie dati esperienze extra 3/4/5
       const getVal = (id) => { const el = document.getElementById(id); return el ? el.value||null : null; };
@@ -945,10 +978,14 @@
         ...expExtra,
         ...(exp1DocPath && { exp1_doc_url: exp1DocPath, exp1_verificata: false, exp1_verifica_pending: true }),
         ...(exp2DocPath && { exp2_doc_url: exp2DocPath, exp2_verificata: false, exp2_verifica_pending: true }),
+        ...(exp3DocPath && { exp3_doc_url: exp3DocPath, exp3_verificata: false, exp3_verifica_pending: true }),
+        ...(exp4DocPath && { exp4_doc_url: exp4DocPath, exp4_verificata: false, exp4_verifica_pending: true }),
+        ...(exp5DocPath && { exp5_doc_url: exp5DocPath, exp5_verificata: false, exp5_verifica_pending: true }),
       };
       const{error}=await supabaseClient.from('esperienze_lavoratori').update(aggiornamenti).eq('user_id',user.id);
       if(!error){
-        const msgDoc = (exp1DocPath||exp2DocPath) ? '\n📎 Documento caricato — riceverai il badge ✅ dopo la verifica.' : '';
+        const anyDoc = exp1DocPath||exp2DocPath||exp3DocPath||exp4DocPath||exp5DocPath;
+        const msgDoc = anyDoc ? '\n📎 Documento caricato — riceverai il badge ✅ dopo la verifica.' : '';
         alert('✅ Profilo aggiornato!' + msgDoc);
         document.getElementById('modal-modifica').style.display='none';
         caricaProfilo(user.id);
