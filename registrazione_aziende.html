@@ -273,13 +273,36 @@
     const SUPABASE_KEY="sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX";
     const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
+    // ── Legge la mail dall'URL se arriva da login.html ──
+    const _urlParams = new URLSearchParams(window.location.search);
+    const _emailDaLogin = _urlParams.get('email');
+    let _sessioneAttiva = false; // true se la sessione Supabase è già attiva
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      if(_emailDaLogin){
+        // Precompila il campo email e lo blocca
+        const emailField = document.getElementById('email_azienda');
+        emailField.value = _emailDaLogin;
+        emailField.readOnly = true;
+        emailField.style.opacity = '0.6';
+        emailField.style.cursor = 'not-allowed';
+
+        // Verifica se c'è già una sessione attiva
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if(session && session.user && session.user.email === _emailDaLogin){
+          _sessioneAttiva = true;
+          // Cambia il tasto: non serve più il codice OTP
+          document.getElementById('btn-step1').innerHTML = '✅ Completa Registrazione →';
+        }
+      }
+    });
+
     // Avanza automaticamente tra i campi OTP
     function avanzaOTP(el, pos){
       el.value=el.value.replace(/[^0-9]/g,'');
       if(el.value.length===1 && pos<6){
         document.querySelectorAll('.otp-digit')[pos].focus();
       }
-      // Auto-submit quando tutti e 6 sono compilati
       const digits=document.querySelectorAll('.otp-digit');
       const codice=[...digits].map(d=>d.value).join('');
       if(codice.length===6)completaRegistrazione();
@@ -319,8 +342,18 @@
       if(!convalidaPIVA(piva))return alert("La Partita IVA inserita non è valida. Controlla i dati.");
 
       const btn=document.getElementById('btn-step1');
-      btn.disabled=true;btn.innerHTML='⏳ Invio in corso...';
+      btn.disabled=true;btn.innerHTML='⏳ Salvataggio in corso...';
 
+      // ── CASO A: sessione già attiva (arriva da login.html) ──
+      // Non serve un nuovo OTP — salviamo direttamente nel DB
+      if(_sessioneAttiva){
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        const userId = session.user.id;
+        await salvaAziendaDB(userId, ragione, piva, email, btn);
+        return;
+      }
+
+      // ── CASO B: accesso diretto alla pagina — serve OTP ──
       const{error}=await supabaseClient.auth.signInWithOtp({email});
       if(error){
         alert("Errore: "+error.message);
@@ -328,12 +361,10 @@
         return;
       }
 
-      // Aggiorna step indicator
       document.getElementById('dot-1').className='step-dot done';
       document.getElementById('dot-1').innerText='✓';
       document.getElementById('line-1').className='step-line done';
       document.getElementById('dot-2').className='step-dot active';
-
       document.getElementById('otp-desc').innerText=`Codice inviato a ${email}. Controlla anche la cartella spam.`;
       document.getElementById('step-1').classList.remove('active');
       document.getElementById('step-2').classList.add('active');
@@ -360,8 +391,12 @@
         return;
       }
 
+      await salvaAziendaDB(data.user.id, ragione, piva, email, btn);
+    }
+
+    async function salvaAziendaDB(userId, ragione, piva, email, btn){
       const{error:dbError}=await supabaseClient.from('profili_aziende').upsert([{
-        id:data.user.id,
+        id:userId,
         nome_azienda:ragione,
         partita_iva:piva,
         email:email,
@@ -370,11 +405,10 @@
 
       if(dbError){
         alert("Errore nel salvataggio: "+dbError.message);
-        btn.disabled=false;btn.innerHTML='✅ Verifica e Registrati';
+        if(btn){ btn.disabled=false; btn.innerHTML='Ricevi Codice di Accesso →'; }
         return;
       }
 
-      // Invia email di conferma all'azienda + notifica ad Alexandra
       try {
         await fetch('/api/conferma-azienda', {
           method: 'POST',
