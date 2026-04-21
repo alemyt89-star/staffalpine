@@ -936,8 +936,8 @@
         const input = document.getElementById(inputId);
         if(!input || !input.files || input.files.length === 0) return null;
         const file = input.files[0];
-        const { error } = await supabaseClient.storage.from('verifiche-esperienze').upload(path, file, { upsert:true, contentType: file.type });
-        if(error){ console.log('Upload error:', error.message); return null; }
+        const { data, error } = await supabaseClient.storage.from('verifiche-esperienze').upload(path, file, { upsert:true, contentType: file.type });
+        if(error){ console.log('Upload error '+inputId+':', error.message); return null; }
         return path;
       };
 
@@ -957,6 +957,12 @@
         expExtra[`exp${n}_dal`]      = getVal(`edit-exp${n}-dal`);
         expExtra[`exp${n}_al`]       = getVal(`edit-exp${n}-al`);
       }
+
+      // Verifica flags — controlla se l'input file ha un file selezionato (indipendentemente dal risultato upload)
+      const hasFile = (inputId) => {
+        const el = document.getElementById(inputId);
+        return el && el.files && el.files.length > 0;
+      };
 
       const aggiornamenti={
         email:user.email,
@@ -991,11 +997,16 @@
         exp2_dal:document.getElementById('edit-exp2-dal').value||null,
         exp2_al:document.getElementById('edit-exp2-al').value||null,
         ...expExtra,
-        ...(exp1DocPath && { exp1_doc_url: exp1DocPath, exp1_verificata: false, exp1_verifica_pending: true }),
-        ...(exp2DocPath && { exp2_doc_url: exp2DocPath, exp2_verificata: false, exp2_verifica_pending: true }),
-        ...(exp3DocPath && { exp3_doc_url: exp3DocPath, exp3_verificata: false, exp3_verifica_pending: true }),
-        ...(exp4DocPath && { exp4_doc_url: exp4DocPath, exp4_verificata: false, exp4_verifica_pending: true }),
-        ...(exp5DocPath && { exp5_doc_url: exp5DocPath, exp5_verificata: false, exp5_verifica_pending: true }),
+        // exp1 e exp2: solo se doc caricato con successo
+        ...(exp1DocPath ? { exp1_doc_url: exp1DocPath, exp1_verificata: false, exp1_verifica_pending: true } : {}),
+        ...(exp2DocPath ? { exp2_doc_url: exp2DocPath, exp2_verificata: false, exp2_verifica_pending: true } : {}),
+        // exp3/4/5: pending=true se il file era presente nell'input (anche se upload fallisce registra l'intenzione)
+        ...(exp3DocPath ? { exp3_doc_url: exp3DocPath, exp3_verificata: false, exp3_verifica_pending: true }
+            : hasFile('edit-exp3-doc') ? { exp3_verificata: false, exp3_verifica_pending: true } : {}),
+        ...(exp4DocPath ? { exp4_doc_url: exp4DocPath, exp4_verificata: false, exp4_verifica_pending: true }
+            : hasFile('edit-exp4-doc') ? { exp4_verificata: false, exp4_verifica_pending: true } : {}),
+        ...(exp5DocPath ? { exp5_doc_url: exp5DocPath, exp5_verificata: false, exp5_verifica_pending: true }
+            : hasFile('edit-exp5-doc') ? { exp5_verificata: false, exp5_verifica_pending: true } : {}),
       };
       const{error}=await supabaseClient.from('esperienze_lavoratori').update(aggiornamenti).eq('user_id',user.id);
       if(!error){
