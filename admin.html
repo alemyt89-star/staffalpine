@@ -204,9 +204,12 @@
     }
 
     async function eliminaLavoratore(userId){
-      if(!confirm('Eliminare questo profilo lavoratore?'))return;
+      if(!confirm("⚠️ Eliminare questo profilo lavoratore?\n\nVerranno cancellati:\n- Profilo e esperienze\n- Notifiche ricevute\n\nL'utente potrà re-registrarsi con la stessa email."))return;
+      await supabaseClient.from('notifiche_lavoratori').delete().eq('lavoratore_id',userId);
       await supabaseClient.from('esperienze_lavoratori').delete().eq('user_id',userId);
+      // Nota: l'utente in auth.users rimane — potrà re-registrarsi con la stessa email
       caricaLavoratori();
+      alert('✅ Profilo lavoratore eliminato.');
     }
 
     async function caricaOfferteAdmin(){
@@ -545,9 +548,15 @@
     }
 
     async function eliminaAzienda(id){
-      if(!confirm("Eliminare questa azienda?"))return;
+      if(!confirm("⚠️ Eliminare questa azienda?\n\nVerranno cancellati:\n- Profilo azienda\n- Offerte di lavoro\n- Notifiche ai lavoratori\n- Richieste Premium\n\nL'utente potrà re-registrarsi con la stessa email."))return;
+      // Cancella in cascata tutto il collegato
+      await supabaseClient.from('notifiche_lavoratori').delete().eq('azienda_id',id);
+      await supabaseClient.from('offerte_lavoro').delete().eq('azienda_id',id);
+      await supabaseClient.from('richieste_premium').delete().eq('azienda_id',id);
       await supabaseClient.from('profili_aziende').delete().eq('id',id);
+      // Nota: l'utente in auth.users rimane — potrà re-registrarsi con la stessa email
       caricaAziende();
+      alert('✅ Azienda eliminata. L\'utente può re-registrarsi con la stessa email.');
     }
 
     async function caricaRichiestePremium(){
