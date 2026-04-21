@@ -141,6 +141,15 @@
     .ob-btns{display:flex;gap:10px;}
     .ob-skip{flex:1;background:none;border:1px solid rgba(0,0,0,0.1);color:var(--pietra);padding:11px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;}
     .ob-next{flex:2;background:linear-gradient(135deg,var(--verde),var(--verde-chiaro));color:white;border:none;padding:11px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;}
+
+    /* AGGIUNGI ESPERIENZA */
+    .btn-add-exp{display:inline-flex;align-items:center;gap:8px;background:none;border:2px dashed var(--verde-chiaro);color:var(--verde);padding:10px 18px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;width:100%;justify-content:center;margin-bottom:10px;}
+    .btn-add-exp:hover{background:#e8f5e9;border-color:var(--verde);}
+    .btn-add-exp:disabled{opacity:0.4;cursor:not-allowed;}
+    .exp-extra-block{background:var(--grigio);border-radius:10px;padding:12px;margin-bottom:10px;position:relative;animation:fadeInExp 0.25s ease;}
+    @keyframes fadeInExp{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+    .btn-remove-exp{position:absolute;top:10px;right:10px;background:#fde8e8;color:var(--rosso);border:none;border-radius:6px;font-size:11px;font-weight:700;padding:4px 8px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+    .btn-remove-exp:hover{background:#fca5a5;}
   </style>
 </head>
 <body>
@@ -150,7 +159,7 @@
     <div class="nav-user">
       <span class="nav-user-name" id="nav-nome"></span>
       <span id="nav-badge-proposte" onclick="showTab('proposte',document.getElementById('tab-proposte'))" style="display:none;background:var(--rosso);color:white;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;cursor:pointer;" title="Proposte ricevute">🔔 <span id="nav-badge-num">0</span></span>
-
+      <span id="nav-back-btn" style="display:none;"></span>
       <button class="hamburger-btn" onclick="apriDrawer()" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>
   </nav>
@@ -296,7 +305,7 @@
         </div>
       </div>
       <!-- STORICO ESPERIENZE -->
-      <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pietra);margin-bottom:8px;font-weight:600;margin-top:4px;">Esperienze (ultime 2)</div>
+      <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pietra);margin-bottom:8px;font-weight:600;margin-top:4px;">Esperienze (fino a 5)</div>
 
       <!-- Avviso dati sensibili -->
       <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:10px;padding:12px 14px;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start;">
@@ -307,6 +316,7 @@
         </div>
       </div>
 
+      <!-- ESP 1 — fissa -->
       <div style="background:var(--grigio);border-radius:10px;padding:12px;margin-bottom:10px;">
         <div style="font-size:11px;font-weight:700;color:var(--pietra);margin-bottom:8px;">Esperienza 1</div>
         <div class="form-row">
@@ -328,6 +338,7 @@
         <div id="edit-exp1-verifica-area"></div>
       </div>
 
+      <!-- ESP 2 — fissa -->
       <div style="background:var(--grigio);border-radius:10px;padding:12px;margin-bottom:10px;">
         <div style="font-size:11px;font-weight:700;color:var(--pietra);margin-bottom:8px;">Esperienza 2</div>
         <div class="form-row">
@@ -348,6 +359,16 @@
         </div>
         <div id="edit-exp2-verifica-area"></div>
       </div>
+
+      <!-- ESP 3/4/5 — dinamiche -->
+      <div id="extra-esperienze-container"></div>
+
+      <!-- TASTO AGGIUNGI -->
+      <button class="btn-add-exp" id="btn-aggiungi-exp" onclick="aggiungiEsperienza()">
+        ＋ Aggiungi un'altra esperienza
+      </button>
+      <p id="exp-limit-msg" style="font-size:11px;color:var(--pietra);text-align:center;display:none;margin-bottom:10px;">✓ Hai raggiunto il massimo di 5 esperienze.</p>
+
       <!-- CERTIFICAZIONI -->
       <div class="form-group">
         <label class="form-label">Certificazioni</label>
@@ -427,6 +448,14 @@
       const{data:{user},error}=await supabaseClient.auth.getUser();
       if(error||!user){window.location.replace('login.html');return;}
       document.body.style.visibility='visible';
+      // Tasto indietro se proveniente da altra pagina
+      if(_fromPage){
+        const backEl = document.getElementById('nav-back-btn');
+        if(backEl){
+          backEl.style.display='inline-block';
+          backEl.innerHTML=`<button onclick="window.location.href='${_fromPage}.html'" style="background:none;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.7);padding:5px 12px;border-radius:8px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;">← Torna indietro</button>`;
+        }
+      }
       caricaProfilo(user.id);
       caricaNotifiche();
       caricaMieRecensioni();
@@ -692,6 +721,75 @@
         </div>`).join('');
     }
 
+    // ── TASTO INDIETRO ──
+    const _fromPage = new URLSearchParams(window.location.search).get('from');
+
+    // ── ESPERIENZE DINAMICHE ──
+    const COMUNI_OPTIONS = `<option value="">— Seleziona —</option><option value="Allein">Allein</option><option value="Antey-Saint-André">Antey-Saint-André</option><option value="Aoste / Aosta">Aoste / Aosta</option><option value="Arnad">Arnad</option><option value="Arvier">Arvier</option><option value="Avise">Avise</option><option value="Ayas">Ayas</option><option value="Aymavilles">Aymavilles</option><option value="Bard">Bard</option><option value="Bionaz">Bionaz</option><option value="Brissogne">Brissogne</option><option value="Brusson">Brusson</option><option value="Challand-Saint-Anselme">Challand-Saint-Anselme</option><option value="Challand-Saint-Victor">Challand-Saint-Victor</option><option value="Chambave">Chambave</option><option value="Chamois">Chamois</option><option value="Champdepraz">Champdepraz</option><option value="Champorcher">Champorcher</option><option value="Charvensod">Charvensod</option><option value="Châtillon">Châtillon</option><option value="Cogne">Cogne</option><option value="Courmayeur">Courmayeur</option><option value="Donnas">Donnas</option><option value="Doues">Doues</option><option value="Emarèse">Emarèse</option><option value="Etroubles">Etroubles</option><option value="Fénis">Fénis</option><option value="Fontainemore">Fontainemore</option><option value="Gaby">Gaby</option><option value="Gignod">Gignod</option><option value="Gran San Bernardo">Gran San Bernardo</option><option value="Gressan">Gressan</option><option value="Gressoney-La-Trinité">Gressoney-La-Trinité</option><option value="Gressoney-Saint-Jean">Gressoney-Saint-Jean</option><option value="Hône">Hône</option><option value="Introd">Introd</option><option value="Issime">Issime</option><option value="Issogne">Issogne</option><option value="La Magdeleine">La Magdeleine</option><option value="La Salle">La Salle</option><option value="La Thuile">La Thuile</option><option value="Lillianes">Lillianes</option><option value="Montjovet">Montjovet</option><option value="Morgex">Morgex</option><option value="Nus">Nus</option><option value="Ollomont">Ollomont</option><option value="Oyace">Oyace</option><option value="Perloz">Perloz</option><option value="Pollein">Pollein</option><option value="Pontboset">Pontboset</option><option value="Pontey">Pontey</option><option value="Pont-Saint-Martin">Pont-Saint-Martin</option><option value="Pré-Saint-Didier">Pré-Saint-Didier</option><option value="Quart">Quart</option><option value="Rhêmes-Notre-Dame">Rhêmes-Notre-Dame</option><option value="Rhêmes-Saint-Georges">Rhêmes-Saint-Georges</option><option value="Roisan">Roisan</option><option value="Saint-Christophe">Saint-Christophe</option><option value="Saint-Denis">Saint-Denis</option><option value="Saint-Marcel">Saint-Marcel</option><option value="Saint-Nicolas">Saint-Nicolas</option><option value="Saint-Oyen">Saint-Oyen</option><option value="Saint-Pierre">Saint-Pierre</option><option value="Saint-Rhémy-en-Bosses">Saint-Rhémy-en-Bosses</option><option value="Saint-Vincent">Saint-Vincent</option><option value="Sarre">Sarre</option><option value="Torgnon">Torgnon</option><option value="Valgrisenche">Valgrisenche</option><option value="Valpelline">Valpelline</option><option value="Valsavarenche">Valsavarenche</option><option value="Valtournenche">Valtournenche</option><option value="Verrayes">Verrayes</option><option value="Verrès">Verrès</option><option value="Villeneuve">Villeneuve</option><option value="Fuori Valle d'Aosta">Fuori Valle d'Aosta</option>`;
+
+    let _expCount = 2; // fisse 1+2, quelle extra partono da 3
+
+    function buildExpExtraHTML(n, dati = {}){
+      return `
+        <div class="exp-extra-block" id="exp-extra-block-${n}">
+          <button class="btn-remove-exp" onclick="rimuoviEsperienza(${n})">✕ Rimuovi</button>
+          <div style="font-size:11px;font-weight:700;color:var(--pietra);margin-bottom:8px;">Esperienza ${n}</div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Mansione</label><input type="text" id="edit-exp${n}-mansione" class="form-control" placeholder="es. Chef de Rang" value="${dati.mansione||''}"></div>
+            <div class="form-group"><label class="form-label">Nome Azienda</label><input type="text" id="edit-exp${n}-azienda" class="form-control" placeholder="es. Hotel Eden" value="${dati.azienda||''}"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Località</label>
+            <select id="edit-exp${n}-zona" class="form-control">${COMUNI_OPTIONS}</select>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Dal</label><input type="month" id="edit-exp${n}-dal" class="form-control" value="${dati.dal||''}"></div>
+            <div class="form-group"><label class="form-label">Al</label><input type="month" id="edit-exp${n}-al" class="form-control" value="${dati.al||''}"></div>
+          </div>
+        </div>`;
+    }
+
+    function aggiungiEsperienza(){
+      if(_expCount >= 5) return;
+      _expCount++;
+      const container = document.getElementById('extra-esperienze-container');
+      container.insertAdjacentHTML('beforeend', buildExpExtraHTML(_expCount));
+      aggiornaStatoTasto();
+    }
+
+    function rimuoviEsperienza(n){
+      const block = document.getElementById(`exp-extra-block-${n}`);
+      if(block) block.remove();
+      _expCount--;
+      // Rinumera i blocchi extra rimasti
+      document.querySelectorAll('.exp-extra-block').forEach((b, i) => {
+        const nuovo = i + 3;
+        const vecchio = parseInt(b.id.replace('exp-extra-block-',''));
+        if(vecchio !== nuovo){
+          b.id = `exp-extra-block-${nuovo}`;
+          b.querySelector('div[style*="Esperienza"]').innerText = `Esperienza ${nuovo}`;
+          b.querySelector('.btn-remove-exp').setAttribute('onclick', `rimuoviEsperienza(${nuovo})`);
+          ['mansione','azienda','zona','dal','al'].forEach(f => {
+            const el = b.querySelector(`[id="edit-exp${vecchio}-${f}"]`);
+            if(el) el.id = `edit-exp${nuovo}-${f}`;
+          });
+        }
+      });
+      aggiornaStatoTasto();
+    }
+
+    function aggiornaStatoTasto(){
+      const btn = document.getElementById('btn-aggiungi-exp');
+      const msg = document.getElementById('exp-limit-msg');
+      if(_expCount >= 5){
+        btn.style.display = 'none';
+        msg.style.display = 'block';
+      } else {
+        btn.style.display = 'flex';
+        msg.style.display = 'none';
+      }
+    }
+
     async function apriModificaProfilo(){
       const{data:{user}}=await supabaseClient.auth.getUser();
       const{data:prof}=await supabaseClient.from('esperienze_lavoratori').select('*').eq('user_id',user.id).single();
@@ -702,7 +800,6 @@
         document.getElementById('edit-fr').value=prof.lingua_francese||'Nessuno';
         document.getElementById('edit-en').value=prof.lingua_inglese||'Nessuno';
         document.getElementById('edit-de').value=prof.lingua_tedesco||'Nessuno';
-        // Altra lingua
         try {
           const extra = JSON.parse(prof.lingue_extra||'[]');
           if(extra.length > 0){
@@ -710,13 +807,11 @@
             document.getElementById('edit-altra-lingua-livello').value = extra[0].livello||'Base';
             document.getElementById('altra-lingua-livello-row').style.display = 'grid';
           } else if(prof.lingua_spagnolo && prof.lingua_spagnolo !== 'Nessuno'){
-            // Migrazione vecchi dati spagnolo
             document.getElementById('edit-altra-lingua-nome').value = 'Spagnolo';
             document.getElementById('edit-altra-lingua-livello').value = prof.lingua_spagnolo;
             document.getElementById('altra-lingua-livello-row').style.display = 'grid';
           }
         } catch(e){}
-
         document.getElementById('edit-dispo').value=prof.tipo_disponibilita||'';
         document.getElementById('edit-disponibile-dal').value=prof.disponibile_dal||'';
         document.getElementById('edit-alloggio').value=prof.bisogno_vitto_alloggio?'true':'false';
@@ -724,6 +819,7 @@
         document.getElementById('edit-sicurezza').checked=prof.cert_sicurezza;
         document.getElementById('edit-sommelier').checked=prof.cert_sommelier;
         document.getElementById('edit-barman').checked=prof.cert_barman;
+        // Esperienze 1 e 2 fisse
         document.getElementById('edit-exp1-mansione').value=prof.exp1_mansione||'';
         document.getElementById('edit-exp1-azienda').value=prof.exp1_azienda||'';
         document.getElementById('edit-exp1-zona').value=prof.exp1_zona||'';
@@ -734,7 +830,7 @@
         document.getElementById('edit-exp2-zona').value=prof.exp2_zona||'';
         document.getElementById('edit-exp2-dal').value=prof.exp2_dal||'';
         document.getElementById('edit-exp2-al').value=prof.exp2_al||'';
-        // Mostra stato verifica e upload per ogni esperienza
+        // Verifica area exp 1 e 2
         [1,2].forEach(n => {
           const area = document.getElementById(`edit-exp${n}-verifica-area`);
           const verificata = prof[`exp${n}_verificata`];
@@ -755,6 +851,27 @@
               </label>`;
           }
         });
+        // Esperienze 3/4/5 — carica quelle già salvate
+        _expCount = 2;
+        document.getElementById('extra-esperienze-container').innerHTML = '';
+        for(let n = 3; n <= 5; n++){
+          if(prof[`exp${n}_mansione`]||prof[`exp${n}_azienda`]){
+            _expCount = n;
+            const container = document.getElementById('extra-esperienze-container');
+            container.insertAdjacentHTML('beforeend', buildExpExtraHTML(n, {
+              mansione: prof[`exp${n}_mansione`]||'',
+              azienda:  prof[`exp${n}_azienda`]||'',
+              dal:      prof[`exp${n}_dal`]||'',
+              al:       prof[`exp${n}_al`]||''
+            }));
+            // Imposta la località dopo inserimento DOM
+            setTimeout(()=>{
+              const sel = document.getElementById(`edit-exp${n}-zona`);
+              if(sel) sel.value = prof[`exp${n}_zona`]||'';
+            }, 0);
+          }
+        }
+        aggiornaStatoTasto();
         document.getElementById('modal-modifica').style.display='flex';
       }
     }
@@ -770,7 +887,6 @@
     async function salvaModificheProfilo(){
       const{data:{user}}=await supabaseClient.auth.getUser();
 
-      // Upload documenti verifica se presenti
       const uploadDoc = async (inputId, path) => {
         const input = document.getElementById(inputId);
         if(!input || !input.files || input.files.length === 0) return null;
@@ -782,6 +898,17 @@
 
       const exp1DocPath = await uploadDoc('edit-exp1-doc', `${user.id}/exp1`);
       const exp2DocPath = await uploadDoc('edit-exp2-doc', `${user.id}/exp2`);
+
+      // Raccoglie dati esperienze extra 3/4/5
+      const getVal = (id) => { const el = document.getElementById(id); return el ? el.value||null : null; };
+      const expExtra = {};
+      for(let n = 3; n <= 5; n++){
+        expExtra[`exp${n}_mansione`] = getVal(`edit-exp${n}-mansione`);
+        expExtra[`exp${n}_azienda`]  = getVal(`edit-exp${n}-azienda`);
+        expExtra[`exp${n}_zona`]     = getVal(`edit-exp${n}-zona`);
+        expExtra[`exp${n}_dal`]      = getVal(`edit-exp${n}-dal`);
+        expExtra[`exp${n}_al`]       = getVal(`edit-exp${n}-al`);
+      }
 
       const aggiornamenti={
         email:user.email,
@@ -815,6 +942,7 @@
         exp2_zona:document.getElementById('edit-exp2-zona').value||null,
         exp2_dal:document.getElementById('edit-exp2-dal').value||null,
         exp2_al:document.getElementById('edit-exp2-al').value||null,
+        ...expExtra,
         ...(exp1DocPath && { exp1_doc_url: exp1DocPath, exp1_verificata: false, exp1_verifica_pending: true }),
         ...(exp2DocPath && { exp2_doc_url: exp2DocPath, exp2_verificata: false, exp2_verifica_pending: true }),
       };
