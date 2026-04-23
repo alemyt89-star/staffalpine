@@ -96,10 +96,6 @@
     .form-label{display:block;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--pietra);font-weight:600;margin-bottom:6px;}
     .form-control{width:100%;padding:11px 14px;border:1px solid rgba(0,0,0,0.1);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color 0.3s;background:var(--grigio);}
     .form-control:focus{border-color:var(--verde-chiaro);background:white;}
-    .month-wrap{display:flex;align-items:center;gap:6px;}
-    .month-wrap .form-control{flex:1;}
-    .btn-cal{background:var(--grigio);border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:10px 11px;cursor:pointer;font-size:14px;line-height:1;flex-shrink:0;}
-    .btn-cal:hover{background:#e0e0e0;}
     .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
     .cert-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;background:var(--grigio);padding:14px;border-radius:10px;border:1px solid rgba(0,0,0,0.06);}
     .cert-label{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;}
@@ -337,8 +333,8 @@
           </select>
         </div>
         <div class="form-row">
-          <div class="form-group"><label class="form-label">Dal</label><div class="month-wrap"><input type="month" id="edit-exp1-dal" class="form-control"><button type="button" class="btn-cal" onclick="apriCalendario('edit-exp1-dal')" title="Apri calendario">📅</button></div></div>
-          <div class="form-group"><label class="form-label">Al</label><div class="month-wrap"><input type="month" id="edit-exp1-al" class="form-control"><button type="button" class="btn-cal" onclick="apriCalendario('edit-exp1-al')" title="Apri calendario">📅</button></div></div>
+          <div class="form-group"><label class="form-label">Dal</label><input type="month" id="edit-exp1-dal" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Al</label><input type="month" id="edit-exp1-al" class="form-control"></div>
         </div>
         <div id="edit-exp1-verifica-area"></div>
       </div>
@@ -359,8 +355,8 @@
           </select>
         </div>
         <div class="form-row">
-          <div class="form-group"><label class="form-label">Dal</label><div class="month-wrap"><input type="month" id="edit-exp2-dal" class="form-control"><button type="button" class="btn-cal" onclick="apriCalendario('edit-exp2-dal')" title="Apri calendario">📅</button></div></div>
-          <div class="form-group"><label class="form-label">Al</label><div class="month-wrap"><input type="month" id="edit-exp2-al" class="form-control"><button type="button" class="btn-cal" onclick="apriCalendario('edit-exp2-al')" title="Apri calendario">📅</button></div></div>
+          <div class="form-group"><label class="form-label">Dal</label><input type="month" id="edit-exp2-dal" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Al</label><input type="month" id="edit-exp2-al" class="form-control"></div>
         </div>
         <div id="edit-exp2-verifica-area"></div>
       </div>
@@ -814,8 +810,8 @@
             <select id="edit-exp${n}-zona" class="form-control">${COMUNI_OPTIONS}</select>
           </div>
           <div class="form-row">
-            <div class="form-group"><label class="form-label">Dal</label><div class="month-wrap"><input type="month" id="edit-exp${n}-dal" class="form-control" value="${dati.dal||''}"><button type="button" class="btn-cal" onclick="apriCalendario('edit-exp'+n+'-dal')" title="Apri calendario">📅</button></div></div>
-            <div class="form-group"><label class="form-label">Al</label><div class="month-wrap"><input type="month" id="edit-exp${n}-al" class="form-control" value="${dati.al||''}"><button type="button" class="btn-cal" onclick="apriCalendario('edit-exp'+n+'-al')" title="Apri calendario">📅</button></div></div>
+            <div class="form-group"><label class="form-label">Dal</label><input type="month" id="edit-exp${n}-dal" class="form-control" value="${dati.dal||''}"></div>
+            <div class="form-group"><label class="form-label">Al</label><input type="month" id="edit-exp${n}-al" class="form-control" value="${dati.al||''}"></div>
           </div>
           <div id="edit-exp${n}-verifica-area">${verificaHTML}</div>
         </div>`;
@@ -1118,12 +1114,6 @@
     });
 
     // Apre il picker calendario nativo (cross-browser)
-    function apriCalendario(id){
-      var el = document.getElementById(id);
-      if(!el) return;
-      if(el.showPicker) { try{ el.showPicker(); }catch(e){ el.focus(); } }
-      else { el.focus(); el.click(); }
-    }
 
     inizializzaDashboardLavoratore();
 
