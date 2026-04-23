@@ -176,6 +176,22 @@
         if(l.lingua_inglese&&l.lingua_inglese!=='Nessuno')lingue.push(`🇬🇧 ${l.lingua_inglese}`);
         if(l.lingua_tedesco&&l.lingua_tedesco!=='Nessuno')lingue.push(`🇩🇪 ${l.lingua_tedesco}`);
         if(l.lingua_spagnolo&&l.lingua_spagnolo!=='Nessuno')lingue.push(`🇪🇸 ${l.lingua_spagnolo}`);
+        const nomeCompleto = [l.nome_reale,l.cognome_reale].filter(Boolean).join(' ');
+        const expRows = [1,2,3,4,5].map(n=>{
+          const mansione = l[`exp${n}_mansione`];
+          if(!mansione) return '';
+          const azienda = l[`exp${n}_azienda`]||'';
+          const dal = l[`exp${n}_dal`]||'';
+          const al = l[`exp${n}_al`]||'';
+          const verif = l[`exp${n}_verificata`];
+          const pending = l[`exp${n}_verifica_pending`];
+          const badge = verif
+            ? '<span style="color:var(--verde);font-weight:700;font-size:11px;">✅ Verificata</span>'
+            : pending
+              ? '<span style="color:var(--oro);font-weight:700;font-size:11px;">⏳ In attesa</span>'
+              : '';
+          return `<div style="background:var(--grigio);border-radius:8px;padding:8px 12px;font-size:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;"><span><b>Esp.${n} — ${mansione}</b>${azienda?' · '+azienda:''} ${dal?'('+dal.substring(0,7)+(al?' → '+al.substring(0,7):'')+')'  :''}</span>${badge}</div>`;
+        }).filter(Boolean).join('');
         return `
         <div class="card" style="margin-bottom:12px;" data-lav-id="${l.user_id}">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
@@ -184,20 +200,18 @@
                 <span style="background:var(--verde-chiaro);color:white;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;">${l.settore||'N/D'}</span>
                 <span style="font-size:11px;color:var(--pietra);">${l.aggiornato_il?new Date(l.aggiornato_il).toLocaleDateString('it-IT'):''}</span>
               </div>
-              <h3 style="font-family:'Playfair Display',serif;font-size:1rem;color:var(--scuro);margin-bottom:4px;">👤 Lavoratore #${i+1} — ${l.mansione_principale||'Mansione N/D'}</h3>
+              <h3 style="font-family:'Playfair Display',serif;font-size:1rem;color:var(--scuro);margin-bottom:2px;">${nomeCompleto?nomeCompleto+' —':('👤 Lavoratore #'+(i+1)+' —')} ${l.mansione_principale||'Mansione N/D'}</h3>
+              ${nomeCompleto?`<p style="font-size:11px;color:var(--pietra);margin-bottom:4px;">📧 ${l.email||''} · ID: ${l.user_id.substring(0,8)}…</p>`:''}
               <p style="font-size:12px;color:var(--pietra);">📍 ${l.localita_preferita||'N/D'} · 📅 ${l.tipo_disponibilita||'N/D'}</p>
               ${lingue.length?`<p style="font-size:12px;color:var(--pietra);margin-top:4px;">${lingue.join(' · ')}</p>`:''}
               ${l.disponibile_dal?`<p style="font-size:12px;color:var(--verde);margin-top:4px;">✅ Disponibile dal ${new Date(l.disponibile_dal).toLocaleDateString('it-IT',{month:'long',year:'numeric'})}</p>`:''}
             </div>
             <button class="btn btn-delete" onclick="eliminaLavoratore('${l.user_id}')">🗑️ Elimina</button>
           </div>
-          ${(l.exp1_mansione||l.exp2_mansione)?`
+          ${expRows?`
           <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--grigio);">
             <div style="font-size:10px;font-weight:700;color:var(--pietra);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Esperienze</div>
-            <div style="display:flex;flex-direction:column;gap:6px;">
-              ${l.exp1_mansione?`<div style="background:var(--grigio);border-radius:8px;padding:8px 12px;font-size:12px;display:flex;justify-content:space-between;align-items:center;"><span><b>${l.exp1_mansione}</b>${l.exp1_azienda?' · '+l.exp1_azienda:''} ${l.exp1_dal?'('+l.exp1_dal.substring(0,7)+(l.exp1_al?' → '+l.exp1_al.substring(0,7):'')+')'  :''}</span>${l.exp1_verificata?'<span style="color:var(--verde);font-weight:700;font-size:11px;">✅ Verificata</span>':l.exp1_verifica_pending?'<span style="color:var(--oro);font-weight:700;font-size:11px;">⏳ In attesa</span>':''}</div>`:''}
-              ${l.exp2_mansione?`<div style="background:var(--grigio);border-radius:8px;padding:8px 12px;font-size:12px;display:flex;justify-content:space-between;align-items:center;"><span><b>${l.exp2_mansione}</b>${l.exp2_azienda?' · '+l.exp2_azienda:''} ${l.exp2_dal?'('+l.exp2_dal.substring(0,7)+(l.exp2_al?' → '+l.exp2_al.substring(0,7):'')+')'  :''}</span>${l.exp2_verificata?'<span style="color:var(--verde);font-weight:700;font-size:11px;">✅ Verificata</span>':l.exp2_verifica_pending?'<span style="color:var(--oro);font-weight:700;font-size:11px;">⏳ In attesa</span>':''}</div>`:''}
-            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;">${expRows}</div>
           </div>`:''}
         </div>`;
       }).join('');
@@ -641,15 +655,20 @@
 
     async function caricaVerifiche(){
       const div = document.getElementById('lista-verifiche');
+
+      // Query con tutti e 5 i pending possibili
       const { data: lavoratori, error } = await supabaseClient
         .from('esperienze_lavoratori')
         .select('*')
-        .or('exp1_verifica_pending.eq.true,exp2_verifica_pending.eq.true')
+        .or('exp1_verifica_pending.eq.true,exp2_verifica_pending.eq.true,exp3_verifica_pending.eq.true,exp4_verifica_pending.eq.true,exp5_verifica_pending.eq.true')
         .order('aggiornato_il', { ascending: false });
 
       if(error){ div.innerHTML=`<div class="empty-state"><span class="empty-icon">❌</span><p>${error.message}</p></div>`; return; }
 
-      const pending = (lavoratori||[]).filter(l => l.exp1_verifica_pending || l.exp2_verifica_pending);
+      const pending = (lavoratori||[]).filter(l =>
+        l.exp1_verifica_pending || l.exp2_verifica_pending ||
+        l.exp3_verifica_pending || l.exp4_verifica_pending || l.exp5_verifica_pending
+      );
       document.getElementById('badge-ver').innerText = pending.length || '';
 
       if(!pending.length){
@@ -659,18 +678,31 @@
 
       div.innerHTML = pending.map((l, i) => {
         const exps = [];
-        if(l.exp1_verifica_pending && !l.exp1_verificata) exps.push({ num:1, mansione:l.exp1_mansione, azienda:l.exp1_azienda, zona:l.exp1_zona, dal:l.exp1_dal, al:l.exp1_al, doc:l.exp1_doc_url });
-        if(l.exp2_verifica_pending && !l.exp2_verificata) exps.push({ num:2, mansione:l.exp2_mansione, azienda:l.exp2_azienda, zona:l.exp2_zona, dal:l.exp2_dal, al:l.exp2_al, doc:l.exp2_doc_url });
+        for(let n = 1; n <= 5; n++){
+          if(l[`exp${n}_verifica_pending`] && !l[`exp${n}_verificata`]){
+            exps.push({
+              num: n,
+              mansione: l[`exp${n}_mansione`],
+              azienda:  l[`exp${n}_azienda`],
+              zona:     l[`exp${n}_zona`],
+              dal:      l[`exp${n}_dal`],
+              al:       l[`exp${n}_al`],
+              doc:      l[`exp${n}_doc_url`]
+            });
+          }
+        }
         if(!exps.length) return '';
+        const nomeCompleto = [l.nome_reale, l.cognome_reale].filter(Boolean).join(' ');
 
         return `
           <div class="verifica-card">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
               <div>
                 <div style="font-size:10px;font-weight:700;color:var(--oro);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">⏳ Verifica in attesa</div>
-                <h3 style="font-family:'Playfair Display',serif;font-size:1rem;color:var(--scuro);">👤 Lavoratore #${i+1} — ${l.mansione_principale||'N/D'}</h3>
+                <h3 style="font-family:'Playfair Display',serif;font-size:1rem;color:var(--scuro);">${nomeCompleto||('👤 Lavoratore #'+(i+1))} — ${l.mansione_principale||'N/D'}</h3>
                 <p style="font-size:12px;color:var(--pietra);margin-top:2px;">
-                  ${l.nome_reale||''} ${l.cognome_reale||''} · ${l.data_nascita?new Date(l.data_nascita).toLocaleDateString('it-IT'):''}
+                  ${l.data_nascita?'🎂 '+new Date(l.data_nascita).toLocaleDateString('it-IT'):''}
+                  ${l.email?' · 📧 '+l.email:''}
                 </p>
               </div>
             </div>
