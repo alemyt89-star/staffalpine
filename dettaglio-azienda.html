@@ -132,7 +132,7 @@
     #cookie-banner p{font-size:12px;line-height:1.5;flex:1;min-width:220px;}
     #cookie-banner a{color:var(--oro-chiaro);text-decoration:underline;}
     #cookie-banner .cookie-btn{background:var(--verde-chiaro);color:white;border:none;padding:9px 20px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;}
-  </style>
+  
     .hero-desc{color:rgba(255,255,255,0.62);font-size:13px;line-height:1.65;max-width:560px;}
     .hero-desc-full{display:none;}
     .hero-desc-toggle{background:none;border:none;color:var(--verde-accento);font-size:12px;cursor:pointer;padding:0;margin-top:4px;font-family:'DM Sans',sans-serif;display:none;}
@@ -422,6 +422,9 @@
 
       } else {
         document.getElementById('hero-zona').innerText="Valle d'Aosta · Hospitality";
+        // Nessun profilo pubblico compilato
+        document.getElementById('card-profilo-az').innerHTML = '<div style="text-align:center;padding:20px;color:var(--pietra);font-size:14px;">🏢 Questa azienda non ha ancora compilato il profilo pubblico.</div>';
+        document.getElementById('card-profilo-az').style.display='block';
       }
 
       // Recensioni
