@@ -530,6 +530,16 @@
       if(id==='recensioni')caricaMieRecensioni();
     }
 
+    // Formatta "YYYY-MM" in "Mese YYYY" (es. "Giu 2023")
+    function fmtMese(ym){
+      if(!ym) return '';
+      var parts = ym.split('-');
+      if(parts.length < 2) return ym;
+      var mesi = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+      var m = parseInt(parts[1],10) - 1;
+      return (mesi[m]||parts[1]) + ' ' + parts[0];
+    }
+
     async function caricaProfilo(uid){
       const div=document.getElementById('profilo-content');
       const{data:prof}=await supabaseClient.from('esperienze_lavoratori').select('*').eq('user_id',uid).single();
@@ -591,7 +601,7 @@
                 <div>
                   <span style="font-weight:600;font-size:13px;">${mansione}</span>
                   ${azienda ? `<span style="font-size:12px;color:var(--pietra);"> · ${azienda}</span>` : ''}
-                  <div style="font-size:12px;color:var(--pietra);margin-top:2px;">${zona}${dal?' · '+dal.substring(0,7):''}${al?' → '+al.substring(0,7):''}</div>
+                   <div style="font-size:12px;color:var(--pietra);margin-top:2px;">${zona}${dal?' · '+fmtMese(dal):''}${al?' → '+fmtMese(al):''}</div>
                 </div>
                 ${badgeHTML}
               </div>`);
