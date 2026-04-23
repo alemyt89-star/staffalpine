@@ -119,7 +119,20 @@
     .empty-state p{font-size:14px;}
     .divider{height:1px;background:var(--grigio);margin:22px 0;}
 
-    /* DESCRIZIONE ESPANDIBILE */
+    /* PROFILO CARD */
+    .profilo-info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:16px;}
+    .profilo-info-item{background:var(--grigio);border-radius:10px;padding:12px 14px;}
+    .profilo-info-label{font-size:10px;color:var(--pietra);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+    .profilo-info-val{font-size:13px;font-weight:600;color:var(--scuro);}
+    .profilo-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;}
+    .profilo-tag{background:var(--grigio);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--pietra);display:inline-flex;align-items:center;gap:4px;}
+
+    /* COOKIE BANNER */
+    #cookie-banner{position:fixed;bottom:0;left:0;right:0;background:var(--scuro);color:rgba(255,255,255,0.85);padding:14px 5%;display:flex;align-items:center;justify-content:space-between;gap:16px;z-index:9998;flex-wrap:wrap;box-shadow:0 -4px 20px rgba(0,0,0,0.2);}
+    #cookie-banner p{font-size:12px;line-height:1.5;flex:1;min-width:220px;}
+    #cookie-banner a{color:var(--oro-chiaro);text-decoration:underline;}
+    #cookie-banner .cookie-btn{background:var(--verde-chiaro);color:white;border:none;padding:9px 20px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+  </style>
     .hero-desc{color:rgba(255,255,255,0.62);font-size:13px;line-height:1.65;max-width:560px;}
     .hero-desc-full{display:none;}
     .hero-desc-toggle{background:none;border:none;color:var(--verde-accento);font-size:12px;cursor:pointer;padding:0;margin-top:4px;font-family:'DM Sans',sans-serif;display:none;}
@@ -127,6 +140,14 @@
   </style>
 </head>
 <body>
+
+  <!-- COOKIE BANNER -->
+  <div id="cookie-banner" style="display:none;">
+    <p>🍪 Usiamo cookie tecnici essenziali per il funzionamento della piattaforma. Nessun cookie pubblicitario.
+      <a href="cookie-policy.html" target="_blank">Cookie Policy</a> · <a href="informativa-privacy.html" target="_blank">Privacy</a>
+    </p>
+    <button class="cookie-btn" onclick="accettaCookie()">Ho capito ✓</button>
+  </div>
 
   <nav class="main-nav">
     <a href="index.html" class="nav-logo"><img src="stella-alpina.svg" alt="">StaffAlpine</a>
@@ -158,6 +179,12 @@
   </div>
 
   <div class="container">
+
+    <!-- CARD PROFILO AZIENDA -->
+    <div class="card" id="card-profilo-az" style="display:none;">
+      <div id="profilo-az-content"></div>
+    </div>
+
     <div class="card" id="card-stats">
       <div class="lock-overlay" id="premium-overlay">
         <span class="lock-icon">🔒</span>
@@ -280,23 +307,23 @@
 
       // Profilo pubblico azienda
       const{data:profilo}=await supabaseClient.from('profili_aziende')
-        .select('descrizione,zona,foto_url,sito_web,num_dipendenti,tipi_contratto,lingue_richieste')
+        .select('descrizione,zona,foto_url,sito_web,num_dipendenti,tipi_contratto,lingue_richieste,lingue_extra,email')
         .ilike('nome_azienda',`%${nomeAzienda.trim()}%`)
         .maybeSingle();
 
       if(profilo){
-        // ── FOTO ──
+        // ── FOTO nell'hero ──
         const logoEl = document.getElementById('hero-logo');
         if(profilo.foto_url && profilo.foto_url.trim() !== ''){
           logoEl.innerHTML = `<img src="${profilo.foto_url}" alt="${nomeAzienda}" onerror="this.parentElement.innerHTML='🏢'">`;
         }
-        // ── ZONA ──
+        // ── ZONA nell'hero ──
         if(profilo.zona){
           document.getElementById('hero-zona').innerText='📍 '+profilo.zona+' · Valle d\'Aosta';
         } else {
           document.getElementById('hero-zona').innerText="Valle d'Aosta · Hospitality";
         }
-        // ── DESCRIZIONE con "leggi di più" se > 160 caratteri ──
+        // ── DESCRIZIONE nell'hero con "leggi di più" ──
         const descEl = document.getElementById('hero-desc');
         const toggleBtn = document.getElementById('hero-desc-toggle');
         if(profilo.descrizione && profilo.descrizione.trim()){
@@ -313,7 +340,7 @@
             descEl.innerText = desc;
           }
         }
-        // ── TAG ──
+        // ── TAG nell'hero ──
         const tags=[];
         if(profilo.num_dipendenti)tags.push('👥 '+profilo.num_dipendenti+' dipendenti');
         if(profilo.sito_web)tags.push(`<a href="${profilo.sito_web}" target="_blank" style="color:rgba(255,255,255,0.6);text-decoration:none;">🌐 Sito web</a>`);
@@ -322,9 +349,77 @@
           const lng=JSON.parse(profilo.lingue_richieste||'[]');
           lng.forEach(l=>{const map={fr:'🇫🇷 Francese',en:'🇬🇧 Inglese',de:'🇩🇪 Tedesco'};tags.push(map[l]||'🌐 '+l);});
         }catch(e){}
+        try{
+          const lngExtra=JSON.parse(profilo.lingue_extra||'[]');
+          lngExtra.forEach(l=>{ if(l.lingua) tags.push('🌐 '+l.lingua+(l.livello?' ('+l.livello+')':'')); });
+        }catch(e){}
         if(tags.length){
           document.getElementById('hero-tags').innerHTML=tags.map(t=>`<span class="hero-tag">${t}</span>`).join('');
         }
+
+        // ── CARD PROFILO COMPLETO ──
+        let tipiContratto=[], lingueRich=[], lingueEx=[];
+        try{tipiContratto=JSON.parse(profilo.tipi_contratto||'[]');}catch(e){}
+        try{lingueRich=JSON.parse(profilo.lingue_richieste||'[]');}catch(e){}
+        try{lingueEx=JSON.parse(profilo.lingue_extra||'[]');}catch(e){}
+        const mapLng={fr:'🇫🇷 Francese',en:'🇬🇧 Inglese',de:'🇩🇪 Tedesco'};
+
+        const tuttiContratti = tipiContratto.length
+          ? tipiContratto.map(c=>`<span class="profilo-tag">📋 ${c}</span>`).join('')
+          : '<span style="font-size:12px;color:var(--pietra);">Non specificati</span>';
+
+        const tutteLingue = [
+          ...lingueRich.map(l=>mapLng[l]||'🌐 '+l),
+          ...lingueEx.map(l=>l.lingua?(l.lingua+(l.livello?' · '+l.livello:'')):'')
+        ].filter(Boolean);
+        const lingueHTML = tutteLingue.length
+          ? tutteLingue.map(l=>`<span class="profilo-tag">🗣️ ${l}</span>`).join('')
+          : '<span style="font-size:12px;color:var(--pietra);">Non specificate</span>';
+
+        // Foto grande nella card
+        const fotoHTML = profilo.foto_url && profilo.foto_url.trim()
+          ? `<img src="${profilo.foto_url}" alt="${nomeAzienda}" onerror="this.style.display='none'"
+               style="width:80px;height:80px;border-radius:12px;object-fit:cover;flex-shrink:0;border:1px solid rgba(0,0,0,0.08);">`
+          : `<div style="width:80px;height:80px;border-radius:12px;background:var(--grigio);display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0;">🏢</div>`;
+
+        document.getElementById('profilo-az-content').innerHTML = `
+          <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:16px;">
+            ${fotoHTML}
+            <div style="flex:1;min-width:200px;">
+              <div style="font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--scuro);margin-bottom:4px;">${nomeAzienda}</div>
+              ${profilo.zona?`<div style="font-size:13px;color:var(--pietra);margin-bottom:6px;">📍 ${profilo.zona} · Valle d'Aosta</div>`:''}
+              ${profilo.sito_web?`<a href="${profilo.sito_web}" target="_blank" style="font-size:13px;color:var(--verde);text-decoration:none;">🌐 ${profilo.sito_web}</a>`:''}
+            </div>
+          </div>
+          ${profilo.descrizione?`
+          <div style="font-size:14px;color:var(--testo);line-height:1.7;margin-bottom:16px;padding:14px;background:var(--grigio);border-radius:10px;">
+            ${profilo.descrizione}
+          </div>`:''}
+          <div class="profilo-info-grid">
+            ${profilo.num_dipendenti?`
+            <div class="profilo-info-item">
+              <div class="profilo-info-label">Dimensione</div>
+              <div class="profilo-info-val">👥 ${profilo.num_dipendenti}</div>
+            </div>`:''}
+            ${profilo.zona?`
+            <div class="profilo-info-item">
+              <div class="profilo-info-label">Località</div>
+              <div class="profilo-info-val">📍 ${profilo.zona}</div>
+            </div>`:''}
+          </div>
+          ${tipiContratto.length?`
+          <div style="margin-top:14px;">
+            <div style="font-size:11px;font-weight:700;color:var(--pietra);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Tipi di contratto offerti</div>
+            <div class="profilo-tags">${tuttiContratti}</div>
+          </div>`:''}
+          ${tutteLingue.length?`
+          <div style="margin-top:14px;">
+            <div style="font-size:11px;font-weight:700;color:var(--pietra);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Lingue richieste al personale</div>
+            <div class="profilo-tags">${lingueHTML}</div>
+          </div>`:''}
+        `;
+        document.getElementById('card-profilo-az').style.display='block';
+
       } else {
         document.getElementById('hero-zona').innerText="Valle d'Aosta · Hospitality";
       }
@@ -426,6 +521,15 @@
     async function logout(){
       await supabaseClient.auth.signOut();
       window.location.replace('index.html');
+    }
+
+    // ── COOKIE BANNER ──
+    function accettaCookie(){
+      localStorage.setItem('staffalpine_cookie_ok','1');
+      document.getElementById('cookie-banner').style.display='none';
+    }
+    if(!localStorage.getItem('staffalpine_cookie_ok')){
+      document.getElementById('cookie-banner').style.display='flex';
     }
 
     aggiornaNavbar();
