@@ -81,10 +81,10 @@
     .empty-state h3{font-family:'Playfair Display',serif;color:var(--scuro);margin-bottom:6px;}
     .empty-state p{font-size:14px;}
     .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:10000;align-items:center;justify-content:center;overflow-y:auto;padding:20px;}
-    .file-upload-area{border:2px dashed rgba(0,0,0,0.12);border-radius:10px;padding:16px 14px;background:var(--grigio);display:flex;flex-direction:column;align-items:flex-start;gap:8px;width:100%;margin-top:8px;}
-    .file-upload-area label{display:inline-flex;align-items:center;gap:8px;background:var(--verde);color:white;padding:8px 16px;border-radius:8px;font-family:"DM Sans",sans-serif;font-size:13px;font-weight:600;cursor:pointer;}
-    .file-upload-area label:hover{opacity:0.88;}
-    .file-upload-area input[type=file]{display:none;}
+    .file-wrap-exp{border:2px dashed rgba(0,0,0,0.1);border-radius:12px;padding:16px;text-align:center;cursor:pointer;transition:all 0.3s;background:var(--grigio);display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;margin-top:8px;}
+    .file-wrap-exp:hover{border-color:var(--verde-chiaro);background:rgba(82,183,136,0.04);}
+    .file-wrap-exp input[type=file]{display:none;}
+
     .az-card-cerca{background:white;border-radius:12px;padding:16px;border:1px solid rgba(0,0,0,0.06);margin-bottom:10px;cursor:pointer;transition:all 0.2s;border-left:4px solid var(--verde-chiaro);}
     .az-card-cerca:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,0.08);}
     .az-card-cerca h4{font-family:'Playfair Display',serif;font-size:1rem;color:var(--scuro);margin-bottom:4px;}
@@ -713,7 +713,7 @@
         <div class="az-card-cerca" onclick="window.location.href='dettaglio-azienda.html?nome=${encodeURIComponent(a.nome)}&from=dashboard-lavoratore'">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:6px;">
             <h4>🏢 ${a.nome}</h4>
-            ${a.offerte>0?`<span style="background:#d1f0e0;color:var(--verde);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;">💼 ${a.offerte} offerta${a.offerte>1?'e':''} attiva${a.offerte>1?'':'e'}</span>`:''}
+            ${a.offerte>0?`<span style="background:#d1f0e0;color:var(--verde);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;">💼 ${a.offerte} ${a.offerte===1?'offerta attiva':'offerte attive'}</span>`:''}
           </div>
           <div class="az-voti">
             <span>📋 <b>${a.count}</b> recension${a.count===1?'e':'i'}</span>
@@ -768,17 +768,14 @@
     function buildUploadAreaHTML(n){
       var id = "edit-exp" + n + "-doc";
       var labelId = "edit-exp" + n + "-doc-label";
-      // Label che wrappa l'input — click sulla label apre il file picker nativamente
-      // Questo funziona su tutti i browser desktop e mobile senza JS aggiuntivo
       var html = '<div style="font-size:11px;font-weight:700;color:var(--pietra);text-transform:uppercase;letter-spacing:1px;margin-top:10px;margin-bottom:6px;">📎 Carica documento per ottenere il badge ✅</div>';
-      html += '<div class="file-upload-area">';
-      html += '<div style="font-size:12px;color:var(--pietra);">Busta paga, contratto o cedolino · PDF, JPG, PNG · Max 5MB</div>';
-      html += '<label for="' + id + '">';
-      html += '📂 Scegli file';
+      html += '<label class="file-wrap-exp" for="' + id + '">';
+      html += '<span style="font-size:26px;">📄</span>';
+      html += '<span style="font-size:13px;color:var(--pietra);">Busta paga, contratto o cedolino</span>';
+      html += '<span style="font-size:11px;color:var(--pietra);">PDF, JPG, PNG · Max 5MB</span>';
+      html += '<span style="font-size:12px;color:var(--verde);font-weight:600;min-height:16px;" id="' + labelId + '"></span>';
+      html += '<input type="file" id="' + id + '" accept="image/*,application/pdf" onchange="mostraFileEditExp(this,' + JSON.stringify(labelId) + ')">';
       html += '</label>';
-      html += '<input type="file" id="' + id + '" accept="image/*,application/pdf" onchange="onFileChange(this,&quot;' + labelId + '&quot;)">';
-      html += '<span id="' + labelId + '" style="font-size:12px;"></span>';
-      html += '</div>';
       return html;
     }
 
