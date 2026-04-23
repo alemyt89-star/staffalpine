@@ -146,6 +146,13 @@
           <label class="form-label">Nome dell'attività</label>
           <input type="text" id="nome_azienda" class="form-control" placeholder="es. Hotel Bellevue, Ristorante Da Mario...">
         </div>
+        <div class="form-group">
+          <label class="form-label">Località</label>
+          <select id="localita_azienda" class="form-control">
+              <option value="">— Seleziona comune —</option>
+              <option value="Allein">Allein</option><option value="Antey-Saint-André">Antey-Saint-André</option><option value="Aoste / Aosta">Aoste / Aosta</option><option value="Arnad">Arnad</option><option value="Arvier">Arvier</option><option value="Avise">Avise</option><option value="Ayas">Ayas</option><option value="Aymavilles">Aymavilles</option><option value="Bard">Bard</option><option value="Bionaz">Bionaz</option><option value="Brissogne">Brissogne</option><option value="Brusson">Brusson</option><option value="Challand-Saint-Anselme">Challand-Saint-Anselme</option><option value="Challand-Saint-Victor">Challand-Saint-Victor</option><option value="Chambave">Chambave</option><option value="Chamois">Chamois</option><option value="Champdepraz">Champdepraz</option><option value="Champorcher">Champorcher</option><option value="Charvensod">Charvensod</option><option value="Châtillon">Châtillon</option><option value="Cogne">Cogne</option><option value="Courmayeur">Courmayeur</option><option value="Donnas">Donnas</option><option value="Doues">Doues</option><option value="Emarèse">Emarèse</option><option value="Etroubles">Etroubles</option><option value="Fénis">Fénis</option><option value="Fontainemore">Fontainemore</option><option value="Gaby">Gaby</option><option value="Gignod">Gignod</option><option value="Gran San Bernardo">Gran San Bernardo</option><option value="Gressan">Gressan</option><option value="Gressoney-La-Trinité">Gressoney-La-Trinité</option><option value="Gressoney-Saint-Jean">Gressoney-Saint-Jean</option><option value="Hône">Hône</option><option value="Introd">Introd</option><option value="Issime">Issime</option><option value="Issogne">Issogne</option><option value="La Magdeleine">La Magdeleine</option><option value="La Salle">La Salle</option><option value="La Thuile">La Thuile</option><option value="Lillianes">Lillianes</option><option value="Montjovet">Montjovet</option><option value="Morgex">Morgex</option><option value="Nus">Nus</option><option value="Ollomont">Ollomont</option><option value="Oyace">Oyace</option><option value="Perloz">Perloz</option><option value="Pollein">Pollein</option><option value="Pontboset">Pontboset</option><option value="Pontey">Pontey</option><option value="Pont-Saint-Martin">Pont-Saint-Martin</option><option value="Pré-Saint-Didier">Pré-Saint-Didier</option><option value="Quart">Quart</option><option value="Rhêmes-Notre-Dame">Rhêmes-Notre-Dame</option><option value="Rhêmes-Saint-Georges">Rhêmes-Saint-Georges</option><option value="Roisan">Roisan</option><option value="Saint-Christophe">Saint-Christophe</option><option value="Saint-Denis">Saint-Denis</option><option value="Saint-Marcel">Saint-Marcel</option><option value="Saint-Nicolas">Saint-Nicolas</option><option value="Saint-Oyen">Saint-Oyen</option><option value="Saint-Pierre">Saint-Pierre</option><option value="Saint-Rhémy-en-Bosses">Saint-Rhémy-en-Bosses</option><option value="Saint-Vincent">Saint-Vincent</option><option value="Sarre">Sarre</option><option value="Torgnon">Torgnon</option><option value="Valgrisenche">Valgrisenche</option><option value="Valpelline">Valpelline</option><option value="Valsavarenche">Valsavarenche</option><option value="Valtournenche">Valtournenche</option><option value="Verrayes">Verrayes</option><option value="Verrès">Verrès</option><option value="Villeneuve">Villeneuve</option><option value="Fuori Valle d'Aosta">Fuori Valle d'Aosta</option>
+          </select>
+        </div>
       </div>
 
       <div class="form-card">
@@ -247,10 +254,21 @@
 
       <div class="form-card">
         <div class="form-card-title">📎 Prova di Lavoro</div>
-        <p style="font-size:13px;color:var(--pietra);margin-bottom:14px;line-height:1.5;">Allega un contratto o busta paga per verificare la recensione. Il documento è visibile <b>solo all'admin</b>.</p>
+        <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:12px;padding:16px;margin-bottom:16px;">
+          <div style="font-size:12px;font-weight:700;color:#8a6d00;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">⚠️ Prima di caricare — oscura i dati sensibili</div>
+          <p style="font-size:13px;color:#7d6608;line-height:1.6;margin-bottom:10px;">Allega un <strong>contratto o busta paga</strong>. Abbiamo bisogno di vedere solo:</p>
+          <ul style="font-size:13px;color:#7d6608;line-height:1.9;padding-left:20px;margin-bottom:10px;">
+            <li>✅ Il tuo <strong>nome e cognome</strong></li>
+            <li>✅ La tua <strong>data di nascita</strong></li>
+            <li>✅ Il <strong>nome dell'azienda</strong> e la <strong>P.IVA</strong></li>
+          </ul>
+          <p style="font-size:13px;color:#c0392b;font-weight:600;line-height:1.6;">❌ Oscura tutto il resto: codice fiscale, IBAN, importi stipendio, indirizzo, dati di contatto.</p>
+          <p style="font-size:12px;color:#7d6608;margin-top:8px;">🔒 Il documento è visibile <strong>solo all'admin</strong> e viene eliminato dopo la verifica.</p>
+        </div>
         <label class="file-wrap" for="prova_lavoro">
           <span class="file-icon">📄</span>
           <span class="file-text">Tocca per caricare un documento (PDF o immagine)</span>
+          <span style="font-size:11px;color:var(--pietra);">PDF, JPG, PNG · Max 5MB</span>
           <span class="file-name" id="file-label"></span>
           <input type="file" id="prova_lavoro" accept="image/*,application/pdf" onchange="mostraFile(this)">
         </label>
@@ -364,12 +382,6 @@
               <option value="Nessuno">Nessuno</option><option value="Base">Base</option><option value="Buono">Buono</option><option value="Ottimo">Ottimo</option>
             </select>
           </div>
-          <div class="form-group">
-            <label class="form-label">Spagnolo</label>
-            <select id="lingua_es" class="form-control">
-              <option value="Nessuno">Nessuno</option><option value="Base">Base</option><option value="Buono">Buono</option><option value="Ottimo">Ottimo</option>
-            </select>
-          </div>
         </div>
         <!-- LINGUE AGGIUNTIVE -->
         <div id="lingue-extra"></div>
@@ -419,18 +431,12 @@
               <input type="text" id="exp1_azienda" class="form-control" placeholder="es. Hotel Bellevue">
             </div>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Zona</label>
-              <select id="exp1_zona" class="form-control">
-                <option value="">— Seleziona —</option>
-                <option value="Alta Valle">Alta Valle</option>
-                <option value="Aosta">Aosta e dintorni</option>
-                <option value="Bassa Valle">Bassa Valle</option>
-                <option value="Ayas-Gressoney">Val d'Ayas / Gressoney</option>
-                <option value="Fuori Valle d'Aosta">Fuori Valle d'Aosta</option>
-              </select>
-            </div>
+          <div class="form-group">
+            <label class="form-label">Località</label>
+            <select id="exp1_zona" class="form-control">
+              <option value="">— Seleziona comune —</option>
+              <option value="Allein">Allein</option><option value="Antey-Saint-André">Antey-Saint-André</option><option value="Aoste / Aosta">Aoste / Aosta</option><option value="Arnad">Arnad</option><option value="Arvier">Arvier</option><option value="Avise">Avise</option><option value="Ayas">Ayas</option><option value="Aymavilles">Aymavilles</option><option value="Bard">Bard</option><option value="Bionaz">Bionaz</option><option value="Brissogne">Brissogne</option><option value="Brusson">Brusson</option><option value="Challand-Saint-Anselme">Challand-Saint-Anselme</option><option value="Challand-Saint-Victor">Challand-Saint-Victor</option><option value="Chambave">Chambave</option><option value="Chamois">Chamois</option><option value="Champdepraz">Champdepraz</option><option value="Champorcher">Champorcher</option><option value="Charvensod">Charvensod</option><option value="Châtillon">Châtillon</option><option value="Cogne">Cogne</option><option value="Courmayeur">Courmayeur</option><option value="Donnas">Donnas</option><option value="Doues">Doues</option><option value="Emarèse">Emarèse</option><option value="Etroubles">Etroubles</option><option value="Fénis">Fénis</option><option value="Fontainemore">Fontainemore</option><option value="Gaby">Gaby</option><option value="Gignod">Gignod</option><option value="Gran San Bernardo">Gran San Bernardo</option><option value="Gressan">Gressan</option><option value="Gressoney-La-Trinité">Gressoney-La-Trinité</option><option value="Gressoney-Saint-Jean">Gressoney-Saint-Jean</option><option value="Hône">Hône</option><option value="Introd">Introd</option><option value="Issime">Issime</option><option value="Issogne">Issogne</option><option value="La Magdeleine">La Magdeleine</option><option value="La Salle">La Salle</option><option value="La Thuile">La Thuile</option><option value="Lillianes">Lillianes</option><option value="Montjovet">Montjovet</option><option value="Morgex">Morgex</option><option value="Nus">Nus</option><option value="Ollomont">Ollomont</option><option value="Oyace">Oyace</option><option value="Perloz">Perloz</option><option value="Pollein">Pollein</option><option value="Pontboset">Pontboset</option><option value="Pontey">Pontey</option><option value="Pont-Saint-Martin">Pont-Saint-Martin</option><option value="Pré-Saint-Didier">Pré-Saint-Didier</option><option value="Quart">Quart</option><option value="Rhêmes-Notre-Dame">Rhêmes-Notre-Dame</option><option value="Rhêmes-Saint-Georges">Rhêmes-Saint-Georges</option><option value="Roisan">Roisan</option><option value="Saint-Christophe">Saint-Christophe</option><option value="Saint-Denis">Saint-Denis</option><option value="Saint-Marcel">Saint-Marcel</option><option value="Saint-Nicolas">Saint-Nicolas</option><option value="Saint-Oyen">Saint-Oyen</option><option value="Saint-Pierre">Saint-Pierre</option><option value="Saint-Rhémy-en-Bosses">Saint-Rhémy-en-Bosses</option><option value="Saint-Vincent">Saint-Vincent</option><option value="Sarre">Sarre</option><option value="Torgnon">Torgnon</option><option value="Valgrisenche">Valgrisenche</option><option value="Valpelline">Valpelline</option><option value="Valsavarenche">Valsavarenche</option><option value="Valtournenche">Valtournenche</option><option value="Verrayes">Verrayes</option><option value="Verrès">Verrès</option><option value="Villeneuve">Villeneuve</option><option value="Fuori Valle d'Aosta">Fuori Valle d'Aosta</option>
+            </select>
           </div>
           <div class="form-row">
             <div class="form-group">
@@ -468,18 +474,12 @@
               <input type="text" id="exp2_azienda" class="form-control" placeholder="es. Ristorante Da Mario">
             </div>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Zona</label>
-              <select id="exp2_zona" class="form-control">
-                <option value="">— Seleziona —</option>
-                <option value="Alta Valle">Alta Valle</option>
-                <option value="Aosta">Aosta e dintorni</option>
-                <option value="Bassa Valle">Bassa Valle</option>
-                <option value="Ayas-Gressoney">Val d'Ayas / Gressoney</option>
-                <option value="Fuori Valle d'Aosta">Fuori Valle d'Aosta</option>
-              </select>
-            </div>
+          <div class="form-group">
+            <label class="form-label">Località</label>
+            <select id="exp2_zona" class="form-control">
+              <option value="">— Seleziona comune —</option>
+              <option value="Allein">Allein</option><option value="Antey-Saint-André">Antey-Saint-André</option><option value="Aoste / Aosta">Aoste / Aosta</option><option value="Arnad">Arnad</option><option value="Arvier">Arvier</option><option value="Avise">Avise</option><option value="Ayas">Ayas</option><option value="Aymavilles">Aymavilles</option><option value="Bard">Bard</option><option value="Bionaz">Bionaz</option><option value="Brissogne">Brissogne</option><option value="Brusson">Brusson</option><option value="Challand-Saint-Anselme">Challand-Saint-Anselme</option><option value="Challand-Saint-Victor">Challand-Saint-Victor</option><option value="Chambave">Chambave</option><option value="Chamois">Chamois</option><option value="Champdepraz">Champdepraz</option><option value="Champorcher">Champorcher</option><option value="Charvensod">Charvensod</option><option value="Châtillon">Châtillon</option><option value="Cogne">Cogne</option><option value="Courmayeur">Courmayeur</option><option value="Donnas">Donnas</option><option value="Doues">Doues</option><option value="Emarèse">Emarèse</option><option value="Etroubles">Etroubles</option><option value="Fénis">Fénis</option><option value="Fontainemore">Fontainemore</option><option value="Gaby">Gaby</option><option value="Gignod">Gignod</option><option value="Gran San Bernardo">Gran San Bernardo</option><option value="Gressan">Gressan</option><option value="Gressoney-La-Trinité">Gressoney-La-Trinité</option><option value="Gressoney-Saint-Jean">Gressoney-Saint-Jean</option><option value="Hône">Hône</option><option value="Introd">Introd</option><option value="Issime">Issime</option><option value="Issogne">Issogne</option><option value="La Magdeleine">La Magdeleine</option><option value="La Salle">La Salle</option><option value="La Thuile">La Thuile</option><option value="Lillianes">Lillianes</option><option value="Montjovet">Montjovet</option><option value="Morgex">Morgex</option><option value="Nus">Nus</option><option value="Ollomont">Ollomont</option><option value="Oyace">Oyace</option><option value="Perloz">Perloz</option><option value="Pollein">Pollein</option><option value="Pontboset">Pontboset</option><option value="Pontey">Pontey</option><option value="Pont-Saint-Martin">Pont-Saint-Martin</option><option value="Pré-Saint-Didier">Pré-Saint-Didier</option><option value="Quart">Quart</option><option value="Rhêmes-Notre-Dame">Rhêmes-Notre-Dame</option><option value="Rhêmes-Saint-Georges">Rhêmes-Saint-Georges</option><option value="Roisan">Roisan</option><option value="Saint-Christophe">Saint-Christophe</option><option value="Saint-Denis">Saint-Denis</option><option value="Saint-Marcel">Saint-Marcel</option><option value="Saint-Nicolas">Saint-Nicolas</option><option value="Saint-Oyen">Saint-Oyen</option><option value="Saint-Pierre">Saint-Pierre</option><option value="Saint-Rhémy-en-Bosses">Saint-Rhémy-en-Bosses</option><option value="Saint-Vincent">Saint-Vincent</option><option value="Sarre">Sarre</option><option value="Torgnon">Torgnon</option><option value="Valgrisenche">Valgrisenche</option><option value="Valpelline">Valpelline</option><option value="Valsavarenche">Valsavarenche</option><option value="Valtournenche">Valtournenche</option><option value="Verrayes">Verrayes</option><option value="Verrès">Verrès</option><option value="Villeneuve">Villeneuve</option><option value="Fuori Valle d'Aosta">Fuori Valle d'Aosta</option>
+            </select>
           </div>
           <div class="form-row">
             <div class="form-group">
@@ -642,6 +642,7 @@
 
       const dati={
         "AZIENDA": nomeAziendaNorm,
+        "LOCALITA": document.getElementById('localita_azienda').value||null,
         "PAGA_PUNTUALITA":document.getElementById('paga_puntualita').value,
         "VOTO_PAGA":parseInt(document.getElementById('voto_paga').value),
         "STRAORDINARI":document.getElementById('straordinari').value,
@@ -770,7 +771,7 @@
         lingua_francese:document.getElementById('lingua_fr').value,
         lingua_inglese:document.getElementById('lingua_en').value,
         lingua_tedesco:document.getElementById('lingua_de').value,
-        lingua_spagnolo:document.getElementById('lingua_es').value,
+        lingua_spagnolo:'Nessuno',
         lingue_extra: lingueExtra.length > 0 ? JSON.stringify(lingueExtra) : null,
         tipo_disponibilita:document.getElementById('tipo_disponibilita').value,
         disponibile_dal:document.getElementById('disponibile_dal').value||null,
