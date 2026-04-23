@@ -307,9 +307,10 @@
 
       // Profilo pubblico azienda
       const{data:profilo}=await supabaseClient.from('profili_aziende')
-        .select('descrizione,zona,foto_url,sito_web,num_dipendenti,tipi_contratto,lingue_richieste,lingue_extra,email')
+        .select('descrizione,zona,foto_url,sito_web,num_dipendenti,tipi_contratto,lingue_richieste')
         .ilike('nome_azienda',`%${nomeAzienda.trim()}%`)
         .maybeSingle();
+      console.log('Profilo azienda:', profilo, 'Nome cercato:', nomeAzienda.trim());
 
       if(profilo){
         // ── FOTO nell'hero ──
@@ -350,7 +351,7 @@
           lng.forEach(l=>{const map={fr:'🇫🇷 Francese',en:'🇬🇧 Inglese',de:'🇩🇪 Tedesco'};tags.push(map[l]||'🌐 '+l);});
         }catch(e){}
         try{
-          const lngExtra=JSON.parse(profilo.lingue_extra||'[]');
+        const lngExtra=[];
           lngExtra.forEach(l=>{ if(l.lingua) tags.push('🌐 '+l.lingua+(l.livello?' ('+l.livello+')':'')); });
         }catch(e){}
         if(tags.length){
@@ -361,7 +362,7 @@
         let tipiContratto=[], lingueRich=[], lingueEx=[];
         try{tipiContratto=JSON.parse(profilo.tipi_contratto||'[]');}catch(e){}
         try{lingueRich=JSON.parse(profilo.lingue_richieste||'[]');}catch(e){}
-        try{lingueEx=JSON.parse(profilo.lingue_extra||'[]');}catch(e){}
+        lingueEx=[];
         const mapLng={fr:'🇫🇷 Francese',en:'🇬🇧 Inglese',de:'🇩🇪 Tedesco'};
 
         const tuttiContratti = tipiContratto.length
