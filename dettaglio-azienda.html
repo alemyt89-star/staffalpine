@@ -306,11 +306,56 @@
       }
 
       // Profilo pubblico azienda
-      const{data:profilo}=await supabaseClient.from('profili_aziende')
-        .select('descrizione,zona,foto_url,sito_web,num_dipendenti,tipi_contratto,lingue_richieste')
-        .ilike('nome_azienda',`%${nomeAzienda.trim()}%`)
+      // Strategia multipla per trovare il profilo:
+      // 1. Match esatto sul nome
+      // 2. ilike con nome completo
+      // 3. ilike con ogni parola del nome
+      const nomeRicerca = nomeAzienda.trim();
+      let profilo = null;
+
+      // Tentativo 1: match esatto (case insensitive)
+      const t1 = await supabaseClient.from('profili_aziende')
+        .select('nome_azienda,descrizione,zona,foto_url,sito_web,num_dipendenti,tipi_contratto,lingue_richieste')
+        .ilike('nome_azienda', nomeRicerca)
         .maybeSingle();
-      console.log('Profilo azienda:', profilo, 'Nome cercato:', nomeAzienda.trim());
+      if(t1.data) { profilo = t1.data; }
+
+      // Tentativo 2: ilike con %nome%
+      if(!profilo){
+        const t2 = await supabaseClient.from('profili_aziende')
+          .select('nome_azienda,descrizione,zona,foto_url,sito_web,num_dipendenti,tipi_contratto,lingue_richieste')
+          .ilike('nome_azienda', `%${nomeRicerca}%`)
+          .maybeSingle();
+        if(t2.data) { profilo = t2.data; }
+        if(t2.error) console.warn('Errore query t2:', t2.error.message);
+      }
+
+      // Tentativo 3: cerca per ogni parola del nome
+      if(!profilo){
+        const parole = nomeRicerca.split(/\s+/).filter(p => p.length > 2);
+        for(const parola of parole){
+          const t3 = await supabaseClient.from('profili_aziende')
+            .select('nome_azienda,descrizione,zona,foto_url,sito_web,num_dipendenti,tipi_contratto,lingue_richieste')
+            .ilike('nome_azienda', `%${parola}%`)
+            .maybeSingle();
+          if(t3.data){ profilo = t3.data; break; }
+        }
+      }
+
+      // Tentativo 4: prendi tutti e filtra in JS (fallback totale)
+      if(!profilo){
+        const t4 = await supabaseClient.from('profili_aziende')
+          .select('nome_azienda,descrizione,zona,foto_url,sito_web,num_dipendenti,tipi_contratto,lingue_richieste')
+          .limit(500);
+        if(t4.data){
+          const lower = nomeRicerca.toLowerCase();
+          profilo = t4.data.find(p =>
+            p.nome_azienda && p.nome_azienda.toLowerCase().includes(lower)
+          ) || null;
+        }
+      }
+
+      console.log('Profilo trovato:', profilo ? profilo.nome_azienda : 'null', '| Cercato:', nomeRicerca);
 
       if(profilo){
         // ── FOTO nell'hero ──
