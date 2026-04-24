@@ -243,7 +243,7 @@
   <!-- COOKIE BANNER -->
   <div id="cookie-banner" style="display:none;">
     <p>🍪 Usiamo cookie tecnici essenziali per il funzionamento della piattaforma. Nessun cookie pubblicitario.
-      <a href="cookie-policy.html" target="_blank">Cookie Policy</a> · <a href="informativa-privacy.html" target="_blank">Privacy</a>
+      <a href="termini.html" style="color:var(--pietra);text-decoration:none;">Termini</a> · <a href="cookie-policy.html" target="_blank">Cookie Policy</a> · <a href="informativa-privacy.html" target="_blank">Privacy</a>
     </p>
     <button class="cookie-btn" onclick="accettaCookie()">Ho capito ✓</button>
   </div>
@@ -483,8 +483,8 @@
           <div class="form-group">
             <label class="form-label">Tipo Contratto</label>
             <select id="j-tipo" class="form-control">
-              <option value="Stagionale Invernale">Stagionale Invernale</option>
-              <option value="Stagionale Estiva">Stagionale Estiva</option>
+              <option value="Stagionale Invernale">Invernale</option>
+              <option value="Stagionale Estiva">Estiva</option>
               <option value="Extra / Weekend">Extra / Weekend</option>
               <option value="Fisso">Fisso tutto l'anno</option>
             </select>
@@ -861,7 +861,7 @@
         {flag:'🇫🇷', nome:'Francese', val: w.lingua_francese},
         {flag:'🇬🇧', nome:'Inglese', val: w.lingua_inglese},
         {flag:'🇩🇪', nome:'Tedesco', val: w.lingua_tedesco},
-        {flag:'🇪🇸', nome:'Spagnolo', val: w.lingua_spagnolo},
+        
       ];
       const lingueHTML = lingueMap.filter(l => l.val && l.val !== 'Nessuno')
         .map(l => `<div class="modal-lang-item">${l.flag} ${l.nome} <span>${l.val}</span></div>`).join('');

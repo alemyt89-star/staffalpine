@@ -1,4 +1,4 @@
-const CACHE_NAME = 'staffalpine-v5';
+const CACHE_NAME = 'staffalpine-v6';
 const urlsToCache = [
   '/index.html',
   '/login.html',
@@ -14,6 +14,7 @@ const urlsToCache = [
   '/manifest.json',
   '/informativa-privacy.html',
   '/termini.html',
+  '/cookie-policy.html',
 ];
 
 self.addEventListener('install', event => {

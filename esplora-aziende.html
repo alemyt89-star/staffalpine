@@ -367,9 +367,34 @@
       .search-btn { width: 100%; }
       .results-header { flex-direction: column; gap: 10px; align-items: flex-start; }
     }
+
+    /* COOKIE BANNER */
+    #cookie-banner{position:fixed;bottom:0;left:0;right:0;background:var(--scuro);color:rgba(255,255,255,0.85);padding:14px 5%;display:flex;align-items:center;justify-content:space-between;gap:16px;z-index:9998;flex-wrap:wrap;box-shadow:0 -4px 20px rgba(0,0,0,0.2);}
+    #cookie-banner p{font-size:12px;line-height:1.5;flex:1;min-width:220px;}
+    #cookie-banner a{color:var(--oro-chiaro);text-decoration:underline;}
+    #cookie-banner .cookie-btn{background:var(--verde-chiaro);color:white;border:none;padding:9px 20px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+
+    /* CARD FOTO */
+    .card-foto{width:48px;height:48px;border-radius:10px;object-fit:cover;flex-shrink:0;border:1px solid rgba(0,0,0,0.07);}
+    .card-foto-placeholder{width:48px;height:48px;border-radius:10px;background:var(--grigio);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+    .card-header{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+    .card-header-text{flex:1;min-width:0;}
+
+    /* FOOTER */
+    .page-footer{text-align:center;padding:30px 5%;color:var(--pietra);font-size:12px;}
+    .page-footer a{color:var(--pietra);text-decoration:none;margin:0 8px;}
+    .page-footer a:hover{color:var(--verde);}
   </style>
 </head>
 <body>
+
+  <!-- COOKIE BANNER -->
+  <div id="cookie-banner" style="display:none;">
+    <p>🍪 Usiamo cookie tecnici essenziali per il funzionamento della piattaforma. Nessun cookie pubblicitario.
+      <a href="cookie-policy.html" target="_blank">Cookie Policy</a> · <a href="informativa-privacy.html" target="_blank">Privacy</a>
+    </p>
+    <button class="cookie-btn" onclick="accettaCookie()">Ho capito ✓</button>
+  </div>
 
   <!-- NAVBAR -->
   <nav id="dynamic-nav" class="main-nav">
@@ -382,7 +407,7 @@
     <div class="hero-inner">
       <span class="hero-tag">⛰️ Valle d'Aosta · Hospitality</span>
       <h1>Esplora le <em>Aziende</em></h1>
-      <p>Consulta le valutazioni reali lasciate dai lavoratori stagionali.</p>
+      <p>Consulta le valutazioni reali lasciate dai lavoratori del settore hospitality.</p>
     </div>
   </div>
 
@@ -412,6 +437,14 @@
     </div>
   </div>
 
+  <!-- FOOTER -->
+  <div class="page-footer">
+    <a href="termini.html">Termini</a> ·
+    <a href="informativa-privacy.html">Privacy</a> ·
+    <a href="cookie-policy.html">Cookie Policy</a>
+    <div style="margin-top:8px;">© 2025 StaffAlpine · Valle d'Aosta</div>
+  </div>
+
   <script>
     const SUPABASE_URL = "https://maeoqoxzjzusjwrdrkbd.supabase.co";
     const SUPABASE_KEY = "sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX";
@@ -435,7 +468,6 @@
     async function caricaAziende(filtro = "") {
       const container = document.getElementById('lista-aziende');
 
-      // Skeleton
       container.innerHTML = [1,2,3,4,5,6].map(() => `
         <div class="skeleton-card">
           <div class="skeleton sk-bar"></div>
@@ -455,10 +487,17 @@
         if (mioProfilo) { isLavoratore = false; isPremium = mioProfilo.is_premium === true; mioIdAzienda = mioProfilo.id; }
       }
 
-      let query = supabaseClient.from('profili_aziende').select('*').eq('is_approvata', true);
+      // Carica profili aziende approvate (con foto e zona)
+      let query = supabaseClient.from('profili_aziende')
+        .select('id, nome_azienda, zona, foto_url, is_premium')
+        .eq('is_approvata', true);
       if (filtro) query = query.ilike('nome_azienda', `%${filtro}%`);
       const { data: aziende } = await query;
-      const { data: tutteLeRecs } = await supabaseClient.from('RECENSIONI').select('*').eq('VERIFICATA', true);
+
+      // Carica tutte le recensioni verificate
+      const { data: tutteLeRecs } = await supabaseClient.from('RECENSIONI')
+        .select('AZIENDA, VOTO_PAGA, RISPETTO_TITOLARE, VOTO_ALLOGGIO, QUALITA_VITTO, LOCALITA')
+        .eq('VERIFICATA', true);
 
       container.innerHTML = "";
       const aziendeMostrate = new Set();
@@ -468,10 +507,12 @@
           const nomePulito = az.nome_azienda.toLowerCase().trim();
           aziendeMostrate.add(nomePulito);
           const recs = tutteLeRecs ? tutteLeRecs.filter(r => r.AZIENDA && r.AZIENDA.toLowerCase().trim().includes(nomePulito)) : [];
-          renderizzaCard(container, az.nome_azienda, az.localita, recs, isLavoratore, isPremium, mioIdAzienda === az.id);
+          const zona = az.zona || (recs.find(r => r.LOCALITA)?.LOCALITA) || "Valle d'Aosta";
+          renderizzaCard(container, az.nome_azienda, zona, az.foto_url, recs, isLavoratore, isPremium, mioIdAzienda === az.id);
         });
       }
 
+      // Aziende presenti solo nelle recensioni (senza profilo registrato)
       if (tutteLeRecs) {
         const nomiDaRecs = [...new Set(tutteLeRecs.map(r => r.AZIENDA))];
         nomiDaRecs.forEach(nomeRec => {
@@ -479,17 +520,17 @@
           const nomePulitoRec = nomeRec.toLowerCase().trim();
           if (![...aziendeMostrate].some(n => nomePulitoRec.includes(n) || n.includes(nomePulitoRec))) {
             const recs = tutteLeRecs.filter(r => r.AZIENDA && r.AZIENDA.toLowerCase().trim() === nomePulitoRec);
-            renderizzaCard(container, nomeRec, "Valle d'Aosta", recs, isLavoratore, isPremium, false);
+            const zona = recs.find(r => r.LOCALITA)?.LOCALITA || "Valle d'Aosta";
+            renderizzaCard(container, nomeRec, zona, null, recs, isLavoratore, isPremium, false);
             aziendeMostrate.add(nomePulitoRec);
           }
         });
       }
 
-      // Aggiorna contatore
       const totale = container.querySelectorAll('.azienda-card').length;
       document.getElementById('results-count').innerHTML = filtro
         ? `<strong>${totale}</strong> risultati per "${filtro}"`
-        : `<strong>${totale}</strong> attività trovate in Valle d'Aosta`;
+        : `<strong>${totale}</strong> attività in Valle d'Aosta`;
 
       if (totale === 0) {
         container.innerHTML = `
@@ -501,14 +542,20 @@
       }
     }
 
-    function renderizzaCard(container, nome, localita, recs, isLavoratore, isPremium, eMiaAzienda) {
+    function renderizzaCard(container, nome, localita, fotoUrl, recs, isLavoratore, isPremium, eMiaAzienda) {
+      // Media su 3 categorie: paga, ambiente, vitto/alloggio
       let media = null;
       if (recs.length > 0) {
-        const somma = recs.reduce((acc, r) => acc + (parseFloat(r.VOTO_PAGA) || 0) + (parseFloat(r.RISPETTO_TITOLARE) || 0), 0);
-        media = (somma / (recs.length * 2)).toFixed(1);
+        let somma = 0, count = 0;
+        recs.forEach(r => {
+          if (r.VOTO_PAGA)           { somma += parseFloat(r.VOTO_PAGA);          count++; }
+          if (r.RISPETTO_TITOLARE)   { somma += parseFloat(r.RISPETTO_TITOLARE);  count++; }
+          const vitto = r.VOTO_ALLOGGIO || r.QUALITA_VITTO;
+          if (vitto)                 { somma += parseFloat(vitto);                count++; }
+        });
+        if (count > 0) media = (somma / count).toFixed(1);
       }
 
-      // Colore voto
       let votoBadgeClass = 'voto-nd';
       let votoLabel = '⭐ N/D';
       if (media !== null) {
@@ -520,16 +567,19 @@
       }
 
       const puoCliccare = isLavoratore || isPremium || eMiaAzienda;
-
       const htmlBottone = puoCliccare
         ? `<a href="dettaglio-azienda.html?nome=${encodeURIComponent(nome)}" class="btn-dettaglio btn-verde">Vedi Analisi Completa →</a>`
         : `<div class="btn-dettaglio btn-locked" onclick="alert('Abbonati a Premium per vedere i dettagli della concorrenza!')">🔒 Solo Premium</div>`;
 
+      const recLabel = recs.length === 1 ? '1 recensione' : `${recs.length} recensioni`;
       const miniStats = recs.length > 0
-        ? `<div class="card-stats">
-             <span class="mini-stat"><strong>${recs.length}</strong> rec.</span>
-           </div>`
+        ? `<div class="card-stats"><span class="mini-stat"><strong>${recLabel}</strong></span></div>`
         : `<div class="card-stats"><span class="mini-stat">Nessuna recensione</span></div>`;
+
+      // Foto o placeholder
+      const fotoHTML = fotoUrl
+        ? `<img src="${fotoUrl}" class="card-foto" alt="${nome}" onerror="this.outerHTML='<div class=\\'card-foto-placeholder\\'>🏢</div>'">`
+        : `<div class="card-foto-placeholder">🏢</div>`;
 
       const div = document.createElement('div');
       div.className = 'azienda-card';
@@ -538,10 +588,13 @@
         <div class="card-top-bar ${puoCliccare ? '' : 'locked'}"></div>
         <div class="card-body">
           <div class="card-header">
-            <h3 class="azienda-nome">${nome}</h3>
+            ${fotoHTML}
+            <div class="card-header-text">
+              <h3 class="azienda-nome">${nome}</h3>
+              <p class="azienda-loc">📍 ${localita || "Valle d'Aosta"}</p>
+            </div>
             <span class="voto-badge ${votoBadgeClass}">${votoLabel}</span>
           </div>
-          <p class="azienda-loc">📍 ${localita || "Valle d'Aosta"}</p>
           ${miniStats}
           ${htmlBottone}
         </div>
@@ -566,6 +619,14 @@
     async function logout() {
       await supabaseClient.auth.signOut();
       window.location.replace('index.html');
+    }
+
+    function accettaCookie(){
+      localStorage.setItem('staffalpine_cookie_ok','1');
+      document.getElementById('cookie-banner').style.display='none';
+    }
+    if(!localStorage.getItem('staffalpine_cookie_ok')){
+      document.getElementById('cookie-banner').style.display='flex';
     }
 
     aggiornaNavbar();
