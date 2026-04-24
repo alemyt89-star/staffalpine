@@ -292,53 +292,24 @@
         }
       }
 
-      // Profilo pubblico azienda
-      // Strategia multipla per trovare il profilo:
-      // 1. Match esatto sul nome
-      // 2. ilike con nome completo
-      // 3. ilike con ogni parola del nome
-      const nomeRicerca = nomeAzienda.trim();
+      // Profilo pubblico azienda — usa nome_search (colonna lowercase generata automaticamente)
+      const nomeRicerca = nomeAzienda.trim().toLowerCase();
       let profilo = null;
 
-      // Tentativo 1: match esatto (case insensitive)
+      // Tentativo 1: match esatto su nome_search
       const t1 = await supabaseClient.from('profili_aziende')
         .select('nome_azienda,descrizione,zona,foto_url,sito_web,num_dipendenti,tipi_contratto,lingue_richieste')
-        .ilike('nome_azienda', nomeRicerca)
+        .eq('nome_search', nomeRicerca)
         .maybeSingle();
-      if(t1.data) { profilo = t1.data; }
+      if(t1.data){ profilo = t1.data; }
 
-      // Tentativo 2: ilike con %nome%
+      // Tentativo 2: ilike su nome_search con %nome% (copre nomi parziali)
       if(!profilo){
         const t2 = await supabaseClient.from('profili_aziende')
           .select('nome_azienda,descrizione,zona,foto_url,sito_web,num_dipendenti,tipi_contratto,lingue_richieste')
-          .ilike('nome_azienda', `%${nomeRicerca}%`)
+          .ilike('nome_search', `%${nomeRicerca}%`)
           .maybeSingle();
-        if(t2.data) { profilo = t2.data; }
-      }
-
-      // Tentativo 3: cerca per ogni parola del nome
-      if(!profilo){
-        const parole = nomeRicerca.split(/\s+/).filter(p => p.length > 2);
-        for(const parola of parole){
-          const t3 = await supabaseClient.from('profili_aziende')
-            .select('nome_azienda,descrizione,zona,foto_url,sito_web,num_dipendenti,tipi_contratto,lingue_richieste')
-            .ilike('nome_azienda', `%${parola}%`)
-            .maybeSingle();
-          if(t3.data){ profilo = t3.data; break; }
-        }
-      }
-
-      // Tentativo 4: prendi tutti e filtra in JS (fallback totale)
-      if(!profilo){
-        const t4 = await supabaseClient.from('profili_aziende')
-          .select('nome_azienda,descrizione,zona,foto_url,sito_web,num_dipendenti,tipi_contratto,lingue_richieste')
-          .limit(500);
-        if(t4.data){
-          const lower = nomeRicerca.toLowerCase();
-          profilo = t4.data.find(p =>
-            p.nome_azienda && p.nome_azienda.toLowerCase().includes(lower)
-          ) || null;
-        }
+        if(t2.data){ profilo = t2.data; }
       }
 
       if(profilo){
@@ -394,7 +365,7 @@
 
       // Recensioni
       const{data:recs,error}=await supabaseClient.from('RECENSIONI')
-        .select('*').ilike('AZIENDA',`%${nomeAzienda.trim()}%`).eq('VERIFICATA',true);
+        .select('AZIENDA,VOTO_PAGA,RISPETTO_TITOLARE,VOTO_ALLOGGIO,QUALITA_VITTO,RISPETTO_RIPOSI,RISPETTO_CONTRATTO,VITTO_INCLUSO,VOTO_ALLOGGIO,QUALITA_VITTO,STELLE,VERIFICATA,created_at').ilike('AZIENDA_SEARCH',`%${nomeAzienda.trim().toLowerCase()}%`).eq('VERIFICATA',true);
 
       if(error||!recs||recs.length===0){
         document.getElementById('media-generale').innerText='--';

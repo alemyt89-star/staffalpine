@@ -489,14 +489,14 @@
 
       // Carica profili aziende approvate (con foto e zona)
       let query = supabaseClient.from('profili_aziende')
-        .select('id, nome_azienda, zona, foto_url, is_premium')
+        .select('id, nome_azienda, nome_search, zona, foto_url, is_premium')
         .eq('is_approvata', true);
-      if (filtro) query = query.ilike('nome_azienda', `%${filtro}%`);
+      if (filtro) query = query.ilike('nome_search', `%${filtro.toLowerCase().trim()}%`);
       const { data: aziende } = await query;
 
-      // Carica tutte le recensioni verificate
+      // Carica tutte le recensioni verificate (con AZIENDA_SEARCH per matching)
       const { data: tutteLeRecs } = await supabaseClient.from('RECENSIONI')
-        .select('AZIENDA, VOTO_PAGA, RISPETTO_TITOLARE, VOTO_ALLOGGIO, QUALITA_VITTO, LOCALITA')
+        .select('AZIENDA, AZIENDA_SEARCH, VOTO_PAGA, RISPETTO_TITOLARE, VOTO_ALLOGGIO, QUALITA_VITTO, LOCALITA')
         .eq('VERIFICATA', true);
 
       container.innerHTML = "";
@@ -504,9 +504,9 @@
 
       if (aziende) {
         aziende.forEach(az => {
-          const nomePulito = az.nome_azienda.toLowerCase().trim();
+          const nomePulito = az.nome_search || az.nome_azienda.toLowerCase().trim();
           aziendeMostrate.add(nomePulito);
-          const recs = tutteLeRecs ? tutteLeRecs.filter(r => r.AZIENDA && r.AZIENDA.toLowerCase().trim().includes(nomePulito)) : [];
+          const recs = tutteLeRecs ? tutteLeRecs.filter(r => r.AZIENDA_SEARCH && r.AZIENDA_SEARCH.includes(nomePulito)) : [];
           const zona = az.zona || (recs.find(r => r.LOCALITA)?.LOCALITA) || "Valle d'Aosta";
           renderizzaCard(container, az.nome_azienda, zona, az.foto_url, recs, isLavoratore, isPremium, mioIdAzienda === az.id);
         });
@@ -517,9 +517,10 @@
         const nomiDaRecs = [...new Set(tutteLeRecs.map(r => r.AZIENDA))];
         nomiDaRecs.forEach(nomeRec => {
           if (!nomeRec) return;
-          const nomePulitoRec = nomeRec.toLowerCase().trim();
+          const primaRec = tutteLeRecs.find(r => r.AZIENDA === nomeRec);
+          const nomePulitoRec = primaRec?.AZIENDA_SEARCH || nomeRec.toLowerCase().trim();
           if (![...aziendeMostrate].some(n => nomePulitoRec.includes(n) || n.includes(nomePulitoRec))) {
-            const recs = tutteLeRecs.filter(r => r.AZIENDA && r.AZIENDA.toLowerCase().trim() === nomePulitoRec);
+            const recs = tutteLeRecs.filter(r => r.AZIENDA_SEARCH === nomePulitoRec);
             const zona = recs.find(r => r.LOCALITA)?.LOCALITA || "Valle d'Aosta";
             renderizzaCard(container, nomeRec, zona, null, recs, isLavoratore, isPremium, false);
             aziendeMostrate.add(nomePulitoRec);
