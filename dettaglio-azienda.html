@@ -119,6 +119,18 @@
     .empty-state p{font-size:14px;}
     .divider{height:1px;background:var(--grigio);margin:22px 0;}
 
+    /* RECENSIONE CARD */
+    .rec-card{background:var(--grigio);border-radius:12px;padding:16px;margin-bottom:10px;}
+    .rec-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;}
+    .rec-media{display:flex;align-items:center;gap:8px;}
+    .rec-media-num{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--scuro);}
+    .rec-stelle{color:var(--oro-chiaro);font-size:14px;}
+    .rec-data{font-size:11px;color:var(--pietra);}
+    .rec-loc{font-size:12px;color:var(--pietra);margin-bottom:10px;}
+    .rec-voti{display:flex;flex-wrap:wrap;gap:6px;}
+    .rec-voto-item{background:white;border-radius:8px;padding:6px 12px;font-size:12px;display:flex;align-items:center;gap:6px;}
+    .rec-voto-num{font-weight:700;color:var(--scuro);}
+
     /* COOKIE BANNER */
     #cookie-banner{position:fixed;bottom:0;left:0;right:0;background:var(--scuro);color:rgba(255,255,255,0.85);padding:14px 5%;display:flex;align-items:center;justify-content:space-between;gap:16px;z-index:9998;flex-wrap:wrap;box-shadow:0 -4px 20px rgba(0,0,0,0.2);}
     #cookie-banner p{font-size:12px;line-height:1.5;flex:1;min-width:220px;}
@@ -197,6 +209,14 @@
         <div id="info-gestione">
           <div class="empty-state"><span class="empty-icon">⏳</span><p>Caricamento...</p></div>
         </div>
+
+        <div class="divider"></div>
+
+        <div class="card-title">💬 Recensioni Ricevute</div>
+        <div id="lista-recensioni">
+          <div class="empty-state"><span class="empty-icon">⏳</span><p>Caricamento...</p></div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -277,6 +297,51 @@
         el.dataset.expanded = 'false';
         btn.innerText = '▸ Leggi di più';
       }
+    }
+
+    function renderRecensioni(recs){
+      const div = document.getElementById('lista-recensioni');
+      if(!div) return;
+      if(!recs || recs.length === 0){
+        div.innerHTML = `<div class="empty-state"><span class="empty-icon">📭</span><p>Nessuna recensione verificata ancora.</p></div>`;
+        return;
+      }
+      const sorted = [...recs].sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
+      div.innerHTML = sorted.map(r => {
+        // Calcola media della recensione su voti disponibili
+        const valori = [r.VOTO_PAGA, r.RISPETTO_TITOLARE, r.QUALITA_ALLOGGIO, r.QUALITA_VITTO]
+          .map(v => parseFloat(v))
+          .filter(v => !isNaN(v));
+        const media = valori.length ? (valori.reduce((a,b)=>a+b,0)/valori.length).toFixed(1) : null;
+        const stelle = media ? '⭐'.repeat(Math.round(parseFloat(media))) : '';
+        const data = r.created_at ? new Date(r.created_at).toLocaleDateString('it-IT', {month:'long', year:'numeric'}) : '';
+
+        const voti = [
+          r.VOTO_PAGA          ? {label:'💰 Retribuzione', val:r.VOTO_PAGA} : null,
+          r.RISPETTO_TITOLARE  ? {label:'🤝 Ambiente',     val:r.RISPETTO_TITOLARE} : null,
+          r.QUALITA_ALLOGGIO   ? {label:'🏠 Alloggio',     val:r.QUALITA_ALLOGGIO} : null,
+          r.QUALITA_VITTO      ? {label:'🍽️ Vitto',        val:r.QUALITA_VITTO} : null,
+        ].filter(Boolean);
+
+        const votiHTML = voti.map(v =>
+          `<div class="rec-voto-item">${v.label} <span class="rec-voto-num">${parseFloat(v.val).toFixed(1)}/5</span></div>`
+        ).join('');
+
+        const localita = r.LOCALITA ? `📍 ${r.LOCALITA}` : '';
+
+        return `
+          <div class="rec-card">
+            <div class="rec-card-header">
+              <div class="rec-media">
+                <span class="rec-media-num">${media || '--'}</span>
+                <span class="rec-stelle">${stelle}</span>
+              </div>
+              <span class="rec-data">${data}</span>
+            </div>
+            ${localita ? `<div class="rec-loc">${localita}</div>` : ''}
+            ${votiHTML ? `<div class="rec-voti">${votiHTML}</div>` : ''}
+          </div>`;
+      }).join('');
     }
 
     async function caricaDettagli(){
@@ -365,13 +430,16 @@
 
       // Recensioni
       const{data:recs,error}=await supabaseClient.from('RECENSIONI')
-        .select('AZIENDA,VOTO_PAGA,RISPETTO_TITOLARE,VOTO_ALLOGGIO,QUALITA_VITTO,RISPETTO_RIPOSI,RISPETTO_CONTRATTO,VITTO_INCLUSO,VOTO_ALLOGGIO,QUALITA_VITTO,STELLE,VERIFICATA,created_at').ilike('AZIENDA_SEARCH',`%${nomeAzienda.trim().toLowerCase()}%`).eq('VERIFICATA',true);
+        .select('AZIENDA,VOTO_PAGA,RISPETTO_TITOLARE,QUALITA_ALLOGGIO,QUALITA_VITTO,OFFRE_ALLOGGIO,OFFRE_VITTO,VERIFICATA,LOCALITA,PAGA_PUNTUALITA,STRAORDINARI,MANCE,RIPOSO,created_at')
+        .ilike('AZIENDA_SEARCH',`%${nomeAzienda.trim().toLowerCase()}%`)
+        .eq('VERIFICATA',true);
 
       if(error||!recs||recs.length===0){
         document.getElementById('media-generale').innerText='--';
         document.getElementById('tot-recensioni').innerText='Nessuna recensione verificata';
         document.getElementById('categorie-grid').innerHTML=`<div class="empty-state" style="grid-column:1/-1"><span class="empty-icon">📭</span><p>Nessuna recensione verificata per questa azienda.</p></div>`;
         document.getElementById('info-gestione').innerHTML=`<div class="empty-state"><span class="empty-icon">📭</span><p>Nessun dato disponibile.</p></div>`;
+        document.getElementById('lista-recensioni').innerHTML=`<div class="empty-state"><span class="empty-icon">📭</span><p>Nessuna recensione ancora.</p></div>`;
         return;
       }
 
@@ -443,6 +511,9 @@
         percRisposte(recs,'RIPOSO','Giorno di Riposo','🗓️');
       document.getElementById('info-gestione').innerHTML=gestione||
         `<div class="empty-state"><span class="empty-icon">📭</span><p>Nessun dato operativo disponibile.</p></div>`;
+
+      // Recensioni individuali
+      renderRecensioni(recs);
     }
 
     async function aggiornaNavbar(){
