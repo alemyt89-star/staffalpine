@@ -640,7 +640,7 @@
       const{data:profilo}=await supabaseClient.from('profili_aziende').select('*').eq('id',user.id).single();
       if(!profilo)return;
       if(!profilo.is_approvata){
-        document.querySelector('.container').innerHTML="<div class='empty-state'><span class='empty-icon'>⏳</span><h3>Profilo in attesa di approvazione</h3><p>StaffAlpin verificherà il tuo profilo a breve.</p></div>";
+        document.querySelector('.container').innerHTML="<div class='empty-state'><span class='empty-icon'>⏳</span><h3>Profilo in attesa di approvazione</h3><p>StaffAlpine verificherà il tuo profilo a breve.</p></div>";
         return;
       }
       _nomeAzienda=profilo.nome_azienda;
