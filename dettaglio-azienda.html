@@ -152,7 +152,7 @@
   </div>
 
   <nav class="main-nav">
-    <a href="#" class="nav-logo" onclick="return false;"><img src="stella-alpina.svg" alt="">StaffAlpine</a>
+    <a href="index.html" class="nav-logo"><img src="stella-alpina.svg" alt="">StaffAlpine</a>
     <div class="nav-links" id="nav-elements"></div>
   </nav>
 
@@ -419,7 +419,7 @@
 
       // Recensioni
       const{data:recs,error}=await supabaseClient.from('RECENSIONI')
-        .select('AZIENDA,VOTO_PAGA,RISPETTO_TITOLARE,VOTO_ALLOGGIO,QUALITA_VITTO,RISPETTO_RIPOSI,RISPETTO_CONTRATTO,VITTO_INCLUSO,STELLE,VERIFICATA,TESTO_RECENSIONE,created_at,PAGA_PUNTUALITA,STRAORDINARI,MANCE,RIPOSO').ilike('AZIENDA_SEARCH',`%${nomeAzienda.trim().toLowerCase()}%`).eq('VERIFICATA',true);
+        .select('AZIENDA,VOTO_PAGA,RISPETTO_TITOLARE,VOTO_ALLOGGIO,QUALITA_VITTO,QUALITA_ALLOGGIO,RISPETTO_RIPOSI,RISPETTO_CONTRATTO,VITTO_INCLUSO,STELLE,VERIFICATA,TESTO_RECENSIONE,created_at,PAGA_PUNTUALITA,STRAORDINARI,MANCE,RIPOSO').ilike('AZIENDA_SEARCH',`%${nomeAzienda.trim().toLowerCase()}%`).eq('VERIFICATA',true);
 
       if(error||!recs||recs.length===0){
         document.getElementById('media-generale').innerText='--';
@@ -511,7 +511,7 @@
       nav.innerHTML=`
         <a href="esplora-aziende.html">Esplora</a>
         <a href="${azienda?'dashboard-azienda.html':'dashboard-lavoratore.html'}">👤 Area Personale</a>
-        
+        <a onclick="logout()" class="nav-logout">Esci</a>
       `;
     }
 
