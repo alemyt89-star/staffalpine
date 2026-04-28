@@ -398,7 +398,7 @@
 
   <!-- NAVBAR -->
   <nav id="dynamic-nav" class="main-nav">
-    <a href="index.html" class="nav-logo"><img src="stella-alpina.svg" alt="">StaffAlpine</a>
+    <a href="#" class="nav-logo" onclick="return false;"><img src="stella-alpina.svg" alt="">StaffAlpine</a>
     <div id="nav-elements" class="nav-links"></div>
   </nav>
 
@@ -613,7 +613,7 @@
       const { data: azienda } = await supabaseClient.from('profili_aziende').select('id').eq('id', user.id).maybeSingle();
       navElements.innerHTML = `
         <a href="${azienda ? 'dashboard-azienda.html' : 'dashboard-lavoratore.html'}">👤 Area Personale</a>
-        <a onclick="logout()" class="nav-logout">Esci</a>
+        
       `;
     }
 

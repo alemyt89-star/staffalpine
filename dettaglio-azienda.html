@@ -119,6 +119,16 @@
     .empty-state p{font-size:14px;}
     .divider{height:1px;background:var(--grigio);margin:22px 0;}
 
+    /* RECENSIONE CARD */
+    .rec-card{background:var(--grigio);border-radius:12px;padding:16px;margin-bottom:10px;}
+    .rec-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;}
+    .rec-stelle{color:var(--oro-chiaro);font-size:15px;font-weight:700;}
+    .rec-data{font-size:11px;color:var(--pietra);}
+    .rec-voti{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+    .rec-voto-item{background:white;border-radius:8px;padding:6px 12px;font-size:12px;display:flex;align-items:center;gap:6px;}
+    .rec-voto-num{font-weight:700;color:var(--scuro);}
+    .rec-commento{font-size:13px;color:var(--testo);line-height:1.6;font-style:italic;padding-top:10px;border-top:1px solid rgba(0,0,0,0.06);}
+
     /* COOKIE BANNER */
     #cookie-banner{position:fixed;bottom:0;left:0;right:0;background:var(--scuro);color:rgba(255,255,255,0.85);padding:14px 5%;display:flex;align-items:center;justify-content:space-between;gap:16px;z-index:9998;flex-wrap:wrap;box-shadow:0 -4px 20px rgba(0,0,0,0.2);}
     #cookie-banner p{font-size:12px;line-height:1.5;flex:1;min-width:220px;}
@@ -142,7 +152,7 @@
   </div>
 
   <nav class="main-nav">
-    <a href="index.html" class="nav-logo"><img src="stella-alpina.svg" alt="">StaffAlpine</a>
+    <a href="#" class="nav-logo" onclick="return false;"><img src="stella-alpina.svg" alt="">StaffAlpine</a>
     <div class="nav-links" id="nav-elements"></div>
   </nav>
 
@@ -197,6 +207,14 @@
         <div id="info-gestione">
           <div class="empty-state"><span class="empty-icon">⏳</span><p>Caricamento...</p></div>
         </div>
+
+        <div class="divider"></div>
+
+        <div class="card-title">💬 Recensioni Ricevute</div>
+        <div id="lista-recensioni">
+          <div class="empty-state"><span class="empty-icon">⏳</span><p>Caricamento...</p></div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -277,6 +295,42 @@
         el.dataset.expanded = 'false';
         btn.innerText = '▸ Leggi di più';
       }
+    }
+
+    function renderRecensioni(recs){
+      const div = document.getElementById('lista-recensioni');
+      if(!div) return;
+      if(!recs || recs.length === 0){
+        div.innerHTML = `<div class="empty-state"><span class="empty-icon">📭</span><p>Nessuna recensione verificata ancora.</p></div>`;
+        return;
+      }
+      const sorted = [...recs].sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
+      div.innerHTML = sorted.map(r => {
+        const stelle = r.STELLE ? '⭐'.repeat(Math.round(r.STELLE)) : '';
+        const data = r.created_at ? new Date(r.created_at).toLocaleDateString('it-IT', {month:'long', year:'numeric'}) : '';
+        const voti = [
+          r.VOTO_PAGA           ? {label:'💰 Retribuzione',  val:r.VOTO_PAGA} : null,
+          r.RISPETTO_TITOLARE   ? {label:'🤝 Ambiente',      val:r.RISPETTO_TITOLARE} : null,
+          r.VOTO_ALLOGGIO       ? {label:'🏠 Alloggio',      val:r.VOTO_ALLOGGIO} : null,
+          r.QUALITA_VITTO       ? {label:'🍽️ Vitto',         val:r.QUALITA_VITTO} : null,
+          r.RISPETTO_RIPOSI     ? {label:'⏰ Riposi',         val:r.RISPETTO_RIPOSI} : null,
+          r.RISPETTO_CONTRATTO  ? {label:'📋 Contratto',      val:r.RISPETTO_CONTRATTO} : null,
+        ].filter(Boolean);
+        const votiHTML = voti.map(v =>
+          `<div class="rec-voto-item">${v.label} <span class="rec-voto-num">${parseFloat(v.val).toFixed(1)}/5</span></div>`
+        ).join('');
+        const commento = r.TESTO_RECENSIONE
+          ? `<div class="rec-commento">"${r.TESTO_RECENSIONE}"</div>` : '';
+        return `
+          <div class="rec-card">
+            <div class="rec-card-header">
+              <span class="rec-stelle">${stelle || '⭐ N/D'}</span>
+              <span class="rec-data">${data}</span>
+            </div>
+            ${votiHTML ? `<div class="rec-voti">${votiHTML}</div>` : ''}
+            ${commento}
+          </div>`;
+      }).join('');
     }
 
     async function caricaDettagli(){
@@ -365,13 +419,14 @@
 
       // Recensioni
       const{data:recs,error}=await supabaseClient.from('RECENSIONI')
-        .select('AZIENDA,VOTO_PAGA,RISPETTO_TITOLARE,VOTO_ALLOGGIO,QUALITA_VITTO,RISPETTO_RIPOSI,RISPETTO_CONTRATTO,VITTO_INCLUSO,VOTO_ALLOGGIO,QUALITA_VITTO,STELLE,VERIFICATA,created_at').ilike('AZIENDA_SEARCH',`%${nomeAzienda.trim().toLowerCase()}%`).eq('VERIFICATA',true);
+        .select('AZIENDA,VOTO_PAGA,RISPETTO_TITOLARE,VOTO_ALLOGGIO,QUALITA_VITTO,RISPETTO_RIPOSI,RISPETTO_CONTRATTO,VITTO_INCLUSO,STELLE,VERIFICATA,TESTO_RECENSIONE,created_at,PAGA_PUNTUALITA,STRAORDINARI,MANCE,RIPOSO').ilike('AZIENDA_SEARCH',`%${nomeAzienda.trim().toLowerCase()}%`).eq('VERIFICATA',true);
 
       if(error||!recs||recs.length===0){
         document.getElementById('media-generale').innerText='--';
         document.getElementById('tot-recensioni').innerText='Nessuna recensione verificata';
         document.getElementById('categorie-grid').innerHTML=`<div class="empty-state" style="grid-column:1/-1"><span class="empty-icon">📭</span><p>Nessuna recensione verificata per questa azienda.</p></div>`;
         document.getElementById('info-gestione').innerHTML=`<div class="empty-state"><span class="empty-icon">📭</span><p>Nessun dato disponibile.</p></div>`;
+        document.getElementById('lista-recensioni').innerHTML=`<div class="empty-state"><span class="empty-icon">📭</span><p>Nessuna recensione ancora.</p></div>`;
         return;
       }
 
@@ -443,6 +498,9 @@
         percRisposte(recs,'RIPOSO','Giorno di Riposo','🗓️');
       document.getElementById('info-gestione').innerHTML=gestione||
         `<div class="empty-state"><span class="empty-icon">📭</span><p>Nessun dato operativo disponibile.</p></div>`;
+
+      // Recensioni individuali
+      renderRecensioni(recs);
     }
 
     async function aggiornaNavbar(){
@@ -453,7 +511,7 @@
       nav.innerHTML=`
         <a href="esplora-aziende.html">Esplora</a>
         <a href="${azienda?'dashboard-azienda.html':'dashboard-lavoratore.html'}">👤 Area Personale</a>
-        <a onclick="logout()" class="nav-logout">Esci</a>
+        
       `;
     }
 

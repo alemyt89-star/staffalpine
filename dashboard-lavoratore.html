@@ -170,7 +170,7 @@
 
 
   <nav class="main-nav">
-    <a href="index.html" class="nav-logo"><img src="stella-alpina.svg" alt="">StaffAlpine</a>
+    <a href="#" class="nav-logo" onclick="return false;"><img src="stella-alpina.svg" alt="">StaffAlpine</a>
     <div class="nav-user">
       <span class="nav-user-name" id="nav-nome"></span>
       <span id="nav-badge-proposte" onclick="showTab('proposte',document.getElementById('tab-proposte'))" style="display:none;background:var(--rosso);color:white;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;cursor:pointer;" title="Proposte ricevute">🔔 <span id="nav-badge-num">0</span></span>
@@ -604,7 +604,7 @@
             const dal      = prof[`exp${n}_dal`]      || '';
             const al       = prof[`exp${n}_al`]       || '';
             const verif    = prof[`exp${n}_verificata`];
-            const pending  = prof[`exp${n}_verifica_pending`];
+            const pending  = prof[`exp${n}_verifica_pending`] || (!verif && !!prof[`exp${n}_doc_url`]);
             const badgeHTML = verif
               ? `<span style="background:#d1f0e0;color:var(--verde);font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;flex-shrink:0;">✅ Verificata</span>`
               : pending
@@ -801,9 +801,10 @@
     function buildExpExtraHTML(n, dati = {}){
       // Area verifica: badge già verificato, pending, o form upload
       let verificaHTML = '';
+      const pendingEffettivo = dati.pending || (!dati.verificata && !!dati.doc_url);
       if(dati.verificata){
         verificaHTML = `<p style="font-size:12px;color:var(--verde);font-weight:700;margin-top:8px;">✅ Esperienza verificata</p>`;
-      } else if(dati.pending){
+      } else if(pendingEffettivo){
         verificaHTML = `<p style="font-size:12px;color:var(--oro);font-weight:700;margin-top:8px;">⏳ Documento in attesa di verifica</p>`;
       } else {
         verificaHTML = buildUploadAreaHTML(n);
@@ -945,7 +946,8 @@
               dal:        prof[`exp${n}_dal`]||'',
               al:         prof[`exp${n}_al`]||'',
               verificata: prof[`exp${n}_verificata`]||false,
-              pending:    prof[`exp${n}_verifica_pending`]||false
+              pending:    prof[`exp${n}_verifica_pending`]||false,
+              doc_url:    prof[`exp${n}_doc_url`]||''
             }));
             // Imposta la località dopo inserimento DOM
             setTimeout(()=>{
