@@ -403,6 +403,17 @@
           <button class="btn-login" id="btn-invia-accesso" onclick="inviaCodice()">
             <span>Invia Codice →</span>
           </button>
+
+          <!-- BOTTONI DEMO (visibili solo con ?demo=true) -->
+          <div id="demo-section" style="display:none;margin-top:24px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.1);">
+            <p style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--oro-chiaro);text-align:center;margin-bottom:14px;font-weight:600;">Demo Access</p>
+            <button class="btn-login" type="button" onclick="loginDemo('lavoratore')" style="background:rgba(82,183,136,0.2);border:1px solid rgba(82,183,136,0.4);margin-bottom:10px;">
+              <span>👤 Demo Worker</span>
+            </button>
+            <button class="btn-login" type="button" onclick="loginDemo('azienda')" style="background:rgba(201,168,76,0.2);border:1px solid rgba(201,168,76,0.4);">
+              <span>🏢 Demo Business</span>
+            </button>
+          </div>
         </div>
 
         <!-- STEP 2 — OTP 6 caselle -->
@@ -456,6 +467,43 @@
     } else {
       const rlav = document.getElementById('role-badge-lav');
       if(rlav) rlav.style.display = 'block';
+    }
+
+    // Mostra i bottoni demo se ?demo=true e' nell'URL
+    if (urlParams.get('demo') === 'true') {
+      const demoSection = document.getElementById('demo-section');
+      if (demoSection) demoSection.style.display = 'block';
+    }
+
+    // Login demo con password (bypassa OTP) — per revisione Google Play
+    async function loginDemo(tipo) {
+      const credentials = {
+        lavoratore: { email: 'demo.lavoratore@staffalpine.it', password: 'StaffAlpineDemo2026!' },
+        azienda:    { email: 'demo.azienda@staffalpine.it',    password: 'StaffAlpineDemo2026!' }
+      };
+      const creds = credentials[tipo];
+      if (!creds) return;
+
+      // Auto-accetta consenso se presente (per la demo)
+      const consenso = document.getElementById('check-consenso');
+      if (consenso) consenso.checked = true;
+
+      const buttons = document.querySelectorAll('#demo-section button');
+      buttons.forEach(b => b.disabled = true);
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: creds.email,
+        password: creds.password
+      });
+
+      if (error) {
+        alert('Errore demo login: ' + error.message);
+        buttons.forEach(b => b.disabled = false);
+        return;
+      }
+      if (data && data.user) {
+        smistaUtente(data.user);
+      }
     }
 
     let _metodo = 'otp';
