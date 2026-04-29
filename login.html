@@ -785,10 +785,13 @@
     }
     mostraTastoAdminSeAutorizzato();
 
-    // Auto-submit OTP quando raggiunge 6 cifre
-    document.getElementById('otp-code').addEventListener('input', function() {
-      if (this.value.length === 6) verificaCodice();
-    });
+    // Auto-submit OTP quando raggiunge 6 cifre (legacy: input #otp-code non piu esistente, sostituito da .otp-cell)
+    const _legacyOtp = document.getElementById('otp-code');
+    if (_legacyOtp) {
+      _legacyOtp.addEventListener('input', function() {
+        if (this.value.length === 6) verificaCodice();
+      });
+    }
   </script>
   <!-- COOKIE BANNER -->
   <div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:99998;background:rgba(26,46,26,0.97);backdrop-filter:blur(8px);border-top:1px solid rgba(82,183,136,0.2);padding:14px 5%;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;box-shadow:0 -4px 24px rgba(0,0,0,0.2);">
