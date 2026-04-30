@@ -67,104 +67,61 @@
 
       <div class="toc">
         <div class="toc-title">Indice</div>
-        <a href="#c1">1. Cosa sono i cookie</a>
-        <a href="#c2">2. Tipologie di cookie utilizzati</a>
-        <a href="#c3">3. Cookie tecnici di prima parte</a>
-        <a href="#c4">4. Tecnologie di terze parti</a>
-        <a href="#c5">5. Cookie non utilizzati</a>
-        <a href="#c6">6. Come gestire i cookie</a>
+        <a href="#c0">Premessa</a>
+        <a href="#c1">1. Titolare del Trattamento</a>
+        <a href="#c2">2. Cosa sono i Cookie</a>
+        <a href="#c3">3. Permanenza dei Cookie</a>
+        <a href="#c4">4. Cookie utilizzati</a>
+        <a href="#c5">5. Strumenti di Terze Parti</a>
+        <a href="#c6">6. Disattivazione Cookie</a>
         <a href="#c7">7. Service Worker e PWA</a>
         <a href="#c8">8. Aggiornamenti</a>
-        <a href="#c9">9. Contatti</a>
       </div>
 
-      <div class="highlight">
-        ✅ StaffAlpine utilizza esclusivamente cookie tecnici strettamente necessari al funzionamento della piattaforma. Non utilizziamo cookie di profilazione, marketing o tracciamento comportamentale. Non è quindi richiesto il tuo consenso ai cookie per utilizzare il sito.
+      <p id="c0">Siamo profondamente impegnati a mantenere la fiducia e l'affidamento dei nostri Utenti, pertanto crediamo sia importante spiegare, nel modo più chiaro possibile, come e quando utilizziamo i cookie e tecnologie simili sul nostro sito internet per raccogliere e usare le Vostre informazioni. Alcune delle finalità di installazione dei cookie potrebbero, inoltre, necessitare del consenso dell'Utente, il quale può essere revocato liberamente in ogni momento.</p>
+
+      <h2 id="c1">1. Titolare del Trattamento</h2>
+      <div class="info-box">
+        <strong>Alexandra Mititelu</strong>
+        Località Grand Chemin 93, Saint-Christophe (AO)<br>
+        Email: <a href="mailto:info@staffalpine.it" style="color:var(--verde);">info@staffalpine.it</a><br>
+        PEC: <a href="mailto:mititelu.alexandra@pec.it" style="color:var(--verde);">mititelu.alexandra@pec.it</a>
       </div>
 
-      <h2 id="c1">1. Cosa sono i cookie</h2>
-      <p>I cookie sono piccoli file di testo che i siti web inviano al browser dell'utente durante la navigazione. Vengono memorizzati nel dispositivo e ritrasmessi al sito nelle visite successive. Servono a far funzionare le pagine web, a ricordare le preferenze dell'utente o — nel caso di cookie di profilazione — a tracciare il comportamento degli utenti a fini pubblicitari.</p>
-      <p>Oltre ai cookie veri e propri, esistono tecnologie simili come il <strong>localStorage</strong> e il <strong>sessionStorage</strong>, che memorizzano dati localmente nel browser senza inviarli automaticamente ai server, e i <strong>Service Worker</strong>, utilizzati per le funzionalità offline delle Progressive Web App (PWA).</p>
-
-      <h2 id="c2">2. Tipologie di cookie utilizzati</h2>
-      <p>La presente Cookie Policy si riferisce al sito <strong>staffalpine.it</strong> e alla relativa PWA. In conformità al Provvedimento del Garante per la Protezione dei Dati Personali dell'8 ottobre 2014 e alle Linee Guida del 10 giugno 2021, i cookie si distinguono in:</p>
+      <h2 id="c2">2. Cosa sono i Cookie</h2>
+      <p>I cookie sono identificativi unici, normalmente composti da piccole porzioni di testo o codici, che vengono inviati dal sito web e memorizzati dal browser Internet nel computer o in altro dispositivo (ad esempio, tablet o cellulare) dell'utente.</p>
+      <p>Per default quasi tutti i browser web sono impostati per accettare automaticamente i cookie.</p>
+      <p>Tipicamente i cookie possono essere installati:</p>
       <ul>
-        <li><strong>Cookie tecnici</strong> — necessari al funzionamento del sito; non richiedono consenso</li>
-        <li><strong>Cookie analitici di terze parti anonimizzati</strong> — assimilati ai tecnici se l'IP è mascherato; non richiedono consenso</li>
-        <li><strong>Cookie di profilazione</strong> — richiedono consenso esplicito prima dell'installazione</li>
+        <li>direttamente dal proprietario e/o responsabile del sito web (c.d. <strong>cookie di prima parte</strong>);</li>
+        <li>da responsabili estranei al sito web visitato dall'utente (c.d. <strong>cookie di terza parte</strong>). Ove non diversamente specificato, si rammenta che questi cookie ricadono sotto la diretta ed esclusiva responsabilità dello stesso gestore. Ulteriori informazioni sulla privacy e sul loro uso sono reperibili direttamente sui siti dei rispettivi gestori.</li>
       </ul>
-      <p>StaffAlpine utilizza esclusivamente cookie tecnici e tecnologie assimilate. Non installiamo cookie di profilazione.</p>
 
-      <h2 id="c3">3. Cookie tecnici di prima parte</h2>
+      <h2 id="c3">3. Permanenza dei Cookie sui Dispositivi</h2>
+      <p>I cookie sono classificati come <strong>"di Sessione"</strong> o <strong>"Persistenti"</strong>.</p>
+      <p>I primi sono i cookie che non vengono memorizzati in modo persistente sul computer dell'utente e sono strettamente limitati alla trasmissione di identificativi di sessione necessari per consentire l'esplorazione sicura ed efficiente del sito evitando il ricorso ad altre tecniche informatiche potenzialmente pregiudizievoli per la riservatezza della navigazione degli utenti.</p>
+      <p>I secondi sono i cookie che rimangono memorizzati sul disco rigido del computer fino alla loro scadenza o cancellazione da parte degli utenti/visitatori. Tramite i cookie persistenti i visitatori che accedono al sito (o eventuali altri utenti che impiegano il medesimo computer) vengono automaticamente riconosciuti ad ogni visita.</p>
 
-      <table>
-        <tr>
-          <th>Nome / Tecnologia</th>
-          <th>Tipo</th>
-          <th>Finalità</th>
-          <th>Durata</th>
-        </tr>
-        <tr>
-          <td><code>sb-&lt;project&gt;-auth-token</code></td>
-          <td><span class="badge badge-tecnico">Tecnico</span></td>
-          <td>Sessione di autenticazione Supabase. Mantiene l'utente connesso dopo il login tramite OTP. Senza questo cookie non è possibile accedere all'area riservata.</td>
-          <td>Sessione / max 7 giorni</td>
-        </tr>
-        <tr>
-          <td><code>localStorage</code> — <code>staffalpine_ob_*</code></td>
-          <td><span class="badge badge-tecnico">Tecnico</span></td>
-          <td>Memorizza localmente se l'utente ha completato il flusso di onboarding introduttivo. Nessun dato personale. Non viene inviato a server esterni.</td>
-          <td>Persistente (fino a cancellazione manuale)</td>
-        </tr>
-        <tr>
-          <td><code>localStorage</code> — preferenze UI</td>
-          <td><span class="badge badge-tecnico">Tecnico</span></td>
-          <td>Memorizza eventuali preferenze di visualizzazione dell'interfaccia. Nessun dato personale.</td>
-          <td>Persistente (fino a cancellazione manuale)</td>
-        </tr>
-      </table>
+      <h2 id="c4">4. Cookie utilizzati dal sito</h2>
+      <p>Questo sito web utilizza, anche in combinazione tra di loro, i seguenti tipi di cookie:</p>
 
-      <h2 id="c4">4. Tecnologie di terze parti</h2>
+      <h3>4.1 Cookie di prima parte — Tecnici/Necessari</h3>
+      <p>Sono i cookie necessari alla trasmissione di comunicazioni su rete di comunicazione elettronica ovvero cookie strettamente necessari al fornitore per erogare il servizio richiesto dal cliente. <strong>Per questi tipi di cookie non è richiesto il consenso preventivo e informato dell'utente.</strong></p>
 
-      <h3>4.1 Google Fonts</h3>
+      <h3>4.2 Cookie di terza parte — Tecnici/Necessari</h3>
+      <p>Sono i cookie necessari alla trasmissione di comunicazioni su rete di comunicazione elettronica ovvero cookie strettamente necessari al fornitore per erogare il servizio richiesto dal cliente. <strong>Per questi tipi di cookie non è richiesto il consenso preventivo e informato dell'utente.</strong></p>
+
+      <h2 id="c5">5. Strumenti di tracciamento di Terze Parti</h2>
+
+      <h3>5.1 Google Fonts</h3>
       <p>La piattaforma carica i font tipografici (Playfair Display, DM Sans) dai server di Google LLC tramite il servizio Google Fonts. Ogni caricamento della pagina comporta una richiesta ai server di Google, che può comportare la raccolta dell'indirizzo IP del visitatore. Google dichiara di non utilizzare questi dati per finalità di profilazione.</p>
+      <p><strong>Luogo del trattamento:</strong> Stati Uniti — <a href="https://policies.google.com/privacy" target="_blank" rel="noopener" style="color:var(--verde);">Privacy Policy</a></p>
 
-      <table>
-        <tr><th>Dato trasmesso</th><th>Destinatario</th><th>Garanzia trasferimento</th></tr>
-        <tr>
-          <td>Indirizzo IP, browser, pagina richiesta</td>
-          <td>Google LLC (USA)</td>
-          <td>Standard Contractual Clauses (SCC)</td>
-        </tr>
-      </table>
+      <h2 id="c6">6. Disattivazione Cookie</h2>
+      <p>L'utente potrà gestire, ovvero richiedere la disattivazione generale o la cancellazione dei cookie, modificando le impostazioni del proprio browser Internet e impedire — ad esempio — che terze parti possano installarne. Tale disattivazione, però, potrà rallentare o impedire l'accesso alla web app.</p>
+      <p>Tramite le preferenze del browser è inoltre possibile eliminare i cookie installati in passato, incluso il cookie in cui venga eventualmente salvato il consenso all'installazione di cookie da parte di questo sito.</p>
+      <p>Le impostazioni per gestire o disattivare i cookie possono variare a seconda del browser Internet utilizzato, pertanto, per avere maggiori informazioni sulle modalità con le quali compiere tali operazioni, suggeriamo all'Utente di consultare il manuale del proprio dispositivo o la funzione "Aiuto" o "Help" del proprio browser Internet.</p>
 
-      <div class="highlight-warn">
-        ⚠️ Se desideri impedire la trasmissione di dati a Google Fonts, puoi bloccare le richieste verso <code>fonts.googleapis.com</code> e <code>fonts.gstatic.com</code> tramite le impostazioni del tuo browser o un'estensione come uBlock Origin. Il sito continuerà a funzionare con i font di sistema del dispositivo.
-      </div>
-
-      <h3>4.2 Cloudflare</h3>
-      <p>Il sito è protetto da Cloudflare Inc., che agisce come proxy tra il browser dell'utente e i nostri server. Cloudflare elabora i dati di traffico (incluso l'IP) per finalità di sicurezza (protezione DDoS, Web Application Firewall). Cloudflare non utilizza questi dati per pubblicità.</p>
-      <p>Cloudflare può impostare i seguenti cookie tecnici:</p>
-      <table>
-        <tr><th>Nome</th><th>Finalità</th><th>Durata</th></tr>
-        <tr><td><code>__cf_bm</code></td><td>Protezione bot e sicurezza della rete Cloudflare</td><td>30 minuti</td></tr>
-        <tr><td><code>cf_clearance</code></td><td>Superamento challenge di sicurezza Cloudflare (attivato solo in caso di traffico anomalo)</td><td>30 minuti / 1 anno</td></tr>
-      </table>
-      <p>Questi cookie sono tecnici e di sicurezza: non richiedono consenso. Per maggiori informazioni: <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener" style="color:var(--verde);">Privacy Policy Cloudflare</a>.</p>
-
-      <h2 id="c5">5. Cookie non utilizzati</h2>
-      <p>StaffAlpine <strong>non utilizza</strong> e <strong>non installa</strong>:</p>
-      <ul>
-        <li>Cookie di profilazione o marketing (Google Ads, Facebook Pixel, ecc.)</li>
-        <li>Cookie di analisi comportamentale (Google Analytics, Hotjar, Mixpanel, ecc.)</li>
-        <li>Cookie di social network (pulsanti di condivisione con tracciamento)</li>
-        <li>Cookie di retargeting pubblicitario</li>
-        <li>Fingerprinting del browser o tecniche di tracciamento alternative ai cookie</li>
-      </ul>
-
-      <h2 id="c6">6. Come gestire i cookie</h2>
-      <p>Poiché StaffAlpine utilizza solo cookie tecnici necessari, il blocco dei cookie potrebbe impedire il corretto funzionamento dell'autenticazione e di altre funzionalità essenziali.</p>
-      <p>Puoi comunque gestire i cookie tramite le impostazioni del tuo browser:</p>
       <table>
         <tr><th>Browser</th><th>Come accedere alle impostazioni cookie</th></tr>
         <tr><td>Google Chrome</td><td>Impostazioni → Privacy e sicurezza → Cookie e altri dati dei siti</td></tr>
@@ -172,7 +129,10 @@
         <tr><td>Safari (iOS/macOS)</td><td>Impostazioni → Safari → Privacy → Blocca tutti i cookie</td></tr>
         <tr><td>Microsoft Edge</td><td>Impostazioni → Cookie e autorizzazioni del sito → Cookie</td></tr>
       </table>
-      <p>Per eliminare i dati salvati nel localStorage del browser relativi a StaffAlpine: apri gli Strumenti per sviluppatori (F12) → Applicazione → Archiviazione locale → staffalpine.it → cancella le voci presenti.</p>
+
+      <div class="highlight-warn">
+        💡 Per eliminare i dati salvati nel <strong>localStorage</strong> del browser relativi a StaffAlpine: apri gli Strumenti per sviluppatori (F12) → Applicazione → Archiviazione locale → staffalpine.it → cancella le voci presenti.
+      </div>
 
       <h2 id="c7">7. Service Worker e PWA</h2>
       <p>Se installi StaffAlpine come Progressive Web App (PWA), il browser registra un <strong>Service Worker</strong> — uno script che viene eseguito in background e consente il funzionamento offline e la gestione della cache. Il Service Worker:</p>
@@ -182,19 +142,11 @@
         <li>Può essere rimosso disinstallando la PWA o tramite le impostazioni del browser (Impostazioni → Privacy → Service Worker)</li>
         <li>Viene aggiornato automaticamente quando è disponibile una nuova versione della piattaforma</li>
       </ul>
-      <p>La versione attuale del Service Worker è identificata come <strong>v5</strong>. Ogni aggiornamento della piattaforma può richiedere il re-download delle risorse in cache.</p>
+      <p>Ogni aggiornamento della piattaforma può richiedere il re-download delle risorse in cache.</p>
 
       <h2 id="c8">8. Aggiornamenti</h2>
       <p>La presente Cookie Policy può essere aggiornata in caso di modifiche tecnologiche o normative. La versione aggiornata con la data di ultima modifica è sempre disponibile su questa pagina. Modifiche sostanziali saranno comunicate agli utenti registrati via email.</p>
-
-      <h2 id="c9">9. Contatti</h2>
-      <p>Per qualsiasi domanda relativa all'uso dei cookie su StaffAlpine:</p>
-      <div class="info-box">
-        <strong>Team StaffAlpine</strong>
-        Località Grand Chemin 93, Saint-Christophe (AO) — 11020<br>
-        P.IVA: 01275120077<br>
-        Email: <a href="mailto:info@staffalpine.it" style="color:var(--verde);">info@staffalpine.it</a>
-      </div>
+      <p>Vista l'oggettiva complessità dell'argomento l'Utente è invitato a contattare il Titolare qualora volesse ricevere qualunque approfondimento all'indirizzo <a href="mailto:info@staffalpine.it" style="color:var(--verde);">info@staffalpine.it</a>.</p>
 
       <p class="updated">Ultimo aggiornamento: Aprile 2026</p>
     </div>
