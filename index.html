@@ -848,6 +848,13 @@
     function accettaPrivacy() {
       localStorage.setItem(PRIVACY_KEY, '1');
       document.getElementById('modal-privacy').style.display = 'none';
+
+      // Dopo accettazione, vai alla destinazione salvata
+      const dest = sessionStorage.getItem('redirect_after_privacy');
+      if (dest) {
+        sessionStorage.removeItem('redirect_after_privacy');
+        window.location.href = dest;
+      }
     }
 
     // Intercetta tutti i link verso login.html
@@ -861,14 +868,6 @@
         }
       });
     });
-
-    // Dopo accettazione, vai alla destinazione
-      const dest = sessionStorage.getItem('redirect_after_privacy');
-      if (dest) {
-        sessionStorage.removeItem('redirect_after_privacy');
-        window.location.href = dest;
-      }
-    }
 
     // COOKIE BANNER
     (function(){
