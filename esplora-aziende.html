@@ -271,6 +271,7 @@
     .voto-medio { background: #fff8e1; color: #b7791f; }
     .voto-basso { background: #fde8e8; color: #9b2c2c; }
     .voto-nd    { background: #f1f5f9; color: #94a3b8; }
+    .voto-nuova { background: #e0f2fe; color: #0c5b8e; }
 
     .azienda-loc {
       font-size: 12px;
@@ -519,7 +520,8 @@
           if (!nomeRec) return;
           const primaRec = tutteLeRecs.find(r => r.AZIENDA === nomeRec);
           const nomePulitoRec = primaRec?.AZIENDA_SEARCH || nomeRec.toLowerCase().trim();
-          if (![...aziendeMostrate].some(n => nomePulitoRec.includes(n) || n.includes(nomePulitoRec))) {
+          // Match esatto invece di parziale per evitare di escludere aziende simili
+          if (!aziendeMostrate.has(nomePulitoRec)) {
             const recs = tutteLeRecs.filter(r => r.AZIENDA_SEARCH === nomePulitoRec);
             const zona = recs.find(r => r.LOCALITA)?.LOCALITA || "Valle d'Aosta";
             renderizzaCard(container, nomeRec, zona, null, recs, isLavoratore, isPremium, false);
@@ -557,8 +559,8 @@
         if (count > 0) media = (somma / count).toFixed(1);
       }
 
-      let votoBadgeClass = 'voto-nd';
-      let votoLabel = '⭐ N/D';
+      let votoBadgeClass = 'voto-nuova';
+      let votoLabel = '✨ Nuova';
       if (media !== null) {
         const m = parseFloat(media);
         votoLabel = `⭐ ${media}`;
