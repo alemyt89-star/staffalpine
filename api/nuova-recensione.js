@@ -45,9 +45,11 @@ module.exports = async function handler(req, res) {
                 </a>
               </div>
             </div>
-            <p style="color: #6b705c; font-size: 12px; text-align: center; margin-top: 16px;">
-              StaffAlpine — Valle d'Aosta
-            </p>
+            <div style="text-align:center; margin-top:20px; padding-top:16px; border-top:1px solid #d4d8d0;">
+              <p style="color:#6b705c; font-size:12px; margin:0;">
+                StaffAlpine — Valle d'Aosta · Notifica interna pannello admin
+              </p>
+            </div>
           </div>
         `
       })

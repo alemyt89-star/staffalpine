@@ -46,9 +46,15 @@ module.exports = async function handler(req, res) {
                 </a>
               </div>
             </div>
-            <p style="color: #6b705c; font-size: 12px; text-align: center; margin-top: 16px;">
-              StaffAlpine — Valle d'Aosta | <a href="https://staffalpine.it" style="color: #52b788;">staffalpine.it</a>
-            </p>
+            <div style="text-align:center; margin-top:20px; padding-top:16px; border-top:1px solid #d4d8d0;">
+              <p style="color:#6b705c; font-size:12px; margin:0 0 8px;">
+                StaffAlpine — Valle d'Aosta · <a href="https://staffalpine.it" style="color:#52b788; text-decoration:none;">staffalpine.it</a>
+              </p>
+              <p style="color:#9aa093; font-size:11px; margin:0; line-height:1.5;">
+                Ricevi questa email perché sei registrato su StaffAlpine.<br>
+                Per non ricevere più comunicazioni: <a href="mailto:info@staffalpine.it?subject=Disiscrizione%20StaffAlpine&body=Vorrei%20disiscrivermi%20dalle%20comunicazioni%20email%20di%20StaffAlpine." style="color:#9aa093;">disiscriviti</a>
+              </p>
+            </div>
           </div>
         `
       })
