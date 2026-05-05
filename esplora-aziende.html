@@ -497,7 +497,7 @@
 
       // Carica tutte le recensioni verificate (con AZIENDA_SEARCH per matching)
       const { data: tutteLeRecs } = await supabaseClient.from('RECENSIONI')
-        .select('AZIENDA, AZIENDA_SEARCH, VOTO_PAGA, RISPETTO_TITOLARE, VOTO_ALLOGGIO, QUALITA_VITTO, LOCALITA')
+        .select('AZIENDA, AZIENDA_SEARCH, VOTO_PAGA, RISPETTO_TITOLARE, QUALITA_ALLOGGIO, QUALITA_VITTO, LOCALITA')
         .eq('VERIFICATA', true);
 
       container.innerHTML = "";
@@ -553,7 +553,7 @@
         recs.forEach(r => {
           if (r.VOTO_PAGA)           { somma += parseFloat(r.VOTO_PAGA);          count++; }
           if (r.RISPETTO_TITOLARE)   { somma += parseFloat(r.RISPETTO_TITOLARE);  count++; }
-          const vitto = r.VOTO_ALLOGGIO || r.QUALITA_VITTO;
+          const vitto = r.QUALITA_ALLOGGIO || r.QUALITA_VITTO;
           if (vitto)                 { somma += parseFloat(vitto);                count++; }
         });
         if (count > 0) media = (somma / count).toFixed(1);
