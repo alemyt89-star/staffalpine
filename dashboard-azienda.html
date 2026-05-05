@@ -290,7 +290,11 @@
       <div class="drawer-sub" id="drawer-sub-az">StaffAlpine Business</div>
     </div>
     <div class="drawer-body">
-      <button class="drawer-item active" id="di-panoramica" onclick="drawerTab('panoramica',this)">
+      <button class="drawer-item active" id="di-profilo-az" onclick="drawerTab('profilo-az',this)">
+        <span class="drawer-item-icon">&#127970;</span>
+        <span class="drawer-item-text">Il Mio Profilo</span>
+      </button>
+      <button class="drawer-item" id="di-panoramica" onclick="drawerTab('panoramica',this)">
         <span class="drawer-item-icon">&#128202;</span>
         <span class="drawer-item-text">Panoramica</span>
       </button>
@@ -307,17 +311,13 @@
         <span class="drawer-item-icon">&#128226;</span>
         <span class="drawer-item-text">Pubblica Offerta</span>
       </button>
-      <button class="drawer-item" id="di-profilo-az" onclick="drawerTab('profilo-az',this)">
-        <span class="drawer-item-icon">&#127970;</span>
-        <span class="drawer-item-text">Il Mio Profilo</span>
-      </button>
       <button class="drawer-item" id="di-talenti" onclick="drawerTab('talenti',this)">
         <span class="drawer-item-icon">&#128269;</span>
         <span class="drawer-item-text">Database Talenti</span>
       </button>
-      <button class="drawer-item" id="di-mercato" onclick="drawerTab('mercato',this)">
+      <button class="drawer-item" id="di-mercato" onclick="window.location.href='esplora-aziende.html'">
         <span class="drawer-item-icon">&#128203;</span>
-        <span class="drawer-item-text">Recensioni Mercato</span>
+        <span class="drawer-item-text">Mercato &amp; Recensioni</span>
       </button>
       <div class="drawer-divider"></div>
       <button class="drawer-item danger" onclick="logout()">
@@ -355,13 +355,13 @@
 
   <!-- TAB BAR -->
   <div class="tab-bar">
-    <button class="tab-btn active" onclick="showTab('panoramica',this)">📊 Panoramica</button>
+    <button class="tab-btn active" onclick="showTab('profilo-az',this)">🏢 Il Mio Profilo</button>
+    <button class="tab-btn" onclick="showTab('panoramica',this)">📊 Panoramica</button>
     <button class="tab-btn" onclick="showTab('notifiche',this)">🔔 Lavoratori <span id="badge-notifiche" style="background:var(--rosso);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;display:none;">0</span></button>
     <button class="tab-btn" onclick="showTab('mie-offerte',this)">📋 Le Mie Offerte</button>
     <button class="tab-btn" onclick="showTab('offerte',this)">📢 Pubblica Offerta</button>
-    <button class="tab-btn" onclick="showTab('profilo-az',this)">🏢 Il Mio Profilo</button>
     <button class="tab-btn" onclick="showTab('talenti',this)">🔍 Database Talenti</button>
-    <button class="tab-btn" onclick="showTab('mercato',this)">📋 Recensioni Mercato</button>
+    <button class="tab-btn" onclick="window.location.href='esplora-aziende.html'">📋 Mercato & Recensioni</button>
     <button class="tab-btn" onclick="logout()" style="color:#e88080;margin-left:auto;">⬡ Esci</button>
     
   </div>
@@ -369,7 +369,7 @@
   <div class="container">
 
     <!-- PANORAMICA -->
-    <div id="panoramica" class="section active">
+    <div id="panoramica" class="section">
 
       <div id="banner-upgrade" class="upgrade-banner" style="display:none;">
         <div>
@@ -500,7 +500,7 @@
     </div>
 
     <!-- PROFILO AZIENDA -->
-    <div id="profilo-az" class="section">
+    <div id="profilo-az" class="section active">
 
       <!-- VISUALIZZAZIONE PROFILO -->
       <div id="profilo-az-view" style="display:none;">
