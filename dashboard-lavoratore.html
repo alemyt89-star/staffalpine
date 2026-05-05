@@ -183,7 +183,7 @@
     <button class="tab-btn active" id="tab-profilo" onclick="showTab('profilo',this)">👤 Area Personale</button>
     <button class="tab-btn" id="tab-proposte" onclick="showTab('proposte',this)">🔔 Proposte <span class="tab-badge" id="badge-notifiche">New</span></button>
     <button class="tab-btn" id="tab-recensioni" onclick="showTab('recensioni',this)">✍️ Mie Recensioni</button>
-    <button class="tab-btn" id="tab-cerca" onclick="showTab('cerca',this)">🏢 Cerca Azienda</button>
+    <button class="tab-btn" id="tab-cerca" onclick="window.location.href='esplora-aziende.html'">🏢 Cerca Azienda</button>
     <button class="tab-btn" id="tab-offerte" onclick="showTab('offerte',this)">💼 Offerte Lavoro</button>
     <button class="tab-btn" onclick="logout()" style="color:#e88080;margin-left:auto;">⬡ Esci</button>
   </div>
@@ -215,16 +215,7 @@
       <div id="lista-mie-recensioni"></div>
     </div>
 
-    <div id="cerca" class="section">
-      <h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--scuro);margin-bottom:20px;">🏢 Cerca un'Azienda</h2>
-      <div class="search-row">
-        <input type="text" id="input-cerca-az" placeholder="Inserisci il nome dell'azienda..." oninput="filtraAziende(this.value)">
-        <button class="btn-primary" onclick="filtraAziende(document.getElementById('input-cerca-az').value)">Cerca →</button>
-      </div>
-      <div id="risultato-ricerca-az">
-        <div class="empty-state"><span class="empty-icon">⏳</span><h3>Caricamento...</h3></div>
-      </div>
-    </div>
+    <div id="cerca" class="section"></div>
 
     <div id="offerte" class="section">
       <h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--scuro);margin-bottom:20px;">💼 Offerte di Lavoro in Valle</h2>
@@ -438,7 +429,7 @@
         <span class="drawer-item-icon">&#9997;&#65039;</span>
         <span class="drawer-item-text">Mie Recensioni</span>
       </button>
-      <button class="drawer-item" id="di-cerca" onclick="drawerTab('cerca',this)">
+      <button class="drawer-item" id="di-cerca" onclick="window.location.href='esplora-aziende.html'">
         <span class="drawer-item-icon">&#127970;</span>
         <span class="drawer-item-text">Cerca Azienda</span>
       </button>
@@ -540,7 +531,7 @@
       document.getElementById(id).classList.add('active');
       btn.classList.add('active');
       if(id==='offerte')caricaOfferte();
-      if(id==='cerca')caricaAziendeCerca();
+      if(id==='cerca'){window.location.href='esplora-aziende.html';return;}
       if(id==='recensioni')caricaMieRecensioni();
     }
 
@@ -683,100 +674,6 @@
             <button onclick="condividiOfferta('${o.id}','${(o.ruolo||'').replace(/'/g,"\\'")}','${(o.nome_azienda||'').replace(/'/g,"\\'")}');" style="background:#25D366;color:white;border:none;padding:8px 16px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">📲 Condividi</button>
           </div>
         </div>`).join('');
-    }
-
-    let _tutteAziende = [];
-
-    async function caricaAziendeCerca(){
-      const [{ data: aziendeProfili }, { data: recs }, { data: offerte }] = await Promise.all([
-        supabaseClient.from('profili_aziende').select('nome_azienda, foto_url, zona').eq('is_approvata', true),
-        supabaseClient.from('RECENSIONI').select('AZIENDA, AZIENDA_SEARCH, VOTO_PAGA, RISPETTO_TITOLARE').eq('VERIFICATA', true),
-        supabaseClient.from('offerte_lavoro').select('nome_azienda').eq('is_attiva', true)
-      ]);
-
-      // Conta offerte per azienda (case-insensitive con AZIENDA_SEARCH)
-      const offerteMap = {};
-      (offerte||[]).forEach(o => {
-        if(o.nome_azienda){
-          const k = o.nome_azienda.trim().toLowerCase();
-          offerteMap[k] = (offerteMap[k]||0) + 1;
-        }
-      });
-
-      // Mappa aziende: parte dai profili approvati (così mostra anche quelle senza recensioni)
-      const map = {};
-      (aziendeProfili||[]).forEach(p => {
-        const nomePulito = (p.nome_azienda||'').trim().toLowerCase();
-        if(!nomePulito) return;
-        map[nomePulito] = {
-          nome: p.nome_azienda,
-          zona: p.zona || null,
-          foto: p.foto_url || null,
-          voti_paga: [],
-          voti_rispetto: [],
-          count: 0,
-          offerte: offerteMap[nomePulito] || 0
-        };
-      });
-
-      // Aggiungi recensioni dove possibile
-      (recs||[]).forEach(r => {
-        const k = r.AZIENDA_SEARCH || (r.AZIENDA||'').trim().toLowerCase();
-        if(!k) return;
-        if(!map[k]){
-          // Azienda recensita ma senza profilo registrato — la creo lo stesso
-          map[k] = { nome: r.AZIENDA, zona: null, foto: null, voti_paga: [], voti_rispetto: [], count: 0, offerte: offerteMap[k] || 0 };
-        }
-        map[k].voti_paga.push(parseFloat(r.VOTO_PAGA)||0);
-        map[k].voti_rispetto.push(parseFloat(r.RISPETTO_TITOLARE)||0);
-        map[k].count++;
-      });
-
-      // Ordina: prima quelle con più recensioni, poi le nuove
-      _tutteAziende = Object.values(map).sort((a,b) => b.count - a.count);
-      filtraAziende('');
-    }
-
-    function filtraAziende(query){
-      const container = document.getElementById('risultato-ricerca-az');
-      const filtrate = query.trim()
-        ? _tutteAziende.filter(a => a.nome.toLowerCase().includes(query.toLowerCase()))
-        : _tutteAziende;
-
-      if(filtrate.length === 0){
-        container.innerHTML = `<div class="empty-state"><span class="empty-icon">🔍</span><h3>Nessun risultato</h3><p>Prova con un altro nome.</p></div>`;
-        return;
-      }
-
-      const media = arr => arr.length ? (arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(1) : '—';
-      container.innerHTML = filtrate.map(a => {
-        const haRecensioni = a.count > 0;
-        const badgeNuova = !haRecensioni
-          ? `<span style="background:#e0f2fe;color:#0c5b8e;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;">✨ Nuova</span>`
-          : '';
-        const badgeOfferte = a.offerte > 0
-          ? `<span style="background:#d1f0e0;color:var(--verde);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;">💼 ${a.offerte} ${a.offerte===1?'offerta attiva':'offerte attive'}</span>`
-          : '';
-        const votiHTML = haRecensioni
-          ? `<div class="az-voti">
-              <span>📋 <b>${a.count}</b> recension${a.count===1?'e':'i'}</span>
-              <span>💰 Paga: <b>${media(a.voti_paga)}/5</b></span>
-              <span>🤝 Rispetto: <b>${media(a.voti_rispetto)}/5</b></span>
-            </div>`
-          : `<div class="az-voti"><span style="color:var(--pietra);font-style:italic;">Nessuna recensione ancora</span></div>`;
-        const zonaHTML = a.zona ? `<p style="font-size:12px;color:var(--pietra);margin-top:2px;">📍 ${a.zona}</p>` : '';
-        return `
-        <div class="az-card-cerca" onclick="window.location.href='dettaglio-azienda.html?nome=${encodeURIComponent(a.nome)}&from=dashboard-lavoratore'">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:6px;">
-            <div>
-              <h4>🏢 ${a.nome}</h4>
-              ${zonaHTML}
-            </div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;">${badgeNuova}${badgeOfferte}</div>
-          </div>
-          ${votiHTML}
-        </div>`;
-      }).join('');
     }
 
     async function caricaMieRecensioni(){
