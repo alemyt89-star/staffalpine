@@ -688,25 +688,51 @@
     let _tutteAziende = [];
 
     async function caricaAziendeCerca(){
-      const [{ data: recs }, { data: offerte }] = await Promise.all([
-        supabaseClient.from('RECENSIONI').select('AZIENDA, VOTO_PAGA, RISPETTO_TITOLARE').eq('VERIFICATA', true),
+      const [{ data: aziendeProfili }, { data: recs }, { data: offerte }] = await Promise.all([
+        supabaseClient.from('profili_aziende').select('nome_azienda, foto_url, zona').eq('is_approvata', true),
+        supabaseClient.from('RECENSIONI').select('AZIENDA, AZIENDA_SEARCH, VOTO_PAGA, RISPETTO_TITOLARE').eq('VERIFICATA', true),
         supabaseClient.from('offerte_lavoro').select('nome_azienda').eq('is_attiva', true)
       ]);
-      if(!recs) return;
-      // Conta offerte per azienda
+
+      // Conta offerte per azienda (case-insensitive con AZIENDA_SEARCH)
       const offerteMap = {};
       (offerte||[]).forEach(o => {
-        if(o.nome_azienda) offerteMap[o.nome_azienda] = (offerteMap[o.nome_azienda]||0) + 1;
+        if(o.nome_azienda){
+          const k = o.nome_azienda.trim().toLowerCase();
+          offerteMap[k] = (offerteMap[k]||0) + 1;
+        }
       });
-      // Raggruppa recensioni per azienda
+
+      // Mappa aziende: parte dai profili approvati (così mostra anche quelle senza recensioni)
       const map = {};
-      recs.forEach(r => {
-        if(!map[r.AZIENDA]) map[r.AZIENDA] = { nome: r.AZIENDA, voti_paga: [], voti_rispetto: [], count: 0, offerte: 0 };
-        map[r.AZIENDA].voti_paga.push(parseFloat(r.VOTO_PAGA)||0);
-        map[r.AZIENDA].voti_rispetto.push(parseFloat(r.RISPETTO_TITOLARE)||0);
-        map[r.AZIENDA].count++;
-        map[r.AZIENDA].offerte = offerteMap[r.AZIENDA] || 0;
+      (aziendeProfili||[]).forEach(p => {
+        const nomePulito = (p.nome_azienda||'').trim().toLowerCase();
+        if(!nomePulito) return;
+        map[nomePulito] = {
+          nome: p.nome_azienda,
+          zona: p.zona || null,
+          foto: p.foto_url || null,
+          voti_paga: [],
+          voti_rispetto: [],
+          count: 0,
+          offerte: offerteMap[nomePulito] || 0
+        };
       });
+
+      // Aggiungi recensioni dove possibile
+      (recs||[]).forEach(r => {
+        const k = r.AZIENDA_SEARCH || (r.AZIENDA||'').trim().toLowerCase();
+        if(!k) return;
+        if(!map[k]){
+          // Azienda recensita ma senza profilo registrato — la creo lo stesso
+          map[k] = { nome: r.AZIENDA, zona: null, foto: null, voti_paga: [], voti_rispetto: [], count: 0, offerte: offerteMap[k] || 0 };
+        }
+        map[k].voti_paga.push(parseFloat(r.VOTO_PAGA)||0);
+        map[k].voti_rispetto.push(parseFloat(r.RISPETTO_TITOLARE)||0);
+        map[k].count++;
+      });
+
+      // Ordina: prima quelle con più recensioni, poi le nuove
       _tutteAziende = Object.values(map).sort((a,b) => b.count - a.count);
       filtraAziende('');
     }
@@ -723,18 +749,34 @@
       }
 
       const media = arr => arr.length ? (arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(1) : '—';
-      container.innerHTML = filtrate.map(a => `
+      container.innerHTML = filtrate.map(a => {
+        const haRecensioni = a.count > 0;
+        const badgeNuova = !haRecensioni
+          ? `<span style="background:#e0f2fe;color:#0c5b8e;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;">✨ Nuova</span>`
+          : '';
+        const badgeOfferte = a.offerte > 0
+          ? `<span style="background:#d1f0e0;color:var(--verde);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;">💼 ${a.offerte} ${a.offerte===1?'offerta attiva':'offerte attive'}</span>`
+          : '';
+        const votiHTML = haRecensioni
+          ? `<div class="az-voti">
+              <span>📋 <b>${a.count}</b> recension${a.count===1?'e':'i'}</span>
+              <span>💰 Paga: <b>${media(a.voti_paga)}/5</b></span>
+              <span>🤝 Rispetto: <b>${media(a.voti_rispetto)}/5</b></span>
+            </div>`
+          : `<div class="az-voti"><span style="color:var(--pietra);font-style:italic;">Nessuna recensione ancora</span></div>`;
+        const zonaHTML = a.zona ? `<p style="font-size:12px;color:var(--pietra);margin-top:2px;">📍 ${a.zona}</p>` : '';
+        return `
         <div class="az-card-cerca" onclick="window.location.href='dettaglio-azienda.html?nome=${encodeURIComponent(a.nome)}&from=dashboard-lavoratore'">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:6px;">
-            <h4>🏢 ${a.nome}</h4>
-            ${a.offerte>0?`<span style="background:#d1f0e0;color:var(--verde);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;">💼 ${a.offerte} ${a.offerte===1?'offerta attiva':'offerte attive'}</span>`:''}
+            <div>
+              <h4>🏢 ${a.nome}</h4>
+              ${zonaHTML}
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">${badgeNuova}${badgeOfferte}</div>
           </div>
-          <div class="az-voti">
-            <span>📋 <b>${a.count}</b> recension${a.count===1?'e':'i'}</span>
-            <span>💰 Paga: <b>${media(a.voti_paga)}/5</b></span>
-            <span>🤝 Rispetto: <b>${media(a.voti_rispetto)}/5</b></span>
-          </div>
-        </div>`).join('');
+          ${votiHTML}
+        </div>`;
+      }).join('');
     }
 
     async function caricaMieRecensioni(){
