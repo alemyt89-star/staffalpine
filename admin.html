@@ -476,18 +476,16 @@
         :'—';
       const totOfferte=offerte?.length||0;
       const totMatch=notifiche?.length||0;
-      console.log('[DEBUG MATCH] azienda', nomeAzienda, '→', totMatch, 'notifiche trovate', notifiche);
 
       // Recupera mansioni dei lavoratori coinvolti
       const mansioni={};
       if(notifiche && notifiche.length > 0){
         const lavIds = [...new Set(notifiche.map(n => n.lavoratore_id).filter(Boolean))];
         if(lavIds.length > 0){
-          const {data: profLav, error: errLav} = await supabaseClient
+          const {data: profLav} = await supabaseClient
             .from('esperienze_lavoratori')
             .select('user_id, mansione_principale')
             .in('user_id', lavIds);
-          console.log('[DEBUG MATCH] profLav:', profLav, 'errore:', errLav);
           const mapMansioni = {};
           (profLav||[]).forEach(p => { mapMansioni[p.user_id] = p.mansione_principale || 'N/D'; });
           notifiche.forEach(n => {
