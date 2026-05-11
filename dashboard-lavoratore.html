@@ -465,12 +465,33 @@
       if(error||!user){window.location.replace('login.html');return;}
       document.body.style.visibility='visible';
 
-      // ONBOARDING OBBLIGATORIO: mostra modal se mansione o località mancanti
+      // ONBOARDING OBBLIGATORIO: mostra modal se manca uno dei campi essenziali
       const{data:profCheck}=await supabaseClient.from('esperienze_lavoratori')
-        .select('mansione_principale,localita_preferita')
+        .select('nome_reale,cognome_reale,data_nascita,mansione_principale,localita_preferita')
         .eq('user_id',user.id)
         .maybeSingle();
-      if(!profCheck || !profCheck.mansione_principale || !profCheck.localita_preferita){
+      const mancaQualcosa = !profCheck
+        || !profCheck.nome_reale
+        || !profCheck.cognome_reale
+        || !profCheck.data_nascita
+        || !profCheck.mansione_principale
+        || !profCheck.localita_preferita;
+      if(mancaQualcosa){
+        // Pre-compila campi già presenti (utenti vecchi che hanno solo alcuni dati)
+        if(profCheck){
+          if(profCheck.nome_reale){
+            const el = document.getElementById('onb-nome');
+            if(el) el.value = profCheck.nome_reale;
+          }
+          if(profCheck.cognome_reale){
+            const el = document.getElementById('onb-cognome');
+            if(el) el.value = profCheck.cognome_reale;
+          }
+          if(profCheck.data_nascita){
+            const el = document.getElementById('onb-nascita');
+            if(el) el.value = profCheck.data_nascita;
+          }
+        }
         document.getElementById('modal-onboarding').style.display='flex';
         return; // blocca il resto fino a compilazione
       }
@@ -1125,10 +1146,13 @@
     });
 
     async function salvaOnboarding(){
+      const nome = document.getElementById('onb-nome').value.trim();
+      const cognome = document.getElementById('onb-cognome').value.trim();
+      const nascita = document.getElementById('onb-nascita').value;
       const mansione = document.getElementById('onb-mansione').value.trim();
       const localita = document.getElementById('onb-localita').value;
-      if(!mansione || !localita){
-        alert("⚠️ Compila entrambi i campi per continuare.");
+      if(!nome || !cognome || !nascita || !mansione || !localita){
+        alert("⚠️ Compila tutti i campi obbligatori per continuare.");
         return;
       }
       const{data:{user}}=await supabaseClient.auth.getUser();
@@ -1136,6 +1160,9 @@
 
       const{error}=await supabaseClient.from('esperienze_lavoratori').upsert([{
         user_id: user.id,
+        nome_reale: nome,
+        cognome_reale: cognome,
+        data_nascita: nascita,
         mansione_principale: mansione,
         localita_preferita: localita
       }],{onConflict:'user_id'});
@@ -1152,12 +1179,27 @@
 
   <!-- MODAL ONBOARDING — Mansione + Località obbligatorie -->
   <div id="modal-onboarding" class="modal-overlay" style="display:none;">
-    <div class="modal-box">
+    <div class="modal-box" style="max-width:520px;">
       <h2 class="modal-title">👋 Benvenuto su StaffAlpine!</h2>
       <p style="color:var(--pietra);font-size:14px;margin-bottom:18px;line-height:1.5;">
-        Per iniziare, indica la tua mansione e la zona in cui preferisci lavorare.
-        Questi dati permettono alle aziende della Valle d'Aosta di proporti offerte adatte al tuo profilo.
+        Completa il tuo profilo per iniziare a ricevere offerte di lavoro dalle aziende della Valle d'Aosta.
       </p>
+
+      <div class="form-row" id="onb-row-nome" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group">
+          <label class="form-label">Nome *</label>
+          <input type="text" id="onb-nome" class="form-control" placeholder="Mario">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cognome *</label>
+          <input type="text" id="onb-cognome" class="form-control" placeholder="Rossi">
+        </div>
+      </div>
+
+      <div class="form-group" id="onb-row-nascita">
+        <label class="form-label">Data di nascita *</label>
+        <input type="date" id="onb-nascita" class="form-control">
+      </div>
 
       <div class="form-group">
         <label class="form-label">Mansione principale *</label>
@@ -1168,13 +1210,13 @@
         <label class="form-label">Località preferita *</label>
         <select id="onb-localita" class="form-control">
           <option value="">— Seleziona —</option>
-            <option value="Allein">Allein</option><option value="Antey-Saint-André">Antey-Saint-André</option><option value="Aoste / Aosta">Aoste / Aosta</option><option value="Arnad">Arnad</option><option value="Arvier">Arvier</option><option value="Avise">Avise</option><option value="Ayas">Ayas</option><option value="Aymavilles">Aymavilles</option><option value="Bard">Bard</option><option value="Bionaz">Bionaz</option><option value="Brissogne">Brissogne</option><option value="Brusson">Brusson</option><option value="Challand-Saint-Anselme">Challand-Saint-Anselme</option><option value="Challand-Saint-Victor">Challand-Saint-Victor</option><option value="Chambave">Chambave</option><option value="Chamois">Chamois</option><option value="Champdepraz">Champdepraz</option><option value="Champorcher">Champorcher</option><option value="Charvensod">Charvensod</option><option value="Châtillon">Châtillon</option><option value="Cogne">Cogne</option><option value="Courmayeur">Courmayeur</option><option value="Donnas">Donnas</option><option value="Doues">Doues</option><option value="Emarèse">Emarèse</option><option value="Etroubles">Etroubles</option><option value="Fénis">Fénis</option><option value="Fontainemore">Fontainemore</option><option value="Gaby">Gaby</option><option value="Gignod">Gignod</option><option value="Grand-Saint-Bernard / Gran San Bernardo">Gran San Bernardo</option><option value="Gressan">Gressan</option><option value="Gressoney-La-Trinité">Gressoney-La-Trinité</option><option value="Gressoney-Saint-Jean">Gressoney-Saint-Jean</option><option value="Hône">Hône</option><option value="Introd">Introd</option><option value="Issime">Issime</option><option value="Issogne">Issogne</option><option value="Jocelyn / La Magdeleine">La Magdeleine</option><option value="La Salle">La Salle</option><option value="La Thuile">La Thuile</option><option value="Lillianes">Lillianes</option><option value="Montjovet">Montjovet</option><option value="Morgex">Morgex</option><option value="Nus">Nus</option><option value="Ollomont">Ollomont</option><option value="Oyace">Oyace</option><option value="Perloz">Perloz</option><option value="Pollein">Pollein</option><option value="Pontboset">Pontboset</option><option value="Pontey">Pontey</option><option value="Pont-Saint-Martin">Pont-Saint-Martin</option><option value="Pré-Saint-Didier">Pré-Saint-Didier</option><option value="Quart">Quart</option><option value="Rhêmes-Notre-Dame">Rhêmes-Notre-Dame</option><option value="Rhêmes-Saint-Georges">Rhêmes-Saint-Georges</option><option value="Roisan">Roisan</option><option value="Saint-Christophe">Saint-Christophe</option><option value="Saint-Denis">Saint-Denis</option><option value="Saint-Marcel">Saint-Marcel</option><option value="Saint-Nicolas">Saint-Nicolas</option><option value="Saint-Oyen">Saint-Oyen</option><option value="Saint-Pierre">Saint-Pierre</option><option value="Saint-Rhémy-en-Bosses">Saint-Rhémy-en-Bosses</option><option value="Saint-Vincent">Saint-Vincent</option><option value="Sarre">Sarre</option><option value="Torgnon">Torgnon</option><option value="Valgrisenche">Valgrisenche</option><option value="Valpelline">Valpelline</option><option value="Valsavarenche">Valsavarenche</option><option value="Valtournenche">Valtournenche</option><option value="Verrayes">Verrayes</option><option value="Verrès">Verrès</option><option value="Villeneuve">Villeneuve</option>
+            <option value="Allein">Allein</option><option value="Antey-Saint-André">Antey-Saint-André</option><option value="Aoste / Aosta">Aoste / Aosta</option><option value="Arnad">Arnad</option><option value="Arvier">Arvier</option><option value="Avise">Avise</option><option value="Ayas">Ayas</option><option value="Aymavilles">Aymavilles</option><option value="Bard">Bard</option><option value="Bionaz">Bionaz</option><option value="Brissogne">Brissogne</option><option value="Brusson">Brusson</option><option value="Challand-Saint-Anselme">Challand-Saint-Anselme</option><option value="Challand-Saint-Victor">Challand-Saint-Victor</option><option value="Chambave">Chambave</option><option value="Chamois">Chamois</option><option value="Champdepraz">Champdepraz</option><option value="Champorcher">Champorcher</option><option value="Charvensod">Charvensod</option><option value="Châtillon">Châtillon</option><option value="Cogne">Cogne</option><option value="Courmayeur">Courmayeur</option><option value="Donnas">Donnas</option><option value="Doues">Doues</option><option value="Emarèse">Emarèse</option><option value="Etroubles">Etroubles</option><option value="Fénis">Fénis</option><option value="Fontainemore">Fontainemore</option><option value="Gaby">Gaby</option><option value="Gignod">Gignod</option><option value="Grand-Saint-Bernard / Gran San Bernardo">Gran San Bernardo</option><option value="Gressan">Gressan</option><option value="Gressoney-La-Trinité">Gressoney-La-Trinité</option><option value="Gressoney-Saint-Jean">Gressoney-Saint-Jean</option><option value="Hône">Hône</option><option value="Introd">Introd</option><option value="Issime">Issime</option><option value="Issogne">Issogne</option><option value="Jovençan">Jovençan</option><option value="Jocelyn / La Magdeleine">La Magdeleine</option><option value="La Salle">La Salle</option><option value="La Thuile">La Thuile</option><option value="Lillianes">Lillianes</option><option value="Montjovet">Montjovet</option><option value="Morgex">Morgex</option><option value="Nus">Nus</option><option value="Ollomont">Ollomont</option><option value="Oyace">Oyace</option><option value="Perloz">Perloz</option><option value="Pollein">Pollein</option><option value="Pontboset">Pontboset</option><option value="Pontey">Pontey</option><option value="Pont-Saint-Martin">Pont-Saint-Martin</option><option value="Pré-Saint-Didier">Pré-Saint-Didier</option><option value="Quart">Quart</option><option value="Rhêmes-Notre-Dame">Rhêmes-Notre-Dame</option><option value="Rhêmes-Saint-Georges">Rhêmes-Saint-Georges</option><option value="Roisan">Roisan</option><option value="Saint-Christophe">Saint-Christophe</option><option value="Saint-Denis">Saint-Denis</option><option value="Saint-Marcel">Saint-Marcel</option><option value="Saint-Nicolas">Saint-Nicolas</option><option value="Saint-Oyen">Saint-Oyen</option><option value="Saint-Pierre">Saint-Pierre</option><option value="Saint-Rhémy-en-Bosses">Saint-Rhémy-en-Bosses</option><option value="Saint-Vincent">Saint-Vincent</option><option value="Sarre">Sarre</option><option value="Torgnon">Torgnon</option><option value="Valgrisenche">Valgrisenche</option><option value="Valpelline">Valpelline</option><option value="Valsavarenche">Valsavarenche</option><option value="Valtournenche">Valtournenche</option><option value="Verrayes">Verrayes</option><option value="Verrès">Verrès</option><option value="Villeneuve">Villeneuve</option>
             <option value="Fuori Valle d'Aosta">Fuori Valle d'Aosta</option>
         </select>
       </div>
 
       <p style="font-size:11px;color:var(--pietra);margin:14px 0 6px;line-height:1.4;">
-        Potrai modificare e completare il profilo in qualsiasi momento dalla sezione "Il Mio Profilo".
+        I dati anagrafici sono privati: solo l'admin li vede per verificare le recensioni. Le aziende vedono solo mansione e località.
       </p>
 
       <button class="btn-primary" onclick="salvaOnboarding()" style="width:100%;margin-top:8px;">Continua →</button>
