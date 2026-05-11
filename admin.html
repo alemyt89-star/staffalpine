@@ -467,7 +467,7 @@
         supabaseClient.from('profili_aziende').select('descrizione,zona,foto_url,num_dipendenti,sito_web,tipi_contratto,lingue_richieste,email').eq('id',azId).maybeSingle(),
         supabaseClient.from('RECENSIONI').select('id,VOTO_PAGA,RISPETTO_TITOLARE,created_at,VERIFICATA').ilike('AZIENDA',nomeAzienda),
         supabaseClient.from('offerte_lavoro').select('id,ruolo,created_at,is_attiva').eq('azienda_id',azId),
-        supabaseClient.from('notifiche_lavoratori').select('id,created_at,stato,esperienze_lavoratori(mansione_principale)').eq('azienda_id',azId)
+        supabaseClient.from('notifiche_lavoratori').select('id,created_at,letta,lavoratore_id').eq('azienda_id',azId)
       ]);
 
       const totRec=recensioni?.length||0;
@@ -477,11 +477,23 @@
       const totOfferte=offerte?.length||0;
       const totMatch=notifiche?.length||0;
 
+      // Recupera mansioni dei lavoratori coinvolti (query separata)
       const mansioni={};
-      notifiche?.forEach(n=>{
-        const m=n.esperienze_lavoratori?.mansione_principale||'N/D';
-        mansioni[m]=(mansioni[m]||0)+1;
-      });
+      if(notifiche && notifiche.length > 0){
+        const lavIds = [...new Set(notifiche.map(n => n.lavoratore_id).filter(Boolean))];
+        if(lavIds.length > 0){
+          const {data: profLav} = await supabaseClient
+            .from('esperienze_lavoratori')
+            .select('user_id, mansione_principale')
+            .in('user_id', lavIds);
+          const mapMansioni = {};
+          (profLav||[]).forEach(p => { mapMansioni[p.user_id] = p.mansione_principale || 'N/D'; });
+          notifiche.forEach(n => {
+            const m = mapMansioni[n.lavoratore_id] || 'N/D';
+            mansioni[m] = (mansioni[m]||0) + 1;
+          });
+        }
+      }
 
       // Scheda profilo azienda
       let schedaProfilo='';
