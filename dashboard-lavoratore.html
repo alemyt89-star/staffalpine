@@ -666,6 +666,19 @@
     async function caricaNotifiche(){
       const{data:{user}}=await supabaseClient.auth.getUser();
       const{data:notifiche}=await supabaseClient.from('notifiche_lavoratori').select('*').eq('lavoratore_id',user.id).order('created_at',{ascending:false});
+
+      // Marca come lette le notifiche ricevute (per il tracciamento admin)
+      if(notifiche && notifiche.length > 0){
+        const idsNonLette = notifiche.filter(n => !n.letta).map(n => n.id);
+        if(idsNonLette.length > 0){
+          supabaseClient.from('notifiche_lavoratori')
+            .update({letta: true})
+            .in('id', idsNonLette)
+            .then(() => {})
+            .catch(e => console.log('Update letta non riuscito:', e));
+        }
+      }
+
       const container=document.getElementById('lista-notifiche');
       if(notifiche&&notifiche.length>0){
         // Badge tab

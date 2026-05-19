@@ -479,18 +479,32 @@
 
       // Recupera mansioni dei lavoratori coinvolti
       const mansioni={};
+      let dettagliMatch=[];
       if(notifiche && notifiche.length > 0){
         const lavIds = [...new Set(notifiche.map(n => n.lavoratore_id).filter(Boolean))];
         if(lavIds.length > 0){
           const {data: profLav} = await supabaseClient
             .from('esperienze_lavoratori')
-            .select('user_id, mansione_principale')
+            .select('user_id, mansione_principale, nome_reale, cognome_reale, email')
             .in('user_id', lavIds);
           const mapMansioni = {};
-          (profLav||[]).forEach(p => { mapMansioni[p.user_id] = p.mansione_principale || 'N/D'; });
+          const mapNome = {};
+          const mapEmail = {};
+          (profLav||[]).forEach(p => {
+            mapMansioni[p.user_id] = p.mansione_principale || 'N/D';
+            mapNome[p.user_id] = ((p.nome_reale||'') + ' ' + (p.cognome_reale||'')).trim() || '—';
+            mapEmail[p.user_id] = p.email || '—';
+          });
           notifiche.forEach(n => {
             const m = mapMansioni[n.lavoratore_id] || 'N/D';
             mansioni[m] = (mansioni[m]||0) + 1;
+            dettagliMatch.push({
+              nome: mapNome[n.lavoratore_id] || '—',
+              email: mapEmail[n.lavoratore_id] || '—',
+              mansione: m,
+              data: n.created_at,
+              letta: n.letta
+            });
           });
         }
       }
@@ -562,6 +576,20 @@
               ${Object.entries(mansioni).sort((a,b)=>b[1]-a[1]).map(([m,n])=>`
                 <tr><td>${m}</td><td><b>${n}</b></td></tr>`).join('')}
             </table>`}
+
+        ${dettagliMatch.length>0 ? `
+          <div class="det-title" style="margin-top:14px;">📨 Dettaglio proposte inviate</div>
+          <table class="det-table">
+            <tr><th>Lavoratore</th><th>Email</th><th>Mansione</th><th>Inviata</th><th>Stato</th></tr>
+            ${dettagliMatch.sort((a,b)=>new Date(b.data)-new Date(a.data)).map(d=>{
+              const dataFmt = d.data ? new Date(d.data).toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+new Date(d.data).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}) : '—';
+              const stato = d.letta
+                ? '<span style="color:#2d6a4f;font-weight:600;">✅ Letta</span>'
+                : '<span style="color:#b7791f;font-weight:600;">⏳ Non letta</span>';
+              return `<tr><td>${d.nome}</td><td style="font-size:11px;">${d.email}</td><td>${d.mansione}</td><td style="font-size:11px;">${dataFmt}</td><td>${stato}</td></tr>`;
+            }).join('')}
+          </table>
+        ` : ''}
       `;
     }
 
