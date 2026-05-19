@@ -688,19 +688,75 @@
         document.getElementById('nav-badge-proposte').style.display='inline-flex';
         document.getElementById('nav-badge-num').innerText = notifiche.length;
         aggiornaDrawerBadge(notifiche.length);
-        container.innerHTML=notifiche.map(n=>`
+        container.innerHTML=notifiche.map(n=>{
+          const stato = n.stato_risposta;
+          let contattoHTML, azioniHTML;
+
+          if(stato === 'interessato'){
+            // Risposta positiva: mostra contatto + badge verde
+            contattoHTML = `<div class="notifica-contatto" style="background:#e8f5e9;border:1px solid #2d6a4f;color:#1a2e1a;">📞 Contatta l'azienda: <b>${n.contatto_azienda||'Non specificato'}</b></div>`;
+            azioniHTML = `<div style="margin-top:10px;padding:10px;background:#e8f5e9;border-radius:8px;font-size:13px;color:#2d6a4f;font-weight:600;">✅ Hai risposto: Sono interessato</div>`;
+          } else if(stato === 'rifiutato'){
+            // Risposta negativa: contatto nascosto + badge rosso
+            contattoHTML = `<div class="notifica-contatto" style="background:#fdecea;color:#7a2a2a;opacity:0.7;">📞 Contatto azienda non visibile</div>`;
+            azioniHTML = `<div style="margin-top:10px;padding:10px;background:#fdecea;border-radius:8px;font-size:13px;color:#7a2a2a;font-weight:600;">❌ Hai risposto: Non sono interessato</div>`;
+          } else {
+            // Nessuna risposta: contatto offuscato + bottoni
+            contattoHTML = `<div class="notifica-contatto" style="opacity:0.6;font-style:italic;">📞 Contatto visibile dopo aver risposto</div>`;
+            azioniHTML = `
+              <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn-primary" style="background:#2d6a4f;color:white;border:none;padding:10px 18px;border-radius:8px;font-weight:600;cursor:pointer;flex:1;min-width:140px;" onclick="rispondiProposta('${n.id}', 'interessato')">✅ Sono interessato</button>
+                <button style="background:#fdecea;color:#7a2a2a;border:1px solid #d9a0a0;padding:10px 18px;border-radius:8px;font-weight:600;cursor:pointer;flex:1;min-width:140px;" onclick="rispondiProposta('${n.id}', 'rifiutato')">❌ Non sono interessato</button>
+              </div>`;
+          }
+
+          return `
           <div class="notifica-card">
             <div class="notifica-header"><span class="notifica-azienda">🏢 ${n.nome_azienda}</span><span class="notifica-data">${new Date(n.created_at).toLocaleDateString('it-IT')}</span></div>
             <div class="notifica-messaggio">"${n.messaggio}"</div>
-            <div class="notifica-contatto">📞 Contatto: <b>${n.contatto_azienda||'Non specificato'}</b></div>
-            <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
-              <button class="btn-secondary" onclick="window.location.href='dettaglio-azienda.html?nome=${encodeURIComponent(n.nome_azienda)}&from=dashboard-lavoratore'">⭐ Vedi Recensioni Azienda</button>
+            ${contattoHTML}
+            ${azioniHTML}
+            <div style="margin-top:10px;">
+              <button class="btn-secondary" onclick="window.location.href='dettaglio-azienda.html?nome=${encodeURIComponent(n.nome_azienda)}&from=dashboard-lavoratore'" style="font-size:12px;padding:6px 12px;">⭐ Vedi recensioni</button>
             </div>
-          </div>`).join('');
+          </div>`;
+        }).join('');
       } else {
         document.getElementById('badge-notifiche').classList.remove('visible');
         document.getElementById('nav-badge-proposte').style.display='none';
       }
+    }
+
+    async function rispondiProposta(notificaId, risposta){
+      const labelRisposta = risposta === 'interessato' ? 'Sono interessato' : 'Non sono interessato';
+      if(!confirm(`Confermi la tua risposta: "${labelRisposta}"?\n\nLa risposta sarà definitiva.`)) return;
+
+      const {data:notif, error: errLoad} = await supabaseClient
+        .from('notifiche_lavoratori')
+        .select('azienda_id,nome_azienda')
+        .eq('id', notificaId)
+        .single();
+      if(errLoad){ alert("Errore: " + errLoad.message); return; }
+
+      // Aggiorna stato in DB
+      const {error} = await supabaseClient
+        .from('notifiche_lavoratori')
+        .update({stato_risposta: risposta, risposto_il: new Date().toISOString()})
+        .eq('id', notificaId);
+
+      if(error){ alert("Errore nel salvataggio: " + error.message); return; }
+
+      // Se "interessato", notifica l'azienda via email (in background)
+      if(risposta === 'interessato' && notif && notif.azienda_id){
+        fetch('/api/notifica-risposta-azienda', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ aziendaId: notif.azienda_id })
+        }).catch(e => console.log('Notifica email azienda fallita:', e));
+      }
+
+      // Ricarica la lista per mostrare il nuovo stato
+      caricaNotifiche();
     }
 
     function condividiOfferta(id, ruolo, nomeAzienda){
