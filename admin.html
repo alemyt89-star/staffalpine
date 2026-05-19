@@ -467,7 +467,7 @@
         supabaseClient.from('profili_aziende').select('descrizione,zona,foto_url,num_dipendenti,sito_web,tipi_contratto,lingue_richieste,email').eq('id',azId).maybeSingle(),
         supabaseClient.from('RECENSIONI').select('id,VOTO_PAGA,RISPETTO_TITOLARE,created_at,VERIFICATA').ilike('AZIENDA',nomeAzienda),
         supabaseClient.from('offerte_lavoro').select('id,ruolo,created_at,is_attiva').eq('azienda_id',azId),
-        supabaseClient.from('notifiche_lavoratori').select('id,created_at,letta,lavoratore_id').eq('azienda_id',azId)
+        supabaseClient.from('notifiche_lavoratori').select('id,created_at,letta,lavoratore_id,stato_risposta,risposto_il').eq('azienda_id',azId)
       ]);
 
       const totRec=recensioni?.length||0;
@@ -503,7 +503,9 @@
               email: mapEmail[n.lavoratore_id] || '—',
               mansione: m,
               data: n.created_at,
-              letta: n.letta
+              letta: n.letta,
+              stato_risposta: n.stato_risposta,
+              risposto_il: n.risposto_il
             });
           });
         }
@@ -580,13 +582,23 @@
         ${dettagliMatch.length>0 ? `
           <div class="det-title" style="margin-top:14px;">📨 Dettaglio proposte inviate</div>
           <table class="det-table">
-            <tr><th>Lavoratore</th><th>Email</th><th>Mansione</th><th>Inviata</th><th>Stato</th></tr>
+            <tr><th>Lavoratore</th><th>Email</th><th>Mansione</th><th>Inviata</th><th>Stato</th><th>Risposta</th></tr>
             ${dettagliMatch.sort((a,b)=>new Date(b.data)-new Date(a.data)).map(d=>{
               const dataFmt = d.data ? new Date(d.data).toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+new Date(d.data).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}) : '—';
               const stato = d.letta
                 ? '<span style="color:#2d6a4f;font-weight:600;">✅ Letta</span>'
                 : '<span style="color:#b7791f;font-weight:600;">⏳ Non letta</span>';
-              return `<tr><td>${d.nome}</td><td style="font-size:11px;">${d.email}</td><td>${d.mansione}</td><td style="font-size:11px;">${dataFmt}</td><td>${stato}</td></tr>`;
+              let risposta;
+              if(d.stato_risposta === 'interessato'){
+                const dr = d.risposto_il ? new Date(d.risposto_il).toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit'}) : '';
+                risposta = `<span style="color:#2d6a4f;font-weight:600;">✅ Interessato</span>${dr?`<br><span style="font-size:10px;color:#6b705c;">${dr}</span>`:''}`;
+              } else if(d.stato_risposta === 'rifiutato'){
+                const dr = d.risposto_il ? new Date(d.risposto_il).toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit'}) : '';
+                risposta = `<span style="color:#c0392b;font-weight:600;">❌ Rifiutato</span>${dr?`<br><span style="font-size:10px;color:#6b705c;">${dr}</span>`:''}`;
+              } else {
+                risposta = '<span style="color:#6b705c;">—</span>';
+              }
+              return `<tr><td>${d.nome}</td><td style="font-size:11px;">${d.email}</td><td>${d.mansione}</td><td style="font-size:11px;">${dataFmt}</td><td>${stato}</td><td>${risposta}</td></tr>`;
             }).join('')}
           </table>
         ` : ''}
