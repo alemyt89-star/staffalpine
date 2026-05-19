@@ -990,8 +990,6 @@
         // Query unica sulla view public_stats (sicura, niente dati personali esposti)
         const { data, error } = await client.from('public_stats').select('*').single();
 
-        console.log('[STATS DEBUG] data:', data, 'error:', error);
-
         if (data) {
           const setVal = (id, n) => {
             const el = document.getElementById(id);
