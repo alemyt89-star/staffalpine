@@ -307,6 +307,10 @@
         <span class="drawer-item-icon">&#128203;</span>
         <span class="drawer-item-text">Le Mie Offerte</span>
       </button>
+      <button class="drawer-item" id="di-proposte-inviate" onclick="drawerTab('proposte-inviate',this)">
+        <span class="drawer-item-icon">&#128232;</span>
+        <span class="drawer-item-text">Proposte Inviate</span>
+      </button>
       <button class="drawer-item" id="di-offerte" onclick="drawerTab('offerte',this)">
         <span class="drawer-item-icon">&#128226;</span>
         <span class="drawer-item-text">Pubblica Offerta</span>
@@ -359,6 +363,7 @@
     <button class="tab-btn" onclick="showTab('panoramica',this)">📊 Panoramica</button>
     <button class="tab-btn" onclick="showTab('notifiche',this)">🔔 Lavoratori <span id="badge-notifiche" style="background:var(--rosso);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;display:none;">0</span></button>
     <button class="tab-btn" onclick="showTab('mie-offerte',this)">📋 Le Mie Offerte</button>
+    <button class="tab-btn" onclick="showTab('proposte-inviate',this)">📨 Proposte Inviate</button>
     <button class="tab-btn" onclick="showTab('offerte',this)">📢 Pubblica Offerta</button>
     <button class="tab-btn" onclick="showTab('talenti',this)">🔍 Database Talenti</button>
     <button class="tab-btn" onclick="window.location.href='esplora-aziende.html'">📋 Mercato & Recensioni</button>
@@ -404,6 +409,20 @@
       <div class="card">
         <div class="card-title">📋 Le Mie Offerte Pubblicate</div>
         <div id="lista-mie-offerte">
+          <div class="empty-state"><span class="empty-icon">⏳</span><h3>Caricamento...</h3></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROPOSTE INVIATE -->
+    <div id="proposte-inviate" class="section">
+      <div class="card">
+        <div class="card-title">📨 Proposte Inviate</div>
+        <p style="font-size:13px;color:var(--pietra);margin-bottom:16px;">
+          Tieni traccia delle proposte inviate ai lavoratori e del loro stato di risposta. I profili dei lavoratori rimangono anonimi.
+        </p>
+        <div id="riepilogo-proposte" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:18px;"></div>
+        <div id="lista-proposte-inviate">
           <div class="empty-state"><span class="empty-icon">⏳</span><h3>Caricamento...</h3></div>
         </div>
       </div>
@@ -1284,6 +1303,77 @@
       `).join('');
     }
 
+    async function caricaProposteInviate(){
+      const container = document.getElementById('lista-proposte-inviate');
+      const riepilogo = document.getElementById('riepilogo-proposte');
+      const {data:{user}} = await supabaseClient.auth.getUser();
+      const {data:proposte, error} = await supabaseClient
+        .from('notifiche_lavoratori')
+        .select('id,created_at,letta,stato_risposta,risposto_il,messaggio')
+        .eq('azienda_id', user.id)
+        .order('created_at', {ascending:false});
+
+      if(error){
+        container.innerHTML = `<div class="empty-state"><span class="empty-icon">⚠️</span><h3>Errore</h3><p>${error.message}</p></div>`;
+        return;
+      }
+      if(!proposte || proposte.length === 0){
+        riepilogo.innerHTML = '';
+        container.innerHTML = `<div class="empty-state"><span class="empty-icon">📭</span><h3>Nessuna proposta inviata</h3><p>Vai su "Database Talenti" per inviare proposte ai lavoratori compatibili.</p></div>`;
+        return;
+      }
+
+      // Riepilogo conteggi
+      const tot = proposte.length;
+      const interessati = proposte.filter(p => p.stato_risposta === 'interessato').length;
+      const rifiutati = proposte.filter(p => p.stato_risposta === 'rifiutato').length;
+      const lette = proposte.filter(p => p.letta && !p.stato_risposta).length;
+      const non_lette = proposte.filter(p => !p.letta).length;
+
+      const card = (lbl, num, color) => `
+        <div style="background:${color};border-radius:10px;padding:12px 10px;text-align:center;">
+          <div style="font-size:22px;font-weight:700;color:#1a2e1a;line-height:1;">${num}</div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--pietra);margin-top:4px;font-weight:600;">${lbl}</div>
+        </div>`;
+
+      riepilogo.innerHTML =
+        card('Totale', tot, '#f0f2ee') +
+        card('✅ Interessati', interessati, '#e8f5e9') +
+        card('❌ Rifiutate', rifiutati, '#fdecea') +
+        card('👁 Lette', lette, '#fff8e1') +
+        card('📭 Non lette', non_lette, '#eef2ff');
+
+      // Lista dettagliata
+      container.innerHTML = proposte.map(p => {
+        const dataInvio = new Date(p.created_at).toLocaleDateString('it-IT') + ' ' + new Date(p.created_at).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+        let badgeHTML, descrizioneHTML;
+        if(p.stato_risposta === 'interessato'){
+          const dataRisposta = p.risposto_il ? new Date(p.risposto_il).toLocaleDateString('it-IT') : '';
+          badgeHTML = `<span style="background:#2d6a4f;color:white;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;">✅ INTERESSATO</span>`;
+          descrizioneHTML = `<p style="margin-top:8px;font-size:13px;color:#2d6a4f;font-weight:600;">Il lavoratore è interessato! Risponderà ai tuoi contatti${dataRisposta ? ' (risposta del ' + dataRisposta + ')' : ''}.</p>`;
+        } else if(p.stato_risposta === 'rifiutato'){
+          badgeHTML = `<span style="background:#c0392b;color:white;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;">❌ RIFIUTATA</span>`;
+          descrizioneHTML = `<p style="margin-top:8px;font-size:13px;color:#7a2a2a;">Il lavoratore non è interessato a questa proposta.</p>`;
+        } else if(p.letta){
+          badgeHTML = `<span style="background:#c9a84c;color:#1a2e1a;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;">👁 LETTA</span>`;
+          descrizioneHTML = `<p style="margin-top:8px;font-size:13px;color:var(--pietra);">Il lavoratore ha visualizzato la proposta ma non ha ancora risposto.</p>`;
+        } else {
+          badgeHTML = `<span style="background:#6b705c;color:white;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;">📭 NON LETTA</span>`;
+          descrizioneHTML = `<p style="margin-top:8px;font-size:13px;color:var(--pietra);">Il lavoratore non ha ancora aperto la proposta.</p>`;
+        }
+        const msg = (p.messaggio||'').substring(0,140) + ((p.messaggio||'').length > 140 ? '...' : '');
+        return `
+          <div style="background:white;border:1px solid #e1e4dd;border-radius:10px;padding:16px;margin-bottom:12px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+              <span style="font-size:12px;color:var(--pietra);">📅 Inviata il ${dataInvio}</span>
+              ${badgeHTML}
+            </div>
+            ${msg ? `<p style="font-style:italic;color:#2c3e2d;font-size:13px;margin:0;">"${msg}"</p>` : ''}
+            ${descrizioneHTML}
+          </div>`;
+      }).join('');
+    }
+
     async function toggleOfferta(id, attuale){
       const{data:{user}}=await supabaseClient.auth.getUser();
       const{error}=await supabaseClient.from('offerte_lavoro').update({is_attiva: !attuale}).eq('id', id).eq('azienda_id', user.id);
@@ -1356,6 +1446,7 @@
       if(id==='talenti'&&_isPremium)caricaDatabaseLavoratori();
       if(id==='mercato'&&_isPremium)caricaTutteLeRecensioni();
       if(id==='mie-offerte')caricaMieOfferte();
+      if(id==='proposte-inviate')caricaProposteInviate();
       if(id==='notifiche')caricaNotificheLavoratori();
       if(id==='profilo-az')caricaProfiloAzienda();
     }
