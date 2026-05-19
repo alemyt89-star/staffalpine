@@ -540,7 +540,14 @@
       .nav-links { display: none; }
       .hero h1 { font-size: 3rem; }
       .hero-subtitle { font-size: 1rem; }
-      .stats-bar { gap: 30px; }
+      .stats-bar {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 28px 20px;
+        padding: 32px 6%;
+      }
+      .stat-num { font-size: 2rem; }
+      .stat-label { font-size: 10px; letter-spacing: 1px; }
       .footer-grid { grid-template-columns: 1fr; gap: 30px; }
       .hero-btns { flex-direction: column; align-items: center; }
       .btn-primary, .btn-secondary { width: 260px; justify-content: center; }
@@ -632,23 +639,23 @@
     <div class="scroll-hint">Scorri</div>
   </section>
 
-  <!-- STATS BAR -->
+  <!-- STATS BAR — Numeri live dal database -->
   <div class="stats-bar">
     <div class="stat-item">
-      <span class="stat-num">100%</span>
-      <span class="stat-label">Valle d'Aosta</span>
+      <span class="stat-num" id="stat-lavoratori">—</span>
+      <span class="stat-label">Professionisti registrati</span>
     </div>
     <div class="stat-item">
-      <span class="stat-num">Anonime</span>
-      <span class="stat-label">Recensioni protette</span>
+      <span class="stat-num" id="stat-aziende">—</span>
+      <span class="stat-label">Aziende verificate</span>
     </div>
     <div class="stat-item">
-      <span class="stat-num">Verificate</span>
-      <span class="stat-label">Dati confermati</span>
+      <span class="stat-num" id="stat-recensioni">—</span>
+      <span class="stat-label">Recensioni pubblicate</span>
     </div>
     <div class="stat-item">
-      <span class="stat-num">Beta</span>
-      <span class="stat-label">In crescita</span>
+      <span class="stat-num" id="stat-offerte">—</span>
+      <span class="stat-label">Offerte di lavoro attive</span>
     </div>
   </div>
 
@@ -900,6 +907,38 @@
       document.getElementById('mobile-nav').classList.remove('open');
       document.body.style.overflow='';
     }
+  </script>
+
+  <!-- Supabase JS per caricamento statistiche live -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    (async function caricaStatsLive(){
+      try {
+        const SUPABASE_URL = "https://maeoqoxzjzusjwrdrkbd.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX";
+        const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // 4 conteggi in parallelo
+        const [lav, az, rec, off] = await Promise.all([
+          client.from('esperienze_lavoratori').select('user_id', {count:'exact', head:true}),
+          client.from('profili_aziende').select('id', {count:'exact', head:true}).eq('is_approvata', true),
+          client.from('RECENSIONI').select('id', {count:'exact', head:true}).eq('VERIFICATA', true),
+          client.from('offerte_lavoro').select('id', {count:'exact', head:true}).eq('is_attiva', true)
+        ]);
+
+        const setVal = (id, n) => {
+          const el = document.getElementById(id);
+          if(el && typeof n === 'number') el.textContent = n;
+        };
+        setVal('stat-lavoratori', lav.count);
+        setVal('stat-aziende', az.count);
+        setVal('stat-recensioni', rec.count);
+        setVal('stat-offerte', off.count);
+      } catch(e) {
+        console.log('Stats live non caricate:', e.message);
+        // I valori "—" restano come fallback
+      }
+    })();
   </script>
 
 </body>
