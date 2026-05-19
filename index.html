@@ -986,27 +986,21 @@
         const SUPABASE_KEY = "sb_publishable_BpRfj-r2oCa-6m1XFdO6Uw_3-xGbzLX";
         const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // 4 conteggi in parallelo
-        const [lav, az, rec, off] = await Promise.all([
-          client.from('esperienze_lavoratori').select('user_id', {count:'exact', head:true}),
-          client.from('profili_aziende').select('id', {count:'exact', head:true}).eq('is_approvata', true),
-          client.from('RECENSIONI').select('id', {count:'exact', head:true}).eq('VERIFICATA', true),
-          client.from('offerte_lavoro').select('id', {count:'exact', head:true}).eq('is_attiva', true)
-        ]);
+        // Query unica sulla view public_stats (sicura, niente dati personali esposti)
+        const { data, error } = await client.from('public_stats').select('*').single();
 
-        console.log('[STATS DEBUG] lav:', lav);
-        console.log('[STATS DEBUG] az:', az);
-        console.log('[STATS DEBUG] rec:', rec);
-        console.log('[STATS DEBUG] off:', off);
+        console.log('[STATS DEBUG] data:', data, 'error:', error);
 
-        const setVal = (id, n) => {
-          const el = document.getElementById(id);
-          if(el && typeof n === 'number') el.textContent = n;
-        };
-        setVal('stat-lavoratori', lav.count);
-        setVal('stat-aziende', az.count);
-        setVal('stat-recensioni', rec.count);
-        setVal('stat-offerte', off.count);
+        if (data) {
+          const setVal = (id, n) => {
+            const el = document.getElementById(id);
+            if(el && typeof n === 'number') el.textContent = n;
+          };
+          setVal('stat-lavoratori', data.tot_lavoratori);
+          setVal('stat-aziende', data.tot_aziende);
+          setVal('stat-recensioni', data.tot_recensioni);
+          setVal('stat-offerte', data.tot_offerte);
+        }
       } catch(e) {
         console.log('Stats live non caricate:', e.message);
         // I valori "—" restano come fallback
