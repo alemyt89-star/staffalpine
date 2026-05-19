@@ -90,6 +90,9 @@ module.exports = async function handler(req, res) {
     let errori = 0;
     const dettaglio = [];
 
+    // Funzione helper per pausa tra invii
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+
     for (const az of aziendeOk) {
       const azData = aziendeMap[az.id];
       if (!azData) continue;
@@ -181,6 +184,9 @@ module.exports = async function handler(req, res) {
         errori++;
         console.error('Errore invio:', e.message);
       }
+
+      // Pausa per rispettare il rate limit Resend (max 5 req/sec → uso 300ms tra ogni)
+      await sleep(300);
     }
 
     return res.status(200).json({
