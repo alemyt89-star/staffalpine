@@ -291,6 +291,58 @@
       display: block;
     }
 
+    /* ── CERCHI STATS LIVE DENTRO L'HERO ── */
+    .hero-stats-circles {
+      display: flex;
+      justify-content: center;
+      gap: 22px;
+      margin: 0 auto 28px;
+      flex-wrap: wrap;
+      max-width: 700px;
+      animation: fadeInDown 1s ease 0.3s both;
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .hs-circle {
+      width: 92px;
+      height: 92px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border: 1.5px solid rgba(233,196,106,0.45);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      cursor: default;
+    }
+    .hs-circle:hover {
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(233,196,106,0.85);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    }
+    .hs-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: var(--oro-chiaro);
+      line-height: 1;
+    }
+    .hs-label {
+      font-size: 9px;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-top: 4px;
+      text-align: center;
+      padding: 0 4px;
+    }
+
     /* ── SEZIONE FEATURES ── */
     .features {
       padding: 100px 5%;
@@ -548,6 +600,20 @@
       }
       .stat-num { font-size: 2rem; }
       .stat-label { font-size: 10px; letter-spacing: 1px; }
+      .hero-stats-circles {
+        gap: 12px;
+        margin-bottom: 22px;
+      }
+      .hs-circle {
+        width: 64px;
+        height: 64px;
+      }
+      .hs-num {
+        font-size: 1.3rem;
+      }
+      .hs-label {
+        display: none;
+      }
       .footer-grid { grid-template-columns: 1fr; gap: 30px; }
       .hero-btns { flex-direction: column; align-items: center; }
       .btn-primary, .btn-secondary { width: 260px; justify-content: center; }
@@ -619,9 +685,30 @@
   </div>
 
   <!-- HERO -->
+  
   <section class="hero">
     <div class="hero-bg"></div>
     <div class="hero-content">
+      <!-- CERCHI STATS LIVE -->
+      <div class="hero-stats-circles">
+        <div class="hs-circle">
+          <span class="hs-num" id="stat-lavoratori">—</span>
+          <span class="hs-label">Professionisti</span>
+        </div>
+        <div class="hs-circle">
+          <span class="hs-num" id="stat-aziende">—</span>
+          <span class="hs-label">Aziende</span>
+        </div>
+        <div class="hs-circle">
+          <span class="hs-num" id="stat-recensioni">—</span>
+          <span class="hs-label">Recensioni</span>
+        </div>
+        <div class="hs-circle">
+          <span class="hs-num" id="stat-offerte">—</span>
+          <span class="hs-label">Offerte attive</span>
+        </div>
+      </div>
+
       <p class="hero-pretitle">⛰️ Valle d'Aosta · Hospitality · Trasparenza</p>
       <h1>Staff<em>Alpine</em></h1>
       <p class="hero-subtitle">
@@ -639,25 +726,6 @@
     <div class="scroll-hint">Scorri</div>
   </section>
 
-  <!-- STATS BAR — Numeri live dal database -->
-  <div class="stats-bar">
-    <div class="stat-item">
-      <span class="stat-num" id="stat-lavoratori">—</span>
-      <span class="stat-label">Professionisti registrati</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-num" id="stat-aziende">—</span>
-      <span class="stat-label">Aziende verificate</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-num" id="stat-recensioni">—</span>
-      <span class="stat-label">Recensioni pubblicate</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-num" id="stat-offerte">—</span>
-      <span class="stat-label">Offerte di lavoro attive</span>
-    </div>
-  </div>
 
   <!-- FEATURES -->
   <section class="features">
@@ -827,7 +895,7 @@
         }
       });
     }, { threshold: 0.1 });
-    document.querySelectorAll('.feature-card, .step-item').forEach(el => observer.observe(el));
+    document.querySelectorAll('.feature-card, .step-item, .stat-item').forEach(el => observer.observe(el));
 
     // ── MODAL PRIVACY ──
     const PRIVACY_KEY = 'staffalpine_privacy_v1';
