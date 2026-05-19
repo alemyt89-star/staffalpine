@@ -1,4 +1,4 @@
-const CACHE_NAME = 'staffalpine-v12';
+const CACHE_NAME = 'staffalpine-v13';
 const urlsToCache = [
   '/index.html',
   '/login.html',
@@ -34,7 +34,6 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // Non cachare le chiamate API e Supabase — sempre fresh
   if (
     event.request.url.includes('/api/') ||
     event.request.url.includes('supabase.co') ||
@@ -43,12 +42,9 @@ self.addEventListener('fetch', event => {
     event.respondWith(fetch(event.request));
     return;
   }
-
-  // Per tutto il resto: network first, cache come fallback
   event.respondWith(
     fetch(event.request)
       .then(response => {
-        // Aggiorna la cache con la risposta fresca
         if (response && response.status === 200 && response.type === 'basic') {
           const responseClone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseClone));
