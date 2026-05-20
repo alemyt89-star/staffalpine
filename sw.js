@@ -1,4 +1,4 @@
-const CACHE_NAME = 'staffalpine-v17';
+const CACHE_NAME = 'staffalpine-v18';
 const urlsToCache = [
   '/index.html',
   '/login.html',
