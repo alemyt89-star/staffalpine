@@ -157,6 +157,14 @@
     #cookie-banner a{color:#e9c46a;text-decoration:underline;}
     #cookie-banner .cookie-btn{background:#52b788;color:white;border:none;padding:9px 20px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;}
   </style>
+
+  <!-- PDF.js per supporto caricamento contratti PDF (self-hosted, conforme GDPR) -->
+  <script src="/lib/pdf.min.js"></script>
+  <script>
+    if(typeof pdfjsLib !== 'undefined'){
+      pdfjsLib.GlobalWorkerOptions.workerSrc = '/lib/pdf.worker.min.js';
+    }
+  </script>
 </head>
 <body>
   <!-- COOKIE BANNER -->
@@ -826,9 +834,9 @@
       html += '<label class="file-wrap-exp" for="' + id + '">';
       html += '<span style="font-size:26px;">📄</span>';
       html += '<span style="font-size:13px;color:var(--pietra);">La prima pagina del contratto </span>';
-      html += '<span style="font-size:11px;color:var(--pietra);">JPG, PNG · Max 5MB · Verrà aperto un editor per oscurare i dati personali</span>';
+      html += '<span style="font-size:11px;color:var(--pietra);">PDF, JPG, PNG · Max 5MB · Verrà aperto un editor per oscurare i dati personali</span>';
       html += '<span style="font-size:12px;color:var(--verde);font-weight:600;min-height:16px;" id="' + labelId + '"></span>';
-      html += '<input type="file" id="' + id + '" accept="image/jpeg,image/png" onchange="mostraFileEditExp(this,&#39;' + labelId + '&#39;)">';
+      html += '<input type="file" id="' + id + '" accept="image/jpeg,image/png,application/pdf" onchange="mostraFileEditExp(this,&#39;' + labelId + '&#39;)">';
       html += '</label>';
       // Checkbox consenso GDPR specifica per questo upload (richiesta dall'avvocato)
       html += '<div id="consenso-wrap-exp' + n + '" style="background:#fff8e1;border:1px solid #ffe082;border-radius:10px;padding:10px 14px;margin-top:8px;display:none;">';
@@ -1016,16 +1024,123 @@
       if(input.files && input.files[0]){
         const file = input.files[0];
         if(file.size > 5*1024*1024){ alert('File troppo grande — max 5MB'); input.value=''; return; }
-        // Verifica che sia un'immagine (PDF non supportato in questa fase)
-        if(!file.type.startsWith('image/')){
-          alert("⚠️ Per favore carica un'immagine (JPG o PNG).\n\nSe hai il contratto in PDF, scatta una foto della prima pagina con il telefono.");
+
+        if(file.type === 'application/pdf'){
+          // PDF — converto a immagine tramite PDF.js prima dell'editor
+          if(typeof pdfjsLib === 'undefined'){
+            alert("Errore: la libreria PDF non è stata caricata. Riprova ricaricando la pagina o usa un'immagine (JPG/PNG).");
+            input.value = '';
+            return;
+          }
+          label.innerText = '⏳ Elaborazione PDF in corso...';
+          apriPDFperOscuramento(file, input, labelId);
+        } else if(file.type.startsWith('image/')){
+          // Immagine — apri editor direttamente
+          label.innerText = '⏳ Apertura editor...';
+          apriOscuramento(file, input, labelId);
+        } else {
+          alert("⚠️ Tipo di file non supportato.\n\nUsa solo PDF, JPG o PNG.");
           input.value = '';
           return;
         }
-        // Apri l'editor di oscuramento
-        label.innerText = '⏳ Apertura editor...';
-        apriOscuramento(file, input, labelId);
       }
+    }
+
+    // Carica PDF, mostra selettore pagina, poi converte la pagina scelta in immagine
+    async function apriPDFperOscuramento(file, inputEl, labelId){
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+        const numPagine = pdf.numPages;
+
+        // Salvo nello stato globale
+        _pdfState = { pdf: pdf, paginaCorrente: 1, totale: numPagine, inputEl: inputEl, labelId: labelId };
+
+        if(numPagine === 1){
+          // PDF a 1 pagina, vado dritto all'editor
+          const blob = await convertiPdfPageInBlob(pdf, 1);
+          apriOscuramento(blob, inputEl, labelId);
+        } else {
+          // Mostra selettore pagina
+          mostraSelectorePaginaPDF();
+        }
+      } catch(e){
+        console.error('Errore PDF:', e);
+        alert("Impossibile aprire il PDF.\n\nVerifica che sia un file PDF valido, oppure scatta una foto della prima pagina del contratto.");
+        const label = document.getElementById(labelId);
+        if(label) label.innerText = '';
+        if(inputEl) inputEl.value = '';
+      }
+    }
+
+    let _pdfState = null;
+
+    function mostraSelectorePaginaPDF(){
+      const overlay = document.getElementById('modal-selettore-pdf');
+      document.getElementById('sel-pdf-pagina-totale').innerText = _pdfState.totale;
+      _pdfState.paginaCorrente = 1;
+      aggiornaAnteprimaPDF();
+      overlay.style.display = 'flex';
+    }
+
+    async function aggiornaAnteprimaPDF(){
+      const pagSpan = document.getElementById('sel-pdf-pagina-corrente');
+      const cnv = document.getElementById('sel-pdf-canvas');
+      pagSpan.innerText = _pdfState.paginaCorrente;
+
+      const page = await _pdfState.pdf.getPage(_pdfState.paginaCorrente);
+      const viewport = page.getViewport({scale: 1});
+      // Scala a thumbnail (max 600px largh)
+      const maxW = 600;
+      const scale = Math.min(maxW / viewport.width, 1.2);
+      const vp = page.getViewport({scale: scale});
+      cnv.width = vp.width;
+      cnv.height = vp.height;
+      const ctx = cnv.getContext('2d');
+      await page.render({canvasContext: ctx, viewport: vp}).promise;
+    }
+
+    function cambiaPaginaPDF(delta){
+      const nuovo = _pdfState.paginaCorrente + delta;
+      if(nuovo < 1 || nuovo > _pdfState.totale) return;
+      _pdfState.paginaCorrente = nuovo;
+      aggiornaAnteprimaPDF();
+    }
+
+    async function confermaPaginaPDF(){
+      const inputEl = _pdfState.inputEl;
+      const labelId = _pdfState.labelId;
+      const pagina = _pdfState.paginaCorrente;
+      document.getElementById('modal-selettore-pdf').style.display = 'none';
+
+      // Converto la pagina scelta in immagine e apro l'editor
+      const blob = await convertiPdfPageInBlob(_pdfState.pdf, pagina);
+      apriOscuramento(blob, inputEl, labelId);
+      _pdfState = null;
+    }
+
+    function annullaSelettorePDF(){
+      document.getElementById('modal-selettore-pdf').style.display = 'none';
+      if(_pdfState && _pdfState.inputEl) _pdfState.inputEl.value = '';
+      if(_pdfState && _pdfState.labelId){
+        const label = document.getElementById(_pdfState.labelId);
+        if(label) label.innerText = '';
+      }
+      _pdfState = null;
+    }
+
+    async function convertiPdfPageInBlob(pdf, numeroPagina){
+      const page = await pdf.getPage(numeroPagina);
+      // Renderizzo ad alta risoluzione (scale 2) per qualità
+      const viewport = page.getViewport({scale: 2});
+      const cnv = document.createElement('canvas');
+      cnv.width = viewport.width;
+      cnv.height = viewport.height;
+      const ctx = cnv.getContext('2d');
+      await page.render({canvasContext: ctx, viewport: viewport}).promise;
+      return new Promise(resolve => {
+        cnv.toBlob(blob => resolve(blob), 'image/png');
+      });
     }
 
     async function salvaModificheProfilo(){
@@ -1305,12 +1420,15 @@
   <!-- MODAL EDITOR OSCURAMENTO DOCUMENTO -->
   <div id="modal-oscuramento" style="display:none;position:fixed;inset:0;background:rgba(15,25,15,0.98);z-index:20000;flex-direction:column;">
     <!-- Header -->
-    <div style="background:#1a2e1a;color:white;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #2d6a4f;flex-shrink:0;">
-      <div>
+    <div style="background:#1a2e1a;color:white;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #2d6a4f;flex-shrink:0;gap:10px;">
+      <div style="min-width:0;">
         <div style="font-size:15px;font-weight:700;color:#e9c46a;">🖍️ Oscura i dati personali</div>
         <div style="font-size:11px;color:#9aa093;margin-top:2px;">Copri con il dito o il mouse i dati che non sono strettamente necessari</div>
       </div>
-      <button id="osc-btn-annulla" style="background:transparent;border:1px solid #e88080;color:#e88080;padding:6px 14px;border-radius:6px;font-size:13px;cursor:pointer;">✕ Annulla</button>
+      <div style="display:flex;gap:8px;flex-shrink:0;">
+        <button onclick="apriTutorialOsc()" title="Aiuto" style="background:transparent;border:1px solid #e9c46a;color:#e9c46a;width:36px;height:36px;border-radius:50%;font-size:16px;font-weight:700;cursor:pointer;">?</button>
+        <button id="osc-btn-annulla" style="background:transparent;border:1px solid #e88080;color:#e88080;padding:6px 14px;border-radius:6px;font-size:13px;cursor:pointer;">✕ Annulla</button>
+      </div>
     </div>
 
     <!-- Istruzioni -->
@@ -1330,6 +1448,61 @@
       <button id="osc-btn-undo" style="background:#3a4a3a;color:white;border:none;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">↩️ Annulla</button>
       <button id="osc-btn-reset" style="background:#3a4a3a;color:white;border:none;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">🔄 Ricomincia</button>
       <button id="osc-btn-salva" style="background:#2d6a4f;color:white;border:none;padding:10px 22px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;">💾 Conferma e salva</button>
+    </div>
+  </div>
+
+  <!-- MODAL SELETTORE PAGINA PDF -->
+  <div id="modal-selettore-pdf" style="display:none;position:fixed;inset:0;background:rgba(15,25,15,0.98);z-index:20001;flex-direction:column;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:14px;padding:24px;max-width:680px;width:100%;max-height:90vh;display:flex;flex-direction:column;">
+      <div style="text-align:center;margin-bottom:14px;">
+        <h2 style="margin:0 0 6px;color:#1a2e1a;font-family:'Playfair Display',serif;font-size:22px;">📄 Quale pagina del contratto?</h2>
+        <p style="margin:0;color:#6b705c;font-size:13px;">Scegli la pagina del contratto che contiene <b>nome azienda, periodo e mansione</b>. Sarà l'unica pagina caricata.</p>
+      </div>
+      <div style="background:#0a1410;border-radius:8px;padding:10px;display:flex;align-items:center;justify-content:center;overflow:auto;flex:1;min-height:300px;">
+        <canvas id="sel-pdf-canvas" style="background:white;box-shadow:0 4px 20px rgba(0,0,0,0.5);max-width:100%;display:block;"></canvas>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:8px;flex-wrap:wrap;">
+        <button onclick="cambiaPaginaPDF(-1)" style="background:#3a4a3a;color:white;border:none;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">← Precedente</button>
+        <div style="font-size:14px;color:#1a2e1a;font-weight:600;">Pagina <span id="sel-pdf-pagina-corrente">1</span> di <span id="sel-pdf-pagina-totale">1</span></div>
+        <button onclick="cambiaPaginaPDF(1)" style="background:#3a4a3a;color:white;border:none;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">Successiva →</button>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:14px;justify-content:center;flex-wrap:wrap;">
+        <button onclick="annullaSelettorePDF()" style="background:transparent;border:1px solid #e88080;color:#a04040;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">✕ Annulla</button>
+        <button onclick="confermaPaginaPDF()" style="background:#2d6a4f;color:white;border:none;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;">✅ Usa questa pagina</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL TUTORIAL EDITOR (mostrato al primo uso o cliccando ?) -->
+  <div id="modal-tutorial-osc" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:20002;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:14px;padding:28px;max-width:520px;width:100%;">
+      <h2 style="margin:0 0 8px;color:#1a2e1a;font-family:'Playfair Display',serif;font-size:24px;">🖍️ Benvenuto nell'editor</h2>
+      <p style="color:#6b705c;font-size:13px;margin:0 0 18px;">Una breve guida per usare l'editor di oscuramento.</p>
+
+      <div id="tutorial-steps" style="display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="background:#2d6a4f;color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">1</div>
+          <div style="font-size:14px;color:#2c3e2d;line-height:1.5;"><b>Trascina il dito (mobile) o il mouse (desktop)</b> sopra i dati personali che non sono necessari (nome, codice fiscale, indirizzo, ecc.).</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="background:#2d6a4f;color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">2</div>
+          <div style="font-size:14px;color:#2c3e2d;line-height:1.5;">Vedrai apparire <b>rettangoli neri</b> che coprono le aree selezionate. Lascia visibili solo: nome azienda, periodo, mansione.</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="background:#2d6a4f;color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">3</div>
+          <div style="font-size:14px;color:#2c3e2d;line-height:1.5;">Se sbagli usa <b>↩️ Annulla</b> per rimuovere l'ultimo rettangolo, o <b>🔄 Ricomincia</b> per ripartire da capo.</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="background:#2d6a4f;color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">4</div>
+          <div style="font-size:14px;color:#2c3e2d;line-height:1.5;">Quando hai finito clicca <b>💾 Conferma e salva</b>. Solo la versione oscurata sarà caricata.</div>
+        </div>
+      </div>
+
+      <div style="background:#fff8e1;border-left:4px solid #c9a84c;border-radius:0 8px 8px 0;padding:10px 14px;margin-top:16px;">
+        <p style="font-size:12px;color:#5c4a00;margin:0;line-height:1.5;">🔐 <b>Sicurezza:</b> Il documento originale non lascia mai il tuo dispositivo. Solo l'immagine con i rettangoli neri viene caricata.</p>
+      </div>
+
+      <button onclick="chiudiTutorialOsc()" style="background:#2d6a4f;color:white;border:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-top:18px;width:100%;">Ho capito, inizia →</button>
     </div>
   </div>
 
@@ -1362,6 +1535,11 @@
         _oscState.img = img;
         // PRIMA mostro il modal così le dimensioni del container sono calcolate
         modal.style.display = 'flex';
+
+        // Mostra tutorial al primo uso
+        if(!localStorage.getItem('staffalpine_tutorial_osc_visto')){
+          setTimeout(() => apriTutorialOsc(), 200);
+        }
 
         // Aspetto un tick perché il browser calcoli le dimensioni
         setTimeout(() => {
@@ -1481,6 +1659,16 @@
       _oscState.rects = [];
       _oscState.sourceInput = null;
       _oscState.sourceLabel = null;
+    }
+
+    function apriTutorialOsc(){
+      document.getElementById('modal-tutorial-osc').style.display = 'flex';
+    }
+
+    function chiudiTutorialOsc(){
+      document.getElementById('modal-tutorial-osc').style.display = 'none';
+      // Salva che il tutorial è stato visto
+      try { localStorage.setItem('staffalpine_tutorial_osc_visto', '1'); } catch(e) {}
     }
 
     async function oscSalva(){
