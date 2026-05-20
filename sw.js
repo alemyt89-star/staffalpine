@@ -1,4 +1,4 @@
-const CACHE_NAME = 'staffalpine-v19';
+const CACHE_NAME = 'staffalpine-v20';
 const urlsToCache = [
   '/index.html',
   '/login.html',
@@ -15,6 +15,8 @@ const urlsToCache = [
   '/informativa-privacy.html',
   '/termini.html',
   '/cookie-policy.html',
+  '/lib/pdf.min.js',
+  '/lib/pdf.worker.min.js',
 ];
 
 self.addEventListener('install', event => {
