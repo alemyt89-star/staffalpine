@@ -826,9 +826,9 @@
       html += '<label class="file-wrap-exp" for="' + id + '">';
       html += '<span style="font-size:26px;">📄</span>';
       html += '<span style="font-size:13px;color:var(--pietra);">La prima pagina del contratto </span>';
-      html += '<span style="font-size:11px;color:var(--pietra);">PDF, JPG, PNG · Max 5MB</span>';
+      html += '<span style="font-size:11px;color:var(--pietra);">JPG, PNG · Max 5MB · Verrà aperto un editor per oscurare i dati personali</span>';
       html += '<span style="font-size:12px;color:var(--verde);font-weight:600;min-height:16px;" id="' + labelId + '"></span>';
-      html += '<input type="file" id="' + id + '" accept="image/*,application/pdf" onchange="mostraFileEditExp(this,\'' + labelId + '\')">';
+      html += '<input type="file" id="' + id + '" accept="image/jpeg,image/png" onchange="mostraFileEditExp(this,\'' + labelId + '\')">';
       html += '</label>';
       // Checkbox consenso GDPR specifica per questo upload (richiesta dall'avvocato)
       html += '<div id="consenso-wrap-exp' + n + '" style="background:#fff8e1;border:1px solid #ffe082;border-radius:10px;padding:10px 14px;margin-top:8px;display:none;">';
@@ -1014,16 +1014,17 @@
     function mostraFileEditExp(input, labelId){
       const label = document.getElementById(labelId);
       if(input.files && input.files[0]){
-        if(input.files[0].size > 5*1024*1024){ alert('File troppo grande — max 5MB'); input.value=''; return; }
-        label.innerText = '✅ ' + input.files[0].name;
-        // Mostra il box di consenso GDPR specifico per questa esperienza
-        // Es. input id="edit-exp3-doc" → wrapper "consenso-wrap-exp3"
-        const inputId = input.id || '';
-        const match = inputId.match(/edit-exp(\d+)-doc/);
-        if(match){
-          const wrapper = document.getElementById('consenso-wrap-exp' + match[1]);
-          if(wrapper) wrapper.style.display = 'block';
+        const file = input.files[0];
+        if(file.size > 5*1024*1024){ alert('File troppo grande — max 5MB'); input.value=''; return; }
+        // Verifica che sia un'immagine (PDF non supportato in questa fase)
+        if(!file.type.startsWith('image/')){
+          alert("⚠️ Per favore carica un'immagine (JPG o PNG).\n\nSe hai il contratto in PDF, scatta una foto della prima pagina con il telefono.");
+          input.value = '';
+          return;
         }
+        // Apri l'editor di oscuramento
+        label.innerText = '⏳ Apertura editor...';
+        apriOscuramento(file, input, labelId);
       }
     }
 
@@ -1300,6 +1301,243 @@
       <button class="btn-primary" onclick="salvaOnboarding()" style="width:100%;margin-top:8px;">Continua →</button>
     </div>
   </div>
+
+  <!-- MODAL EDITOR OSCURAMENTO DOCUMENTO -->
+  <div id="modal-oscuramento" style="display:none;position:fixed;inset:0;background:rgba(15,25,15,0.94);z-index:9999;flex-direction:column;">
+    <!-- Header -->
+    <div style="background:#1a2e1a;color:white;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #2d6a4f;flex-shrink:0;">
+      <div>
+        <div style="font-size:15px;font-weight:700;color:#e9c46a;">🖍️ Oscura i dati personali</div>
+        <div style="font-size:11px;color:#9aa093;margin-top:2px;">Copri con il dito o il mouse i dati che non sono strettamente necessari</div>
+      </div>
+      <button id="osc-btn-annulla" style="background:transparent;border:1px solid #e88080;color:#e88080;padding:6px 14px;border-radius:6px;font-size:13px;cursor:pointer;">✕ Annulla</button>
+    </div>
+
+    <!-- Istruzioni -->
+    <div style="background:#fff8e1;padding:10px 18px;font-size:12px;color:#5c4a00;border-bottom:1px solid #ffe082;flex-shrink:0;">
+      <strong>✅ Mantieni visibili:</strong> Nome azienda, Periodo, Mansione, Firma/Timbro
+      &nbsp;·&nbsp;
+      <strong>❌ Copri:</strong> Nome, Cognome, Codice Fiscale, Indirizzo, Data Nascita, IBAN
+    </div>
+
+    <!-- Area canvas -->
+    <div id="osc-canvas-container" style="flex:1;overflow:auto;background:#1a2e1a;display:flex;align-items:flex-start;justify-content:center;padding:14px;">
+      <canvas id="osc-canvas" style="background:white;max-width:100%;box-shadow:0 4px 20px rgba(0,0,0,0.5);touch-action:none;cursor:crosshair;display:block;"></canvas>
+    </div>
+
+    <!-- Toolbar inferiore -->
+    <div style="background:#1a2e1a;padding:12px 18px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;border-top:1px solid #2d6a4f;flex-shrink:0;">
+      <button id="osc-btn-undo" style="background:#3a4a3a;color:white;border:none;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">↩️ Annulla ultimo</button>
+      <button id="osc-btn-reset" style="background:#3a4a3a;color:white;border:none;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">🔄 Ricomincia</button>
+      <button id="osc-btn-salva" style="background:#2d6a4f;color:white;border:none;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;">💾 Conferma e salva</button>
+    </div>
+  </div>
+
+  <script>
+    // ── EDITOR OSCURAMENTO DOCUMENTI ──
+    // Quando l'utente carica un'immagine, apriamo questo editor che permette
+    // di disegnare rettangoli neri sopra i dati personali prima del salvataggio.
+    // Solo la versione oscurata viene caricata, l'originale non lascia mai il browser.
+    let _oscState = {
+      sourceInput: null,    // input file originale (per salvare il blob risultante)
+      sourceLabel: null,    // id label per mostrare nome file
+      img: null,            // Image() dell'originale
+      canvas: null,
+      ctx: null,
+      scale: 1,             // rapporto canvas/img per coordinate
+      rects: [],            // [{x,y,w,h}] in coordinate IMG (non canvas)
+      drawing: false,
+      startX: 0, startY: 0,
+      currentRect: null
+    };
+
+    function apriOscuramento(file, inputEl, labelId){
+      const modal = document.getElementById('modal-oscuramento');
+      _oscState.sourceInput = inputEl;
+      _oscState.sourceLabel = labelId;
+      _oscState.rects = [];
+
+      const img = new Image();
+      img.onload = function(){
+        _oscState.img = img;
+        _oscState.canvas = document.getElementById('osc-canvas');
+        _oscState.ctx = _oscState.canvas.getContext('2d');
+
+        // Calcola dimensioni adatte allo schermo
+        const container = document.getElementById('osc-canvas-container');
+        const maxW = container.clientWidth - 30;
+        const maxH = container.clientHeight - 30;
+        let w = img.naturalWidth, h = img.naturalHeight;
+        const ratio = Math.min(maxW/w, maxH/h, 1);
+        const dispW = Math.floor(w * ratio);
+        const dispH = Math.floor(h * ratio);
+
+        _oscState.canvas.width = dispW;
+        _oscState.canvas.height = dispH;
+        _oscState.scale = dispW / w;  // canvas px per ogni img px
+
+        redisegnaOscuramento();
+        modal.style.display = 'flex';
+      };
+      img.onerror = function(){
+        alert("Impossibile aprire l'immagine. Verifica che sia un file JPG o PNG valido.");
+      };
+      img.src = URL.createObjectURL(file);
+    }
+
+    function redisegnaOscuramento(){
+      const ctx = _oscState.ctx;
+      const cnv = _oscState.canvas;
+      ctx.clearRect(0, 0, cnv.width, cnv.height);
+      // Disegna immagine
+      ctx.drawImage(_oscState.img, 0, 0, cnv.width, cnv.height);
+      // Disegna rettangoli salvati (in coord IMG → converti a canvas)
+      ctx.fillStyle = '#000';
+      _oscState.rects.forEach(r => {
+        ctx.fillRect(r.x * _oscState.scale, r.y * _oscState.scale, r.w * _oscState.scale, r.h * _oscState.scale);
+      });
+      // Disegna rettangolo in corso
+      if(_oscState.currentRect){
+        const r = _oscState.currentRect;
+        ctx.fillStyle = 'rgba(0,0,0,0.7)';
+        ctx.fillRect(r.x * _oscState.scale, r.y * _oscState.scale, r.w * _oscState.scale, r.h * _oscState.scale);
+      }
+    }
+
+    function getCanvasPoint(e){
+      const cnv = _oscState.canvas;
+      const rect = cnv.getBoundingClientRect();
+      const t = e.touches ? e.touches[0] : e;
+      // Coordinate canvas (display)
+      const cx = t.clientX - rect.left;
+      const cy = t.clientY - rect.top;
+      // Converti in coordinate IMG (originali)
+      return { x: cx / _oscState.scale, y: cy / _oscState.scale };
+    }
+
+    function oscStart(e){
+      e.preventDefault();
+      const p = getCanvasPoint(e);
+      _oscState.drawing = true;
+      _oscState.startX = p.x;
+      _oscState.startY = p.y;
+      _oscState.currentRect = { x: p.x, y: p.y, w: 0, h: 0 };
+    }
+
+    function oscMove(e){
+      if(!_oscState.drawing) return;
+      e.preventDefault();
+      const p = getCanvasPoint(e);
+      _oscState.currentRect = {
+        x: Math.min(_oscState.startX, p.x),
+        y: Math.min(_oscState.startY, p.y),
+        w: Math.abs(p.x - _oscState.startX),
+        h: Math.abs(p.y - _oscState.startY)
+      };
+      redisegnaOscuramento();
+    }
+
+    function oscEnd(e){
+      if(!_oscState.drawing) return;
+      _oscState.drawing = false;
+      if(_oscState.currentRect && _oscState.currentRect.w > 5 && _oscState.currentRect.h > 5){
+        _oscState.rects.push(_oscState.currentRect);
+      }
+      _oscState.currentRect = null;
+      redisegnaOscuramento();
+    }
+
+    function oscUndo(){
+      _oscState.rects.pop();
+      redisegnaOscuramento();
+    }
+    function oscReset(){
+      if(_oscState.rects.length > 0 && !confirm("Vuoi cancellare tutti i rettangoli disegnati?")) return;
+      _oscState.rects = [];
+      redisegnaOscuramento();
+    }
+    function oscAnnulla(){
+      if(_oscState.rects.length > 0 && !confirm("Vuoi chiudere l'editor? Tutti i rettangoli disegnati andranno persi e il file non sarà caricato.")) return;
+      // Reset input file
+      if(_oscState.sourceInput) _oscState.sourceInput.value = '';
+      chiudiOscuramento();
+    }
+
+    function chiudiOscuramento(){
+      document.getElementById('modal-oscuramento').style.display = 'none';
+      _oscState.img = null;
+      _oscState.rects = [];
+      _oscState.sourceInput = null;
+      _oscState.sourceLabel = null;
+    }
+
+    async function oscSalva(){
+      if(_oscState.rects.length === 0){
+        if(!confirm("⚠️ Non hai disegnato alcun rettangolo per coprire i dati personali.\n\nIl tuo documento conterrà tutti i dati originali. Vuoi salvare comunque?")) return;
+      }
+      // Esporta il canvas FULL-RESOLUTION (no scale)
+      const fullCanvas = document.createElement('canvas');
+      fullCanvas.width = _oscState.img.naturalWidth;
+      fullCanvas.height = _oscState.img.naturalHeight;
+      const fctx = fullCanvas.getContext('2d');
+      fctx.drawImage(_oscState.img, 0, 0);
+      fctx.fillStyle = '#000';
+      _oscState.rects.forEach(r => {
+        fctx.fillRect(r.x, r.y, r.w, r.h);
+      });
+
+      // Converti in Blob (PNG)
+      fullCanvas.toBlob(async (blob) => {
+        if(!blob){ alert("Errore nella generazione del file oscurato."); return; }
+
+        // Crea File da blob (mantiene "documento-oscurato.png" come nome)
+        const oscuratoFile = new File([blob], 'documento-oscurato.png', { type: 'image/png' });
+
+        // Sostituisci il file nell'input originale tramite DataTransfer
+        try {
+          const dt = new DataTransfer();
+          dt.items.add(oscuratoFile);
+          _oscState.sourceInput.files = dt.files;
+        } catch(e) {
+          console.log('DataTransfer fallito (browser vecchio?):', e);
+        }
+
+        // Aggiorna label
+        const lbl = document.getElementById(_oscState.sourceLabel);
+        if(lbl) lbl.innerText = '✅ Documento oscurato e pronto al salvataggio';
+
+        // Mostra checkbox consenso
+        const inputId = _oscState.sourceInput.id || '';
+        const match = inputId.match(/edit-exp(\d+)-doc/);
+        if(match){
+          const wrapper = document.getElementById('consenso-wrap-exp' + match[1]);
+          if(wrapper) wrapper.style.display = 'block';
+        }
+
+        chiudiOscuramento();
+      }, 'image/png');
+    }
+
+    // Bind eventi mouse + touch + bottoni una volta al caricamento pagina
+    (function initOscEvents(){
+      const cnv = () => document.getElementById('osc-canvas');
+      document.addEventListener('DOMContentLoaded', () => {
+        const c = cnv();
+        if(!c) return;
+        c.addEventListener('mousedown', oscStart);
+        c.addEventListener('mousemove', oscMove);
+        c.addEventListener('mouseup', oscEnd);
+        c.addEventListener('mouseleave', oscEnd);
+        c.addEventListener('touchstart', oscStart, {passive:false});
+        c.addEventListener('touchmove', oscMove, {passive:false});
+        c.addEventListener('touchend', oscEnd);
+        document.getElementById('osc-btn-undo').addEventListener('click', oscUndo);
+        document.getElementById('osc-btn-reset').addEventListener('click', oscReset);
+        document.getElementById('osc-btn-annulla').addEventListener('click', oscAnnulla);
+        document.getElementById('osc-btn-salva').addEventListener('click', oscSalva);
+      });
+    })();
+  </script>
 
 </body>
 </html>
