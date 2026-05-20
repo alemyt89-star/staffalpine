@@ -828,7 +828,7 @@
       html += '<span style="font-size:13px;color:var(--pietra);">La prima pagina del contratto </span>';
       html += '<span style="font-size:11px;color:var(--pietra);">JPG, PNG · Max 5MB · Verrà aperto un editor per oscurare i dati personali</span>';
       html += '<span style="font-size:12px;color:var(--verde);font-weight:600;min-height:16px;" id="' + labelId + '"></span>';
-      html += '<input type="file" id="' + id + '" accept="image/jpeg,image/png" onchange="mostraFileEditExp(this,\'' + labelId + '\')">';
+      html += '<input type="file" id="' + id + '" accept="image/jpeg,image/png" onchange="mostraFileEditExp(this,&#39;' + labelId + '&#39;)">';
       html += '</label>';
       // Checkbox consenso GDPR specifica per questo upload (richiesta dall'avvocato)
       html += '<div id="consenso-wrap-exp' + n + '" style="background:#fff8e1;border:1px solid #ffe082;border-radius:10px;padding:10px 14px;margin-top:8px;display:none;">';
