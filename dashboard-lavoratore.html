@@ -386,17 +386,7 @@
         </div>
       </div>
       <div class="modal-actions">
-        <div id="consenso-doc-wrapper" style="background:#fff8e1;border:1px solid #ffe082;border-radius:10px;padding:14px 16px;margin:18px 0;display:none;">
-        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;line-height:1.5;color:#5c4a00;">
-          <input type="checkbox" id="consenso-doc-esperienze" style="margin-top:3px;flex-shrink:0;width:18px;height:18px;cursor:pointer;accent-color:#2d6a4f;">
-          <span>
-            Acconsento al trattamento dei documenti caricati per la verifica delle esperienze lavorative, come descritto nell'<a href="informativa-privacy.html" target="_blank" style="color:#2d6a4f;font-weight:600;text-decoration:underline;">Informativa Privacy</a>.
-            <br><span style="font-size:11px;color:#7d6608;">Carica solo la <b>prima pagina del contratto di lavoro</b>. Consenso facoltativo e revocabile.</span>
-          </span>
-        </label>
-      </div>
-
-      <button class="btn-primary" onclick="salvaModificheProfilo()">💾 Salva Modifiche</button>
+              <button class="btn-primary" onclick="salvaModificheProfilo()">💾 Salva Modifiche</button>
         <button class="btn-secondary" onclick="document.getElementById('modal-modifica').style.display='none'">Annulla</button>
       </div>
     </div>
@@ -831,6 +821,7 @@
     function buildUploadAreaHTML(n){
       var id = "edit-exp" + n + "-doc";
       var labelId = "edit-exp" + n + "-doc-label";
+      var consensoId = "consenso-doc-exp" + n;
       var html = '<div style="font-size:11px;font-weight:700;color:var(--pietra);text-transform:uppercase;letter-spacing:1px;margin-top:10px;margin-bottom:6px;">📎 Carica documento per ottenere il badge ✅</div>';
       html += '<label class="file-wrap-exp" for="' + id + '">';
       html += '<span style="font-size:26px;">📄</span>';
@@ -839,6 +830,16 @@
       html += '<span style="font-size:12px;color:var(--verde);font-weight:600;min-height:16px;" id="' + labelId + '"></span>';
       html += '<input type="file" id="' + id + '" accept="image/*,application/pdf" onchange="mostraFileEditExp(this,' + JSON.stringify(labelId) + ')">';
       html += '</label>';
+      // Checkbox consenso GDPR specifica per questo upload (richiesta dall'avvocato)
+      html += '<div id="consenso-wrap-exp' + n + '" style="background:#fff8e1;border:1px solid #ffe082;border-radius:10px;padding:10px 14px;margin-top:8px;display:none;">';
+      html +=   '<label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:12px;line-height:1.5;color:#5c4a00;">';
+      html +=     '<input type="checkbox" id="' + consensoId + '" style="margin-top:3px;flex-shrink:0;width:16px;height:16px;cursor:pointer;accent-color:#2d6a4f;">';
+      html +=     '<span>';
+      html +=       'Acconsento al trattamento di questo documento per la verifica delle esperienze lavorative, come descritto nell\\\'<a href="informativa-privacy.html" target="_blank" style="color:#2d6a4f;font-weight:600;text-decoration:underline;">Informativa Privacy</a>.';
+      html +=       '<br><span style="font-size:10px;color:#7d6608;">Carica solo la <b>prima pagina del contratto di lavoro</b>. Consenso facoltativo e revocabile.</span>';
+      html +=     '</span>';
+      html +=   '</label>';
+      html += '</div>';
       return html;
     }
 
@@ -1015,26 +1016,34 @@
       if(input.files && input.files[0]){
         if(input.files[0].size > 5*1024*1024){ alert('File troppo grande — max 5MB'); input.value=''; return; }
         label.innerText = '✅ ' + input.files[0].name;
-        // Mostra il box di consenso GDPR quando viene caricato un file
-        const wrapper = document.getElementById('consenso-doc-wrapper');
-        if(wrapper) wrapper.style.display = 'block';
+        // Mostra il box di consenso GDPR specifico per questa esperienza
+        // Es. input id="edit-exp3-doc" → wrapper "consenso-wrap-exp3"
+        const inputId = input.id || '';
+        const match = inputId.match(/edit-exp(\d+)-doc/);
+        if(match){
+          const wrapper = document.getElementById('consenso-wrap-exp' + match[1]);
+          if(wrapper) wrapper.style.display = 'block';
+        }
       }
     }
 
     async function salvaModificheProfilo(){
       const{data:{user}}=await supabaseClient.auth.getUser();
 
-      // Verifica consenso GDPR se l'utente sta caricando almeno un documento
-      const haCaricatoFile = ['edit-exp1-doc','edit-exp2-doc','edit-exp3-doc','edit-exp4-doc','edit-exp5-doc']
-        .some(id => {
-          const el = document.getElementById(id);
-          return el && el.files && el.files.length > 0;
-        });
-      if(haCaricatoFile){
-        const consenso = document.getElementById('consenso-doc-esperienze');
+      // Verifica consenso GDPR per OGNI documento caricato (checkbox specifica per esperienza)
+      const expConFile = [];
+      for(let n = 1; n <= 5; n++){
+        const el = document.getElementById('edit-exp' + n + '-doc');
+        if(el && el.files && el.files.length > 0){
+          expConFile.push(n);
+        }
+      }
+      // Per ogni file caricato verifico la checkbox corrispondente
+      for(const n of expConFile){
+        const consenso = document.getElementById('consenso-doc-exp' + n);
         if(!consenso || !consenso.checked){
-          alert("⚠️ Hai caricato un documento per la verifica delle esperienze.\n\nDevi acconsentire al trattamento dei dati. Spunta la casella di consenso prima di salvare.");
-          const wrapper = document.getElementById('consenso-doc-wrapper');
+          alert("⚠️ Hai caricato un documento per l'esperienza " + n + ".\n\nDevi acconsentire al trattamento dei dati. Spunta la casella di consenso accanto al file caricato prima di salvare.");
+          const wrapper = document.getElementById('consenso-wrap-exp' + n);
           if(wrapper){
             wrapper.style.display = 'block';
             wrapper.scrollIntoView({behavior:'smooth', block:'center'});
