@@ -103,6 +103,7 @@
     <button class="tab-btn" onclick="showTab('verifiche',this)">🏅 Verifiche <span class="tab-badge" id="badge-ver">0</span></button>
     <button class="tab-btn" onclick="showTab('offerte',this)">📢 Offerte <span class="tab-badge" id="badge-off">0</span></button>
     <button class="tab-btn" onclick="showTab('premium',this)">💎 Richieste Premium <span class="tab-badge" id="badge-prem">0</span></button>
+    <button class="tab-btn" onclick="showTab('formazione',this)">🎓 Richieste Corsi <span class="tab-badge" id="badge-form">0</span></button>
     <button class="tab-btn" onclick="showTab('statistiche',this)">📈 Statistiche</button>
   </div>
   <!-- STATISTICHE GLOBALI -->
@@ -149,6 +150,9 @@
     </div>
     <div id="verifiche" class="section">
       <div id="lista-verifiche"><div class="empty-state"><span class="empty-icon">⏳</span><p>Caricamento...</p></div></div>
+    </div>
+    <div id="formazione" class="section">
+      <div id="lista-richieste-corsi"><div class="empty-state"><span class="empty-icon">⏳</span><p>Caricamento...</p></div></div>
     </div>
     <div id="statistiche" class="section">
       <div id="stats-grafici"><div class="empty-state"><span class="empty-icon">⏳</span><p>Caricamento...</p></div></div>
@@ -264,6 +268,89 @@
       `).join('');
     }
 
+    async function caricaRichiesteCorsi(){
+      const cont = document.getElementById('lista-richieste-corsi');
+      const {data: richieste, error} = await supabaseClient
+        .from('richieste_corsi')
+        .select('*')
+        .order('created_at', {ascending:false});
+
+      if(error){
+        cont.innerHTML = '<div class="empty-state"><span class="empty-icon">⚠️</span><h3>Errore</h3><p>' + error.message + '</p></div>';
+        return;
+      }
+
+      // Aggiorna badge
+      const nuove = (richieste||[]).filter(r => r.stato === 'nuova').length;
+      const badge = document.getElementById('badge-form');
+      if(badge){
+        badge.textContent = nuove;
+        badge.style.display = nuove > 0 ? 'inline-block' : 'none';
+      }
+
+      if(!richieste || richieste.length === 0){
+        cont.innerHTML = '<div class="empty-state"><span class="empty-icon">📭</span><h3>Nessuna richiesta</h3><p>Le richieste di formazione delle aziende appariranno qui.</p></div>';
+        return;
+      }
+
+      const nomiCorsi = {
+        haccp: '🍽️ HACCP',
+        antincendio: '🔥 Antincendio',
+        primo_soccorso: '⛑️ Primo Soccorso',
+        sicurezza_lavoro: '🦺 Sicurezza sul Lavoro'
+      };
+
+      cont.innerHTML = '<div style="margin-bottom:14px;font-size:13px;color:#6b705c;">Totale: <b>' + richieste.length + '</b> · Nuove: <b style="color:#c0392b;">' + nuove + '</b></div>' +
+        richieste.map(r => {
+          const data = new Date(r.created_at).toLocaleDateString('it-IT') + ' ' + new Date(r.created_at).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+          let badgeStato;
+          if(r.stato === 'contattata'){
+            badgeStato = '<span style="background:#c9a84c;color:#1a2e1a;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;">📞 CONTATTATA</span>';
+          } else if(r.stato === 'chiusa'){
+            badgeStato = '<span style="background:#2d6a4f;color:white;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;">✅ CHIUSA</span>';
+          } else {
+            badgeStato = '<span style="background:#c0392b;color:white;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;">🆕 NUOVA</span>';
+          }
+          let bottoni = '';
+          if(r.stato === 'nuova'){
+            bottoni = '<button onclick="aggiornaStatoCorso(\'' + r.id + '\', \'contattata\')" style="background:#c9a84c;color:#1a2e1a;border:none;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;margin-right:6px;">📞 Marca come contattata</button>';
+            bottoni += '<button onclick="aggiornaStatoCorso(\'' + r.id + '\', \'chiusa\')" style="background:#2d6a4f;color:white;border:none;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">✅ Chiudi</button>';
+          } else if(r.stato === 'contattata'){
+            bottoni = '<button onclick="aggiornaStatoCorso(\'' + r.id + '\', \'chiusa\')" style="background:#2d6a4f;color:white;border:none;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">✅ Chiudi</button>';
+          }
+          return '<div style="background:white;border:1px solid #e1e4dd;border-radius:10px;padding:14px;margin-bottom:10px;">' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">' +
+              '<strong style="font-size:15px;color:#1a2e1a;">' + r.nome_azienda + '</strong>' +
+              badgeStato +
+            '</div>' +
+            '<div style="font-size:12px;color:#6b705c;line-height:1.6;margin-bottom:10px;">' +
+              '📅 ' + data + '<br>' +
+              '✉️ <a href="mailto:' + r.email_azienda + '" style="color:#2d6a4f;">' + r.email_azienda + '</a><br>' +
+              '🎓 Corso: <strong style="color:#1a2e1a;">' + (nomiCorsi[r.corso] || r.corso) + '</strong><br>' +
+              '👥 Dipendenti da formare: <strong>' + r.numero_dipendenti + '</strong>' +
+              (r.note ? '<br>📝 Note: <em>"' + r.note + '"</em>' : '') +
+            '</div>' +
+            (bottoni ? '<div style="display:flex;gap:6px;flex-wrap:wrap;">' + bottoni + '</div>' : '') +
+          '</div>';
+        }).join('');
+    }
+
+    async function aggiornaStatoCorso(id, nuovoStato){
+      const conferma = nuovoStato === 'chiusa' ? 'Confermi di voler chiudere questa richiesta?' : 'Marcare questa richiesta come contattata?';
+      if(!confirm(conferma)) return;
+
+      const update = { stato: nuovoStato };
+      if(nuovoStato === 'contattata') update.contattata_il = new Date().toISOString();
+
+      const {error} = await supabaseClient
+        .from('richieste_corsi')
+        .update(update)
+        .eq('id', id);
+
+      if(error){ alert("Errore: " + error.message); return; }
+      caricaRichiesteCorsi();
+    }
+
     async function eliminaOffertaAdmin(id){
       if(!confirm('Eliminare questa offerta?'))return;
       await supabaseClient.from('offerte_lavoro').delete().eq('id',id);
@@ -279,6 +366,7 @@
       if(id==='verifiche')caricaVerifiche();
       if(id==='statistiche')caricaStatisticheDettagliate();
       if(id==='offerte')caricaOfferteAdmin();
+      if(id==='formazione')caricaRichiesteCorsi();
     }
 
     async function inizializzaAdmin(){
@@ -290,6 +378,7 @@
       caricaAziende();
       caricaRichiestePremium();
       caricaVerifiche();
+      caricaRichiesteCorsi();
     }
 
     /* ─── STATISTICHE GLOBALI ─── */

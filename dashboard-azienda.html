@@ -319,6 +319,10 @@
         <span class="drawer-item-icon">&#128269;</span>
         <span class="drawer-item-text">Database Talenti</span>
       </button>
+      <button class="drawer-item" id="di-formazione" onclick="drawerTab('formazione',this)">
+        <span class="drawer-item-icon">&#127891;</span>
+        <span class="drawer-item-text">Formazione</span>
+      </button>
       <button class="drawer-item" id="di-mercato" onclick="window.location.href='esplora-aziende.html'">
         <span class="drawer-item-icon">&#128203;</span>
         <span class="drawer-item-text">Mercato &amp; Recensioni</span>
@@ -366,6 +370,7 @@
     <button class="tab-btn" onclick="showTab('proposte-inviate',this)">📨 Proposte Inviate</button>
     <button class="tab-btn" onclick="showTab('offerte',this)">📢 Pubblica Offerta</button>
     <button class="tab-btn" onclick="showTab('talenti',this)">🔍 Database Talenti</button>
+    <button class="tab-btn" onclick="showTab('formazione',this)">🎓 Formazione</button>
     <button class="tab-btn" onclick="window.location.href='esplora-aziende.html'">📋 Mercato & Recensioni</button>
     <button class="tab-btn" onclick="logout()" style="color:#e88080;margin-left:auto;">⬡ Esci</button>
     
@@ -622,6 +627,56 @@
       </div>
     </div>
 
+    <!-- FORMAZIONE -->
+    <div id="formazione" class="section">
+      <div class="card">
+        <div class="card-title">🎓 Formazione per il tuo team</div>
+        <p style="font-size:13px;color:var(--pietra);margin-bottom:18px;line-height:1.5;">
+          StaffAlpine offre <strong>4 corsi di formazione gratuiti</strong> per le aziende partner della Valle d'Aosta. Clicca su "Chiedi informazioni" sulla card del corso che ti interessa: ti contatteremo per organizzarlo.
+        </p>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;">
+
+          <div style="background:white;border:1px solid #e1e4dd;border-radius:12px;padding:18px;display:flex;flex-direction:column;">
+            <div style="font-size:36px;text-align:center;margin-bottom:10px;">🍽️</div>
+            <div style="font-size:16px;font-weight:700;color:#1a2e1a;text-align:center;margin-bottom:8px;">HACCP</div>
+            <p style="font-size:12px;color:var(--pietra);line-height:1.5;margin:0 0 14px;flex:1;">Igiene e sicurezza alimentare. Obbligatorio per chi lavora a contatto con alimenti.</p>
+            <button onclick="apriRichiestaCorso('haccp','HACCP')" style="background:#2d6a4f;color:white;border:none;padding:10px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">📩 Chiedi informazioni</button>
+          </div>
+
+          <div style="background:white;border:1px solid #e1e4dd;border-radius:12px;padding:18px;display:flex;flex-direction:column;">
+            <div style="font-size:36px;text-align:center;margin-bottom:10px;">🔥</div>
+            <div style="font-size:16px;font-weight:700;color:#1a2e1a;text-align:center;margin-bottom:8px;">Antincendio</div>
+            <p style="font-size:12px;color:var(--pietra);line-height:1.5;margin:0 0 14px;flex:1;">Prevenzione incendi e gestione emergenze. Necessario per ambienti pubblici.</p>
+            <button onclick="apriRichiestaCorso('antincendio','Antincendio')" style="background:#2d6a4f;color:white;border:none;padding:10px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">📩 Chiedi informazioni</button>
+          </div>
+
+          <div style="background:white;border:1px solid #e1e4dd;border-radius:12px;padding:18px;display:flex;flex-direction:column;">
+            <div style="font-size:36px;text-align:center;margin-bottom:10px;">⛑️</div>
+            <div style="font-size:16px;font-weight:700;color:#1a2e1a;text-align:center;margin-bottom:8px;">Primo Soccorso</div>
+            <p style="font-size:12px;color:var(--pietra);line-height:1.5;margin:0 0 14px;flex:1;">Tecniche di intervento in caso di emergenza sanitaria sul luogo di lavoro.</p>
+            <button onclick="apriRichiestaCorso('primo_soccorso','Primo Soccorso')" style="background:#2d6a4f;color:white;border:none;padding:10px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">📩 Chiedi informazioni</button>
+          </div>
+
+          <div style="background:white;border:1px solid #e1e4dd;border-radius:12px;padding:18px;display:flex;flex-direction:column;">
+            <div style="font-size:36px;text-align:center;margin-bottom:10px;">🦺</div>
+            <div style="font-size:16px;font-weight:700;color:#1a2e1a;text-align:center;margin-bottom:8px;">Sicurezza sul Lavoro</div>
+            <p style="font-size:12px;color:var(--pietra);line-height:1.5;margin:0 0 14px;flex:1;">Formazione obbligatoria ex D.Lgs. 81/2008 per tutti i dipendenti.</p>
+            <button onclick="apriRichiestaCorso('sicurezza_lavoro','Sicurezza sul Lavoro')" style="background:#2d6a4f;color:white;border:none;padding:10px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">📩 Chiedi informazioni</button>
+          </div>
+
+        </div>
+
+        <div style="background:#fff8e1;border-left:4px solid #c9a84c;border-radius:0 8px 8px 0;padding:12px 16px;margin-top:18px;">
+          <p style="font-size:12px;color:#5c4a00;margin:0;line-height:1.5;">
+            🎁 <strong>Servizio gratuito per le aziende partner</strong> · 💡 Presto sarà disponibile anche il servizio <em>Welfare aziendale</em>.
+          </p>
+        </div>
+
+        <div id="lista-mie-richieste-corsi" style="margin-top:24px;"></div>
+      </div>
+    </div>
+
     <!-- MERCATO -->
     <div id="mercato" class="section">
       <div class="card" id="card-mercato">
@@ -638,6 +693,32 @@
       </div>
     </div>
 
+  </div>
+
+  <!-- MODAL RICHIESTA CORSO -->
+  <div id="modal-richiesta-corso" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:10000;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:14px;padding:24px;max-width:480px;width:100%;">
+      <h2 style="margin:0 0 6px;color:#1a2e1a;font-family:'Playfair Display',serif;font-size:22px;">📩 Richiedi informazioni</h2>
+      <p style="margin:0 0 18px;color:var(--pietra);font-size:13px;line-height:1.5;">
+        Corso: <strong id="rc-titolo">—</strong><br>
+        Ti contatteremo all&#39;email del tuo profilo per organizzare il corso.
+      </p>
+
+      <div class="form-group">
+        <label class="form-label">Numero dipendenti da formare *</label>
+        <input type="number" id="rc-numero-dipendenti" min="1" max="999" class="form-control" placeholder="es. 5">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Note aggiuntive (facoltativo)</label>
+        <textarea id="rc-note" class="form-control" rows="3" placeholder="es. preferisco corso in sede / tempi entro un mese..." style="resize:vertical;"></textarea>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;flex-wrap:wrap;">
+        <button onclick="chiudiRichiestaCorso()" style="background:transparent;border:1px solid #ccc;color:var(--pietra);padding:10px 18px;border-radius:8px;font-weight:600;cursor:pointer;">Annulla</button>
+        <button onclick="inviaRichiestaCorso()" class="btn-primary" style="padding:10px 22px;">📤 Invia richiesta</button>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -1447,6 +1528,7 @@
       if(id==='mercato'&&_isPremium)caricaTutteLeRecensioni();
       if(id==='mie-offerte')caricaMieOfferte();
       if(id==='proposte-inviate')caricaProposteInviate();
+      if(id==='formazione')caricaMieRichiesteCorsi();
       if(id==='notifiche')caricaNotificheLavoratori();
       if(id==='profilo-az')caricaProfiloAzienda();
     }
@@ -1579,6 +1661,118 @@
     }
 
     inizializzaDashboard();
+
+    // ============= FORMAZIONE =============
+    let _corsoSelezionato = null;
+
+    function apriRichiestaCorso(idCorso, nomeCorso){
+      _corsoSelezionato = { id: idCorso, nome: nomeCorso };
+      document.getElementById('rc-titolo').innerText = nomeCorso;
+      document.getElementById('rc-numero-dipendenti').value = '';
+      document.getElementById('rc-note').value = '';
+      document.getElementById('modal-richiesta-corso').style.display = 'flex';
+    }
+
+    function chiudiRichiestaCorso(){
+      document.getElementById('modal-richiesta-corso').style.display = 'none';
+      _corsoSelezionato = null;
+    }
+
+    async function inviaRichiestaCorso(){
+      if(!_corsoSelezionato) return;
+      const numDip = parseInt(document.getElementById('rc-numero-dipendenti').value);
+      const note = document.getElementById('rc-note').value.trim();
+      if(!numDip || numDip < 1){
+        alert("Inserisci un numero valido di dipendenti da formare (minimo 1).");
+        return;
+      }
+      const {data:{user}} = await supabaseClient.auth.getUser();
+      const {data: profilo} = await supabaseClient
+        .from('profili_aziende')
+        .select('nome_azienda,email')
+        .eq('id', user.id)
+        .single();
+      if(!profilo){ alert("Errore: profilo azienda non trovato."); return; }
+
+      const {error: errIns} = await supabaseClient
+        .from('richieste_corsi')
+        .insert([{
+          azienda_id: user.id,
+          nome_azienda: profilo.nome_azienda,
+          email_azienda: profilo.email,
+          corso: _corsoSelezionato.id,
+          numero_dipendenti: numDip,
+          note: note || null
+        }]);
+
+      if(errIns){
+        alert("Errore nel salvataggio: " + errIns.message);
+        return;
+      }
+
+      // Email admin in background
+      fetch('/api/richiesta-corso', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          nomeAzienda: profilo.nome_azienda,
+          emailAzienda: profilo.email,
+          corso: _corsoSelezionato.nome,
+          numeroDipendenti: numDip,
+          note: note
+        })
+      }).catch(e => console.log('Notifica email admin fallita:', e));
+
+      alert("✅ Richiesta inviata con successo!\n\nVerrai contattata a breve per organizzare il corso.");
+      chiudiRichiestaCorso();
+      caricaMieRichiesteCorsi();
+    }
+
+    async function caricaMieRichiesteCorsi(){
+      const container = document.getElementById('lista-mie-richieste-corsi');
+      if(!container) return;
+      const {data:{user}} = await supabaseClient.auth.getUser();
+      const {data: richieste} = await supabaseClient
+        .from('richieste_corsi')
+        .select('id,created_at,corso,numero_dipendenti,note,stato,contattata_il')
+        .eq('azienda_id', user.id)
+        .order('created_at', {ascending:false});
+
+      if(!richieste || richieste.length === 0){
+        container.innerHTML = '';
+        return;
+      }
+
+      const nomiCorsi = {
+        haccp: '🍽️ HACCP',
+        antincendio: '🔥 Antincendio',
+        primo_soccorso: '⛑️ Primo Soccorso',
+        sicurezza_lavoro: '🦺 Sicurezza sul Lavoro'
+      };
+
+      container.innerHTML = '<h3 style="font-size:16px;color:#1a2e1a;margin:0 0 12px;font-family:\'Playfair Display\',serif;">Le tue richieste</h3>' +
+        richieste.map(r => {
+          const data = new Date(r.created_at).toLocaleDateString('it-IT');
+          let badge;
+          if(r.stato === 'contattata'){
+            badge = '<span style="background:#c9a84c;color:#1a2e1a;padding:3px 8px;border-radius:5px;font-size:10px;font-weight:700;">📞 CONTATTATA</span>';
+          } else if(r.stato === 'chiusa'){
+            badge = '<span style="background:#2d6a4f;color:white;padding:3px 8px;border-radius:5px;font-size:10px;font-weight:700;">✅ CHIUSA</span>';
+          } else {
+            badge = '<span style="background:#6b705c;color:white;padding:3px 8px;border-radius:5px;font-size:10px;font-weight:700;">🆕 NUOVA</span>';
+          }
+          return '<div style="background:#f0f2ee;border-radius:10px;padding:12px 14px;margin-bottom:8px;">' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px;">' +
+              '<strong style="font-size:14px;color:#1a2e1a;">' + (nomiCorsi[r.corso] || r.corso) + '</strong>' +
+              badge +
+            '</div>' +
+            '<div style="font-size:12px;color:var(--pietra);">' +
+              '📅 ' + data + ' · 👥 ' + r.numero_dipendenti + ' dipendenti' +
+              (r.note ? '<br>📝 "' + r.note + '"' : '') +
+            '</div>' +
+          '</div>';
+        }).join('');
+    }
   </script>
 </body>
 </html>
