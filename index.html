@@ -343,6 +343,58 @@
       padding: 0 4px;
     }
 
+    /* ── SEZIONE COLLABORAZIONI / PARTNER ── */
+    .partners {
+      background: #ffffff;
+      padding: 70px 5% 60px;
+      text-align: center;
+      border-bottom: 1px solid #eef0ea;
+    }
+    .partners-tag {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--verde-chiaro);
+      font-weight: 600;
+      display: block;
+      margin-bottom: 14px;
+    }
+    .partners-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 700;
+      color: var(--scuro);
+      margin-bottom: 44px;
+    }
+    .partners-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: clamp(2rem, 6vw, 5rem);
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .partner-logo {
+      width: auto;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+    }
+    .partner-logo:hover {
+      transform: translateY(-4px);
+    }
+    /* Altezze ottiche bilanciate per logo (proporzioni diverse) */
+    .logo-unidea     { height: 80px; }
+    .logo-bertholier { height: 70px; }
+    .logo-mosaico    { height: 88px; }
+    @media (max-width: 600px) {
+      .partners { padding: 50px 5% 44px; }
+      .partners-title { margin-bottom: 32px; }
+      .logo-unidea     { height: 56px; }
+      .logo-bertholier { height: 50px; }
+      .logo-mosaico    { height: 62px; }
+    }
+
     /* ── SEZIONE FEATURES ── */
     .features {
       padding: 100px 5%;
@@ -725,6 +777,18 @@
       </div>
     </div>
     <div class="scroll-hint">Scorri</div>
+  </section>
+
+
+  <!-- COLLABORAZIONI / PARTNER -->
+  <section class="partners" aria-labelledby="partners-title">
+    <span class="partners-tag">Insieme a noi</span>
+    <h2 id="partners-title" class="partners-title">Le nostre collaborazioni</h2>
+    <div class="partners-grid">
+      <img class="partner-logo logo-unidea" src="loghi/unidea.svg" alt="Unidea Assicurazioni Valle d'Aosta" loading="lazy">
+      <img class="partner-logo logo-bertholier" src="loghi/bertholier.jpg" alt="Bertholier Consulting — Food &amp; Ho.Re.Ca." loading="lazy">
+      <img class="partner-logo logo-mosaico" src="loghi/mosaico.png" alt="Mosaico" loading="lazy">
+    </div>
   </section>
 
 
