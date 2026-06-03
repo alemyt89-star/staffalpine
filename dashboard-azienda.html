@@ -43,6 +43,19 @@
     .tab-btn:hover{color:var(--testo);}
     .tab-btn.active{color:var(--verde);border-bottom-color:var(--verde);font-weight:600;}
 
+    /* SUBTAB BAR (Servizi) — 3 bottoni equi-distribuiti, no scroll su mobile */
+    .subtabs-bar{background:white;border:1px solid rgba(0,0,0,0.07);border-radius:12px;padding:6px;display:flex;gap:6px;margin-bottom:16px;}
+    .subtab-btn{flex:1 1 0;min-width:0;padding:10px 12px;border:none;background:transparent;color:var(--testo);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background 0.2s,color 0.2s;white-space:nowrap;overflow:hidden;}
+    .subtab-btn.active{background:var(--verde);color:white;font-weight:600;}
+    .subtab-icon{flex-shrink:0;}
+    .subtab-label-full{display:inline;overflow:hidden;text-overflow:ellipsis;}
+    .subtab-label-short{display:none;}
+    @media(max-width:600px){
+      .subtab-btn{padding:9px 6px;font-size:12px;gap:4px;}
+      .subtab-label-full{display:none;}
+      .subtab-label-short{display:inline;}
+    }
+
     /* CONTENT */
     .container{max-width:960px;margin:0 auto;padding:32px 5%;}
     .section{display:none;}
@@ -502,22 +515,6 @@
     <!-- PROFILO AZIENDA -->
     <div id="profilo-az" class="section active">
 
-      <!-- PANORAMICA INTEGRATA -->
-      <div id="banner-upgrade" class="upgrade-banner" style="display:none;">
-        <div>
-          <h3>💎 Passa a Premium</h3>
-          <p>Accedi al database lavoratori, pubblica offerte e consulta le recensioni di mercato.</p>
-        </div>
-        <button class="btn-oro" onclick="richiediPremium()">Richiedi Premium →</button>
-      </div>
-
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-title">📊 Analisi Recensioni della Tua Azienda</div>
-        <div id="stats-content">
-          <div class="empty-state"><span class="empty-icon">⏳</span><h3>Caricamento...</h3></div>
-        </div>
-      </div>
-
       <!-- VISUALIZZAZIONE PROFILO -->
       <div id="profilo-az-view" style="display:none;">
         <div class="card" style="margin-bottom:16px;">
@@ -617,16 +614,44 @@
         </div>
       </div>
       </div>
+
+      <!-- PANORAMICA (sotto il profilo) -->
+      <div id="banner-upgrade" class="upgrade-banner" style="display:none;margin-top:16px;">
+        <div>
+          <h3>💎 Passa a Premium</h3>
+          <p>Accedi al database lavoratori, pubblica offerte e consulta le recensioni di mercato.</p>
+        </div>
+        <button class="btn-oro" onclick="richiediPremium()">Richiedi Premium →</button>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="card-title">📊 Analisi Recensioni della Tua Azienda</div>
+        <div id="stats-content">
+          <div class="empty-state"><span class="empty-icon">⏳</span><h3>Caricamento...</h3></div>
+        </div>
+      </div>
     </div>
 
     <!-- SERVIZI -->
     <div id="servizi" class="section">
 
       <!-- SOTTO-TAB SERVIZI -->
-      <div style="background:white;border:1px solid rgba(0,0,0,0.07);border-radius:12px;padding:6px;display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none;">
-        <button class="subtab-btn active" data-sub="sub-formazione" onclick="showSubTab(this)" style="padding:10px 16px;border:none;background:var(--verde);color:white;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">🎓 Formazione</button>
-        <button class="subtab-btn" data-sub="sub-consulenza-fb" onclick="showSubTab(this)" style="padding:10px 16px;border:none;background:transparent;color:var(--testo);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">🍷 Consulenza Food &amp; Beverage</button>
-        <button class="subtab-btn" data-sub="sub-analisi-rischio" onclick="showSubTab(this)" style="padding:10px 16px;border:none;background:transparent;color:var(--testo);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">📊 Analisi del Rischio</button>
+      <div class="subtabs-bar">
+        <button class="subtab-btn active" data-sub="sub-formazione" onclick="showSubTab(this)">
+          <span class="subtab-icon">🎓</span>
+          <span class="subtab-label-full">Formazione</span>
+          <span class="subtab-label-short">Formaz.</span>
+        </button>
+        <button class="subtab-btn" data-sub="sub-consulenza-fb" onclick="showSubTab(this)">
+          <span class="subtab-icon">🍷</span>
+          <span class="subtab-label-full">Consulenza Food &amp; Beverage</span>
+          <span class="subtab-label-short">Consul.</span>
+        </button>
+        <button class="subtab-btn" data-sub="sub-analisi-rischio" onclick="showSubTab(this)">
+          <span class="subtab-icon">📊</span>
+          <span class="subtab-label-full">Analisi del Rischio</span>
+          <span class="subtab-label-short">Rischio</span>
+        </button>
       </div>
 
       <!-- SOTTO-SEZIONE: FORMAZIONE -->
@@ -1667,17 +1692,9 @@
     function showSubTab(btn){
       const target = btn.getAttribute('data-sub');
       document.querySelectorAll('.subsection').forEach(s=>s.style.display='none');
-      document.querySelectorAll('.subtab-btn').forEach(b=>{
-        b.style.background='transparent';
-        b.style.color='var(--testo)';
-        b.style.fontWeight='500';
-        b.classList.remove('active');
-      });
+      document.querySelectorAll('.subtab-btn').forEach(b=>b.classList.remove('active'));
       const sec = document.getElementById(target);
       if(sec) sec.style.display='block';
-      btn.style.background='var(--verde)';
-      btn.style.color='white';
-      btn.style.fontWeight='600';
       btn.classList.add('active');
     }
 
