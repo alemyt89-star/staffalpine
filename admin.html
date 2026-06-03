@@ -104,6 +104,7 @@
     <button class="tab-btn" onclick="showTab('offerte',this)">📢 Offerte <span class="tab-badge" id="badge-off">0</span></button>
     <button class="tab-btn" onclick="showTab('premium',this)">💎 Richieste Premium <span class="tab-badge" id="badge-prem">0</span></button>
     <button class="tab-btn" onclick="showTab('formazione',this)">🎓 Richieste Corsi <span class="tab-badge" id="badge-form">0</span></button>
+    <button class="tab-btn" onclick="showTab('servizi-admin',this)">🛠️ Richieste Servizi <span class="tab-badge" id="badge-serv">0</span></button>
     <button class="tab-btn" onclick="showTab('statistiche',this)">📈 Statistiche</button>
   </div>
   <!-- STATISTICHE GLOBALI -->
@@ -153,6 +154,24 @@
     </div>
     <div id="formazione" class="section">
       <div id="lista-richieste-corsi"><div class="empty-state"><span class="empty-icon">⏳</span><p>Caricamento...</p></div></div>
+    </div>
+    <div id="servizi-admin" class="section">
+      <div style="background:white;border:1px solid #e1e4dd;border-radius:10px;padding:12px 14px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+        <label style="font-size:12px;color:#6b705c;font-weight:600;">Filtra per tipo servizio:</label>
+        <select id="filtro-tipo-servizio" onchange="caricaRichiesteServizi()" style="padding:7px 12px;border:1px solid #e1e4dd;border-radius:6px;font-size:13px;font-family:inherit;background:white;cursor:pointer;">
+          <option value="">Tutti i servizi</option>
+          <option value="consulenza_fb">🍷 Consulenza Food &amp; Beverage</option>
+          <option value="analisi_rischio">📊 Analisi del Rischio</option>
+        </select>
+        <label style="font-size:12px;color:#6b705c;font-weight:600;margin-left:10px;">Stato:</label>
+        <select id="filtro-stato-servizio" onchange="caricaRichiesteServizi()" style="padding:7px 12px;border:1px solid #e1e4dd;border-radius:6px;font-size:13px;font-family:inherit;background:white;cursor:pointer;">
+          <option value="">Tutti</option>
+          <option value="nuova">🆕 Nuove</option>
+          <option value="contattata">📞 Contattate</option>
+          <option value="chiusa">✅ Chiuse</option>
+        </select>
+      </div>
+      <div id="lista-richieste-servizi"><div class="empty-state"><span class="empty-icon">⏳</span><p>Caricamento...</p></div></div>
     </div>
     <div id="statistiche" class="section">
       <div id="stats-grafici"><div class="empty-state"><span class="empty-icon">⏳</span><p>Caricamento...</p></div></div>
@@ -351,6 +370,119 @@
       caricaRichiesteCorsi();
     }
 
+    /* ─── RICHIESTE SERVIZI (Consulenza F&B / Analisi Rischio) ─── */
+    const LABEL_TIPO_SERV = {
+      consulenza_fb: '🍷 Consulenza F&B',
+      analisi_rischio: '📊 Analisi del Rischio'
+    };
+    const LABEL_AREA_SERV = {
+      // Consulenza F&B
+      formazione_docenza: '🎓 Formazione tecnica & docenza specialistica',
+      management_food: '📈 Management & sviluppo del business food',
+      strategica_operativa: '🧭 Consulenza strategica e supporto operativo',
+      // Analisi Rischio
+      finanziari: '💶 Rischi finanziari',
+      operativi: '⚙️ Rischi operativi',
+      strategici: '🧭 Rischi strategici',
+      organizzativi: '👥 Rischi organizzativi',
+      mercato_clienti: '🛒 Rischi di mercato e clienti'
+    };
+
+    async function caricaRichiesteServizi(){
+      const cont = document.getElementById('lista-richieste-servizi');
+      const filtroTipo = document.getElementById('filtro-tipo-servizio') ? document.getElementById('filtro-tipo-servizio').value : '';
+      const filtroStato = document.getElementById('filtro-stato-servizio') ? document.getElementById('filtro-stato-servizio').value : '';
+
+      let query = supabaseClient
+        .from('richieste_servizi')
+        .select('*')
+        .order('created_at', {ascending:false});
+
+      if(filtroTipo) query = query.eq('tipo_servizio', filtroTipo);
+      if(filtroStato) query = query.eq('stato', filtroStato);
+
+      const {data: richieste, error} = await query;
+
+      if(error){
+        cont.innerHTML = '<div class="empty-state"><span class="empty-icon">⚠️</span><h3>Errore</h3><p>' + error.message + '</p></div>';
+        return;
+      }
+
+      // Badge sul tab: conta SEMPRE le nuove totali (indipendente dai filtri)
+      try {
+        const {data: tutte} = await supabaseClient
+          .from('richieste_servizi')
+          .select('stato');
+        const nuoveTot = (tutte||[]).filter(r => r.stato === 'nuova').length;
+        const badge = document.getElementById('badge-serv');
+        if(badge){
+          badge.textContent = nuoveTot;
+          badge.style.display = nuoveTot > 0 ? 'inline-block' : 'none';
+        }
+      } catch(e){ /* badge non critico */ }
+
+      if(!richieste || richieste.length === 0){
+        cont.innerHTML = '<div class="empty-state"><span class="empty-icon">📭</span><h3>Nessuna richiesta</h3><p>Nessuna richiesta servizio corrisponde ai filtri selezionati.</p></div>';
+        return;
+      }
+
+      const nuoveFiltrate = richieste.filter(r => r.stato === 'nuova').length;
+
+      cont.innerHTML = '<div style="margin-bottom:14px;font-size:13px;color:#6b705c;">Totale visibili: <b>' + richieste.length + '</b> · Nuove: <b style="color:#c0392b;">' + nuoveFiltrate + '</b></div>' +
+        richieste.map(r => {
+          const data = new Date(r.created_at).toLocaleDateString('it-IT') + ' ' + new Date(r.created_at).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+          let badgeStato;
+          if(r.stato === 'contattata'){
+            badgeStato = '<span style="background:#c9a84c;color:#1a2e1a;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;">📞 CONTATTATA</span>';
+          } else if(r.stato === 'chiusa'){
+            badgeStato = '<span style="background:#2d6a4f;color:white;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;">✅ CHIUSA</span>';
+          } else {
+            badgeStato = '<span style="background:#c0392b;color:white;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;">🆕 NUOVA</span>';
+          }
+          let bottoni = '';
+          if(r.stato === 'nuova'){
+            bottoni = '<button onclick="aggiornaStatoServizio(&#39;' + r.id + '&#39;, &#39;contattata&#39;)" style="background:#c9a84c;color:#1a2e1a;border:none;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;margin-right:6px;">📞 Marca come contattata</button>';
+            bottoni += '<button onclick="aggiornaStatoServizio(&#39;' + r.id + '&#39;, &#39;chiusa&#39;)" style="background:#2d6a4f;color:white;border:none;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">✅ Chiudi</button>';
+          } else if(r.stato === 'contattata'){
+            bottoni = '<button onclick="aggiornaStatoServizio(&#39;' + r.id + '&#39;, &#39;chiusa&#39;)" style="background:#2d6a4f;color:white;border:none;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">✅ Chiudi</button>';
+          }
+
+          const labelTipo = LABEL_TIPO_SERV[r.tipo_servizio] || r.tipo_servizio;
+          const labelArea = LABEL_AREA_SERV[r.area_richiesta] || r.area_richiesta;
+
+          return '<div style="background:white;border:1px solid #e1e4dd;border-radius:10px;padding:14px;margin-bottom:10px;">' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">' +
+              '<strong style="font-size:15px;color:#1a2e1a;">' + r.nome_azienda + '</strong>' +
+              badgeStato +
+            '</div>' +
+            '<div style="font-size:12px;color:#6b705c;line-height:1.6;margin-bottom:10px;">' +
+              '📅 ' + data + '<br>' +
+              '✉️ <a href="mailto:' + r.email_azienda + '" style="color:#2d6a4f;">' + r.email_azienda + '</a><br>' +
+              '🛠️ Servizio: <strong style="color:#1a2e1a;">' + labelTipo + '</strong><br>' +
+              '🎯 Area: <strong style="color:#1a2e1a;">' + labelArea + '</strong>' +
+              (r.note ? '<br>📝 Note: <em>"' + r.note + '"</em>' : '') +
+            '</div>' +
+            (bottoni ? '<div style="display:flex;gap:6px;flex-wrap:wrap;">' + bottoni + '</div>' : '') +
+          '</div>';
+        }).join('');
+    }
+
+    async function aggiornaStatoServizio(id, nuovoStato){
+      const conferma = nuovoStato === 'chiusa' ? 'Confermi di voler chiudere questa richiesta?' : 'Marcare questa richiesta come contattata?';
+      if(!confirm(conferma)) return;
+
+      const update = { stato: nuovoStato };
+      if(nuovoStato === 'contattata') update.contattata_il = new Date().toISOString();
+
+      const {error} = await supabaseClient
+        .from('richieste_servizi')
+        .update(update)
+        .eq('id', id);
+
+      if(error){ alert("Errore: " + error.message); return; }
+      caricaRichiesteServizi();
+    }
+
     async function eliminaOffertaAdmin(id){
       if(!confirm('Eliminare questa offerta?'))return;
       await supabaseClient.from('offerte_lavoro').delete().eq('id',id);
@@ -367,6 +499,7 @@
       if(id==='statistiche')caricaStatisticheDettagliate();
       if(id==='offerte')caricaOfferteAdmin();
       if(id==='formazione')caricaRichiesteCorsi();
+      if(id==='servizi-admin')caricaRichiesteServizi();
     }
 
     async function inizializzaAdmin(){
@@ -379,6 +512,7 @@
       caricaRichiestePremium();
       caricaVerifiche();
       caricaRichiesteCorsi();
+      caricaRichiesteServizi();
     }
 
     /* ─── STATISTICHE GLOBALI ─── */
