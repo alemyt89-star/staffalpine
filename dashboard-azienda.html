@@ -294,10 +294,6 @@
         <span class="drawer-item-icon">&#127970;</span>
         <span class="drawer-item-text">Il Mio Profilo</span>
       </button>
-      <button class="drawer-item" id="di-panoramica" onclick="drawerTab('panoramica',this)">
-        <span class="drawer-item-icon">&#128202;</span>
-        <span class="drawer-item-text">Panoramica</span>
-      </button>
       <button class="drawer-item" id="di-notifiche" onclick="drawerTab('notifiche',this)">
         <span class="drawer-item-icon">&#128276;</span>
         <span class="drawer-item-text">Lavoratori</span>
@@ -317,11 +313,11 @@
       </button>
       <button class="drawer-item" id="di-talenti" onclick="drawerTab('talenti',this)">
         <span class="drawer-item-icon">&#128269;</span>
-        <span class="drawer-item-text">Database Talenti</span>
+        <span class="drawer-item-text">Database Lavoratori</span>
       </button>
-      <button class="drawer-item" id="di-formazione" onclick="drawerTab('formazione',this)">
-        <span class="drawer-item-icon">&#127891;</span>
-        <span class="drawer-item-text">Formazione</span>
+      <button class="drawer-item" id="di-servizi" onclick="drawerTab('servizi',this)">
+        <span class="drawer-item-icon">&#128295;</span>
+        <span class="drawer-item-text">Servizi</span>
       </button>
       <button class="drawer-item" id="di-mercato" onclick="window.location.href='esplora-aziende.html'">
         <span class="drawer-item-icon">&#128203;</span>
@@ -364,13 +360,12 @@
   <!-- TAB BAR -->
   <div class="tab-bar">
     <button class="tab-btn active" onclick="showTab('profilo-az',this)">🏢 Il Mio Profilo</button>
-    <button class="tab-btn" onclick="showTab('panoramica',this)">📊 Panoramica</button>
     <button class="tab-btn" onclick="showTab('notifiche',this)">🔔 Lavoratori <span id="badge-notifiche" style="background:var(--rosso);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;display:none;">0</span></button>
     <button class="tab-btn" onclick="showTab('mie-offerte',this)">📋 Le Mie Offerte</button>
     <button class="tab-btn" onclick="showTab('proposte-inviate',this)">📨 Proposte Inviate</button>
     <button class="tab-btn" onclick="showTab('offerte',this)">📢 Pubblica Offerta</button>
-    <button class="tab-btn" onclick="showTab('talenti',this)">🔍 Database Talenti</button>
-    <button class="tab-btn" onclick="showTab('formazione',this)">🎓 Formazione</button>
+    <button class="tab-btn" onclick="showTab('talenti',this)">🔍 Database Lavoratori</button>
+    <button class="tab-btn" onclick="showTab('servizi',this)">🛠️ Servizi</button>
     <button class="tab-btn" onclick="window.location.href='esplora-aziende.html'">📋 Mercato & Recensioni</button>
     <button class="tab-btn" onclick="logout()" style="color:#e88080;margin-left:auto;">⬡ Esci</button>
     
@@ -379,25 +374,6 @@
   <div class="container">
 
     <!-- PANORAMICA -->
-    <div id="panoramica" class="section">
-
-      <div id="banner-upgrade" class="upgrade-banner" style="display:none;">
-        <div>
-          <h3>💎 Passa a Premium</h3>
-          <p>Accedi al database talenti, pubblica offerte e consulta le recensioni di mercato.</p>
-        </div>
-        <button class="btn-oro" onclick="richiediPremium()">Richiedi Premium →</button>
-      </div>
-
-      <div class="card">
-        <div class="card-title">📊 Analisi Recensioni della Tua Azienda</div>
-        <div id="stats-content">
-          <div class="empty-state"><span class="empty-icon">⏳</span><h3>Caricamento...</h3></div>
-        </div>
-      </div>
-
-    </div>
-
     <!-- NOTIFICHE LAVORATORI COMPATIBILI -->
     <div id="notifiche" class="section">
       <div class="card">
@@ -526,6 +502,22 @@
     <!-- PROFILO AZIENDA -->
     <div id="profilo-az" class="section active">
 
+      <!-- PANORAMICA INTEGRATA -->
+      <div id="banner-upgrade" class="upgrade-banner" style="display:none;">
+        <div>
+          <h3>💎 Passa a Premium</h3>
+          <p>Accedi al database lavoratori, pubblica offerte e consulta le recensioni di mercato.</p>
+        </div>
+        <button class="btn-oro" onclick="richiediPremium()">Richiedi Premium →</button>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title">📊 Analisi Recensioni della Tua Azienda</div>
+        <div id="stats-content">
+          <div class="empty-state"><span class="empty-icon">⏳</span><h3>Caricamento...</h3></div>
+        </div>
+      </div>
+
       <!-- VISUALIZZAZIONE PROFILO -->
       <div id="profilo-az-view" style="display:none;">
         <div class="card" style="margin-bottom:16px;">
@@ -627,54 +619,165 @@
       </div>
     </div>
 
-    <!-- FORMAZIONE -->
-    <div id="formazione" class="section">
-      <div class="card">
-        <div class="card-title">🎓 Formazione per il tuo team</div>
-        <p style="font-size:13px;color:var(--pietra);margin-bottom:18px;line-height:1.5;">
-          StaffAlpine offre <strong>4 corsi di formazione gratuiti</strong> per le aziende partner della Valle d'Aosta. Clicca su "Chiedi informazioni" sulla card del corso che ti interessa: ti contatteremo per organizzarlo.
-        </p>
+    <!-- SERVIZI -->
+    <div id="servizi" class="section">
 
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;">
-
-          <div style="background:white;border:1px solid #e1e4dd;border-radius:12px;padding:18px;display:flex;flex-direction:column;">
-            <div style="font-size:36px;text-align:center;margin-bottom:10px;">🍽️</div>
-            <div style="font-size:16px;font-weight:700;color:#1a2e1a;text-align:center;margin-bottom:8px;">HACCP</div>
-            <p style="font-size:12px;color:var(--pietra);line-height:1.5;margin:0 0 14px;flex:1;">Igiene e sicurezza alimentare. Obbligatorio per chi lavora a contatto con alimenti.</p>
-            <button onclick="apriRichiestaCorso('haccp','HACCP')" style="background:#2d6a4f;color:white;border:none;padding:10px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">📩 Chiedi informazioni</button>
-          </div>
-
-          <div style="background:white;border:1px solid #e1e4dd;border-radius:12px;padding:18px;display:flex;flex-direction:column;">
-            <div style="font-size:36px;text-align:center;margin-bottom:10px;">🔥</div>
-            <div style="font-size:16px;font-weight:700;color:#1a2e1a;text-align:center;margin-bottom:8px;">Antincendio</div>
-            <p style="font-size:12px;color:var(--pietra);line-height:1.5;margin:0 0 14px;flex:1;">Prevenzione incendi e gestione emergenze. Necessario per ambienti pubblici.</p>
-            <button onclick="apriRichiestaCorso('antincendio','Antincendio')" style="background:#2d6a4f;color:white;border:none;padding:10px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">📩 Chiedi informazioni</button>
-          </div>
-
-          <div style="background:white;border:1px solid #e1e4dd;border-radius:12px;padding:18px;display:flex;flex-direction:column;">
-            <div style="font-size:36px;text-align:center;margin-bottom:10px;">⛑️</div>
-            <div style="font-size:16px;font-weight:700;color:#1a2e1a;text-align:center;margin-bottom:8px;">Primo Soccorso</div>
-            <p style="font-size:12px;color:var(--pietra);line-height:1.5;margin:0 0 14px;flex:1;">Tecniche di intervento in caso di emergenza sanitaria sul luogo di lavoro.</p>
-            <button onclick="apriRichiestaCorso('primo_soccorso','Primo Soccorso')" style="background:#2d6a4f;color:white;border:none;padding:10px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">📩 Chiedi informazioni</button>
-          </div>
-
-          <div style="background:white;border:1px solid #e1e4dd;border-radius:12px;padding:18px;display:flex;flex-direction:column;">
-            <div style="font-size:36px;text-align:center;margin-bottom:10px;">🦺</div>
-            <div style="font-size:16px;font-weight:700;color:#1a2e1a;text-align:center;margin-bottom:8px;">Sicurezza sul Lavoro</div>
-            <p style="font-size:12px;color:var(--pietra);line-height:1.5;margin:0 0 14px;flex:1;">Formazione obbligatoria ex D.Lgs. 81/2008 per tutti i dipendenti.</p>
-            <button onclick="apriRichiestaCorso('sicurezza_lavoro','Sicurezza sul Lavoro')" style="background:#2d6a4f;color:white;border:none;padding:10px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">📩 Chiedi informazioni</button>
-          </div>
-
-        </div>
-
-        <div style="background:#fff8e1;border-left:4px solid #c9a84c;border-radius:0 8px 8px 0;padding:12px 16px;margin-top:18px;">
-          <p style="font-size:12px;color:#5c4a00;margin:0;line-height:1.5;">
-            🎁 <strong>Servizio gratuito per le aziende partner</strong> · 💡 Presto sarà disponibile anche il servizio <em>Welfare aziendale</em>.
-          </p>
-        </div>
-
-        <div id="lista-mie-richieste-corsi" style="margin-top:24px;"></div>
+      <!-- SOTTO-TAB SERVIZI -->
+      <div style="background:white;border:1px solid rgba(0,0,0,0.07);border-radius:12px;padding:6px;display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none;">
+        <button class="subtab-btn active" data-sub="sub-formazione" onclick="showSubTab(this)" style="padding:10px 16px;border:none;background:var(--verde);color:white;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">🎓 Formazione</button>
+        <button class="subtab-btn" data-sub="sub-consulenza-fb" onclick="showSubTab(this)" style="padding:10px 16px;border:none;background:transparent;color:var(--testo);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">🍷 Consulenza Food &amp; Beverage</button>
+        <button class="subtab-btn" data-sub="sub-analisi-rischio" onclick="showSubTab(this)" style="padding:10px 16px;border:none;background:transparent;color:var(--testo);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">📊 Analisi del Rischio</button>
       </div>
+
+      <!-- SOTTO-SEZIONE: FORMAZIONE -->
+      <div id="sub-formazione" class="subsection">
+        <div class="card">
+          <div class="card-title">🎓 Formazione per il tuo team</div>
+          <p style="font-size:13px;color:var(--pietra);margin-bottom:18px;line-height:1.5;">
+            StaffAlpine offre <strong>4 corsi di formazione gratuiti</strong> per le aziende partner della Valle d'Aosta. Clicca su "Chiedi informazioni" sulla card del corso che ti interessa: ti contatteremo per organizzarlo.
+          </p>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;">
+
+            <div style="background:white;border:1px solid #e1e4dd;border-radius:12px;padding:18px;display:flex;flex-direction:column;">
+              <div style="font-size:36px;text-align:center;margin-bottom:10px;">🍽️</div>
+              <div style="font-size:16px;font-weight:700;color:#1a2e1a;text-align:center;margin-bottom:8px;">HACCP</div>
+              <p style="font-size:12px;color:var(--pietra);line-height:1.5;margin:0 0 14px;flex:1;">Igiene e sicurezza alimentare. Obbligatorio per chi lavora a contatto con alimenti.</p>
+              <button onclick="apriRichiestaCorso('haccp','HACCP')" style="background:#2d6a4f;color:white;border:none;padding:10px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">📩 Chiedi informazioni</button>
+            </div>
+
+            <div style="background:white;border:1px solid #e1e4dd;border-radius:12px;padding:18px;display:flex;flex-direction:column;">
+              <div style="font-size:36px;text-align:center;margin-bottom:10px;">🔥</div>
+              <div style="font-size:16px;font-weight:700;color:#1a2e1a;text-align:center;margin-bottom:8px;">Antincendio</div>
+              <p style="font-size:12px;color:var(--pietra);line-height:1.5;margin:0 0 14px;flex:1;">Prevenzione incendi e gestione emergenze. Necessario per ambienti pubblici.</p>
+              <button onclick="apriRichiestaCorso('antincendio','Antincendio')" style="background:#2d6a4f;color:white;border:none;padding:10px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">📩 Chiedi informazioni</button>
+            </div>
+
+            <div style="background:white;border:1px solid #e1e4dd;border-radius:12px;padding:18px;display:flex;flex-direction:column;">
+              <div style="font-size:36px;text-align:center;margin-bottom:10px;">⛑️</div>
+              <div style="font-size:16px;font-weight:700;color:#1a2e1a;text-align:center;margin-bottom:8px;">Primo Soccorso</div>
+              <p style="font-size:12px;color:var(--pietra);line-height:1.5;margin:0 0 14px;flex:1;">Tecniche di intervento in caso di emergenza sanitaria sul luogo di lavoro.</p>
+              <button onclick="apriRichiestaCorso('primo_soccorso','Primo Soccorso')" style="background:#2d6a4f;color:white;border:none;padding:10px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">📩 Chiedi informazioni</button>
+            </div>
+
+            <div style="background:white;border:1px solid #e1e4dd;border-radius:12px;padding:18px;display:flex;flex-direction:column;">
+              <div style="font-size:36px;text-align:center;margin-bottom:10px;">🦺</div>
+              <div style="font-size:16px;font-weight:700;color:#1a2e1a;text-align:center;margin-bottom:8px;">Sicurezza sul Lavoro</div>
+              <p style="font-size:12px;color:var(--pietra);line-height:1.5;margin:0 0 14px;flex:1;">Formazione obbligatoria ex D.Lgs. 81/2008 per tutti i dipendenti.</p>
+              <button onclick="apriRichiestaCorso('sicurezza_lavoro','Sicurezza sul Lavoro')" style="background:#2d6a4f;color:white;border:none;padding:10px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">📩 Chiedi informazioni</button>
+            </div>
+
+          </div>
+
+          <div style="background:#fff8e1;border-left:4px solid #c9a84c;border-radius:0 8px 8px 0;padding:12px 16px;margin-top:18px;">
+            <p style="font-size:12px;color:#5c4a00;margin:0;line-height:1.5;">
+              🎁 <strong>Servizio gratuito per le aziende partner.</strong>
+            </p>
+          </div>
+
+          <div id="lista-mie-richieste-corsi" style="margin-top:24px;"></div>
+        </div>
+      </div>
+
+      <!-- SOTTO-SEZIONE: CONSULENZA F&B -->
+      <div id="sub-consulenza-fb" class="subsection" style="display:none;">
+        <div class="card">
+          <div class="card-title">🍷 Consulenza Settore Food &amp; Beverage</div>
+          <p style="font-size:13px;color:var(--pietra);margin-bottom:18px;line-height:1.5;">
+            Consulenze specialistiche per il settore food &amp; beverage in Valle d'Aosta. Seleziona l'area di tuo interesse e clicca su "Richiedi informazioni": ti contatteremo per un primo confronto.
+          </p>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px;">
+
+            <div style="background:white;border:1px solid #e1e4dd;border-radius:12px;padding:18px;display:flex;flex-direction:column;">
+              <div style="font-size:36px;text-align:center;margin-bottom:10px;">🎓</div>
+              <div style="font-size:16px;font-weight:700;color:#1a2e1a;text-align:center;margin-bottom:10px;">Formazione tecnica &amp; docenza specialistica</div>
+              <ul style="font-size:12px;color:var(--pietra);line-height:1.6;margin:0 0 14px;padding-left:18px;flex:1;">
+                <li><strong>Igiene e sicurezza alimentare:</strong> introduzione HACCP, gestione degli allergeni e aggiornamenti normativi obbligatori, in aula o webinar.</li>
+                <li><strong>Tecnologia e processi alimentari:</strong> corsi e seminari su tecniche di conservazione, ottimizzazione della shelf-life e innovazione di prodotto.</li>
+              </ul>
+              <button onclick="apriRichiestaServizio('consulenza_fb','formazione_docenza','Formazione tecnica &amp; docenza specialistica')" style="background:#2d6a4f;color:white;border:none;padding:10px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">📩 Richiedi informazioni</button>
+            </div>
+
+            <div style="background:white;border:1px solid #e1e4dd;border-radius:12px;padding:18px;display:flex;flex-direction:column;">
+              <div style="font-size:36px;text-align:center;margin-bottom:10px;">📈</div>
+              <div style="font-size:16px;font-weight:700;color:#1a2e1a;text-align:center;margin-bottom:10px;">Management &amp; sviluppo del business food</div>
+              <ul style="font-size:12px;color:var(--pietra);line-height:1.6;margin:0 0 14px;padding-left:18px;flex:1;">
+                <li><strong>Food cost &amp; controllo di gestione:</strong> workshop operativi per il calcolo dei margini, ingegnerizzazione dei menu e ottimizzazione degli acquisti.</li>
+                <li><strong>Strategia e marketing alimentare:</strong> conferenze e docenze su posizionamento di mercato, trend di consumo e lancio di nuovi prodotti agroalimentari.</li>
+                <li><strong>Gestione e ottimizzazione dei processi:</strong> corsi di lean manufacturing applicati alla produzione e trasformazione degli alimenti.</li>
+              </ul>
+              <button onclick="apriRichiestaServizio('consulenza_fb','management_food','Management &amp; sviluppo del business food')" style="background:#2d6a4f;color:white;border:none;padding:10px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">📩 Richiedi informazioni</button>
+            </div>
+
+            <div style="background:white;border:1px solid #e1e4dd;border-radius:12px;padding:18px;display:flex;flex-direction:column;">
+              <div style="font-size:36px;text-align:center;margin-bottom:10px;">🧭</div>
+              <div style="font-size:16px;font-weight:700;color:#1a2e1a;text-align:center;margin-bottom:10px;">Consulenza strategica e supporto operativo</div>
+              <ul style="font-size:12px;color:var(--pietra);line-height:1.6;margin:0 0 14px;padding-left:18px;flex:1;">
+                <li><strong>Pre-audit e check-list documentali:</strong> verifica e analisi della conformità dei manuali HACCP, delle etichettature e dei disciplinari di produzione (in loco o da remoto).</li>
+                <li><strong>Mentoring &amp; coaching per food start-up:</strong> sessioni dedicate (in presenza o digitali) per l'avviamento di nuovi progetti e validazione del modello di business.</li>
+                <li><strong>Aggiornamento normativo continuo:</strong> servizio di affiancamento aziendale per l'adeguamento tempestivo alle nuove direttive nazionali ed europee.</li>
+              </ul>
+              <button onclick="apriRichiestaServizio('consulenza_fb','strategica_operativa','Consulenza strategica e supporto operativo')" style="background:#2d6a4f;color:white;border:none;padding:10px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">📩 Richiedi informazioni</button>
+            </div>
+
+          </div>
+
+          <div id="lista-mie-richieste-consulenza" style="margin-top:24px;"></div>
+        </div>
+      </div>
+
+      <!-- SOTTO-SEZIONE: ANALISI DEL RISCHIO -->
+      <div id="sub-analisi-rischio" class="subsection" style="display:none;">
+        <div class="card">
+          <div class="card-title">📊 Analisi del Rischio</div>
+          <p style="font-size:13px;color:var(--pietra);margin-bottom:18px;line-height:1.5;">
+            Identifica, misura e gestisci i principali rischi della tua attività. Seleziona l'area di interesse e richiedi un confronto con i nostri consulenti.
+          </p>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;">
+
+            <div style="background:white;border:1px solid #e1e4dd;border-radius:12px;padding:18px;display:flex;flex-direction:column;">
+              <div style="font-size:36px;text-align:center;margin-bottom:10px;">💶</div>
+              <div style="font-size:16px;font-weight:700;color:#1a2e1a;text-align:center;margin-bottom:8px;">Rischi finanziari</div>
+              <p style="font-size:12px;color:var(--pietra);line-height:1.5;margin:0 0 14px;flex:1;">Liquidità, credito, esposizione bancaria, tassi di interesse e gestione dei flussi di cassa.</p>
+              <button onclick="apriRichiestaServizio('analisi_rischio','finanziari','Rischi finanziari')" style="background:#2d6a4f;color:white;border:none;padding:10px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">📩 Richiedi informazioni</button>
+            </div>
+
+            <div style="background:white;border:1px solid #e1e4dd;border-radius:12px;padding:18px;display:flex;flex-direction:column;">
+              <div style="font-size:36px;text-align:center;margin-bottom:10px;">⚙️</div>
+              <div style="font-size:16px;font-weight:700;color:#1a2e1a;text-align:center;margin-bottom:8px;">Rischi operativi</div>
+              <p style="font-size:12px;color:var(--pietra);line-height:1.5;margin:0 0 14px;flex:1;">Processi interni, errori umani, sistemi tecnologici, sicurezza sul lavoro e continuità operativa.</p>
+              <button onclick="apriRichiestaServizio('analisi_rischio','operativi','Rischi operativi')" style="background:#2d6a4f;color:white;border:none;padding:10px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">📩 Richiedi informazioni</button>
+            </div>
+
+            <div style="background:white;border:1px solid #e1e4dd;border-radius:12px;padding:18px;display:flex;flex-direction:column;">
+              <div style="font-size:36px;text-align:center;margin-bottom:10px;">🧭</div>
+              <div style="font-size:16px;font-weight:700;color:#1a2e1a;text-align:center;margin-bottom:8px;">Rischi strategici</div>
+              <p style="font-size:12px;color:var(--pietra);line-height:1.5;margin:0 0 14px;flex:1;">Posizionamento, decisioni di lungo periodo, evoluzione del settore e modello di business.</p>
+              <button onclick="apriRichiestaServizio('analisi_rischio','strategici','Rischi strategici')" style="background:#2d6a4f;color:white;border:none;padding:10px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">📩 Richiedi informazioni</button>
+            </div>
+
+            <div style="background:white;border:1px solid #e1e4dd;border-radius:12px;padding:18px;display:flex;flex-direction:column;">
+              <div style="font-size:36px;text-align:center;margin-bottom:10px;">👥</div>
+              <div style="font-size:16px;font-weight:700;color:#1a2e1a;text-align:center;margin-bottom:8px;">Rischi organizzativi</div>
+              <p style="font-size:12px;color:var(--pietra);line-height:1.5;margin:0 0 14px;flex:1;">Struttura aziendale, ruoli, competenze, turnover del personale e cultura interna.</p>
+              <button onclick="apriRichiestaServizio('analisi_rischio','organizzativi','Rischi organizzativi')" style="background:#2d6a4f;color:white;border:none;padding:10px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">📩 Richiedi informazioni</button>
+            </div>
+
+            <div style="background:white;border:1px solid #e1e4dd;border-radius:12px;padding:18px;display:flex;flex-direction:column;">
+              <div style="font-size:36px;text-align:center;margin-bottom:10px;">🛒</div>
+              <div style="font-size:16px;font-weight:700;color:#1a2e1a;text-align:center;margin-bottom:8px;">Rischi di mercato e clienti</div>
+              <p style="font-size:12px;color:var(--pietra);line-height:1.5;margin:0 0 14px;flex:1;">Concorrenza, dinamiche del mercato locale, customer experience e fidelizzazione della clientela.</p>
+              <button onclick="apriRichiestaServizio('analisi_rischio','mercato_clienti','Rischi di mercato e clienti')" style="background:#2d6a4f;color:white;border:none;padding:10px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">📩 Richiedi informazioni</button>
+            </div>
+
+          </div>
+
+          <div id="lista-mie-richieste-rischio" style="margin-top:24px;"></div>
+        </div>
+      </div>
+
     </div>
 
     <!-- MERCATO -->
@@ -717,6 +820,28 @@
       <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;flex-wrap:wrap;">
         <button onclick="chiudiRichiestaCorso()" style="background:transparent;border:1px solid #ccc;color:var(--pietra);padding:10px 18px;border-radius:8px;font-weight:600;cursor:pointer;">Annulla</button>
         <button onclick="inviaRichiestaCorso()" class="btn-primary" style="padding:10px 22px;">📤 Invia richiesta</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL RICHIESTA SERVIZIO (Consulenza F&B / Analisi Rischio) -->
+  <div id="modal-richiesta-servizio" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:10000;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:14px;padding:24px;max-width:480px;width:100%;">
+      <h2 style="margin:0 0 6px;color:#1a2e1a;font-family:'Playfair Display',serif;font-size:22px;">📩 Richiedi informazioni</h2>
+      <p style="margin:0 0 18px;color:var(--pietra);font-size:13px;line-height:1.5;">
+        Servizio: <strong id="rs-tipo">&mdash;</strong><br>
+        Area: <strong id="rs-area">&mdash;</strong><br>
+        Ti contatteremo all&#39;email del tuo profilo per un primo confronto.
+      </p>
+
+      <div class="form-group">
+        <label class="form-label">Note (facoltativo)</label>
+        <textarea id="rs-note" class="form-control" rows="4" placeholder="Descrivi brevemente la tua esigenza, tempistiche o domande specifiche..." style="resize:vertical;"></textarea>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;flex-wrap:wrap;">
+        <button onclick="chiudiRichiestaServizio()" style="background:transparent;border:1px solid #ccc;color:var(--pietra);padding:10px 18px;border-radius:8px;font-weight:600;cursor:pointer;">Annulla</button>
+        <button onclick="inviaRichiestaServizio()" class="btn-primary" style="padding:10px 22px;">📤 Invia richiesta</button>
       </div>
     </div>
   </div>
@@ -1150,7 +1275,7 @@
         document.getElementById('j-localita').value='';
         alert("✅ Offerta pubblicata!");
         caricaMieOfferte();
-        showTab('mie-offerte',document.querySelector('.tab-btn:nth-child(3)'));
+        showTab('mie-offerte',document.querySelector('.tab-btn[onclick*="mie-offerte"]'));
       }
       else alert("Errore: "+error.message);
     }
@@ -1400,7 +1525,7 @@
       }
       if(!proposte || proposte.length === 0){
         riepilogo.innerHTML = '';
-        container.innerHTML = `<div class="empty-state"><span class="empty-icon">📭</span><h3>Nessuna proposta inviata</h3><p>Vai su "Database Talenti" per inviare proposte ai lavoratori compatibili.</p></div>`;
+        container.innerHTML = `<div class="empty-state"><span class="empty-icon">📭</span><h3>Nessuna proposta inviata</h3><p>Vai su "Database Lavoratori" per inviare proposte ai lavoratori compatibili.</p></div>`;
         return;
       }
 
@@ -1528,9 +1653,32 @@
       if(id==='mercato'&&_isPremium)caricaTutteLeRecensioni();
       if(id==='mie-offerte')caricaMieOfferte();
       if(id==='proposte-inviate')caricaProposteInviate();
-      if(id==='formazione')caricaMieRichiesteCorsi();
+      if(id==='servizi'){
+        caricaMieRichiesteCorsi();
+        caricaMieRichiesteServizi();
+      }
       if(id==='notifiche')caricaNotificheLavoratori();
-      if(id==='profilo-az')caricaProfiloAzienda();
+      if(id==='profilo-az'){
+        caricaProfiloAzienda();
+        caricaDatiRecensioni(_nomeAzienda);
+      }
+    }
+
+    function showSubTab(btn){
+      const target = btn.getAttribute('data-sub');
+      document.querySelectorAll('.subsection').forEach(s=>s.style.display='none');
+      document.querySelectorAll('.subtab-btn').forEach(b=>{
+        b.style.background='transparent';
+        b.style.color='var(--testo)';
+        b.style.fontWeight='500';
+        b.classList.remove('active');
+      });
+      const sec = document.getElementById(target);
+      if(sec) sec.style.display='block';
+      btn.style.background='var(--verde)';
+      btn.style.color='white';
+      btn.style.fontWeight='600';
+      btn.classList.add('active');
     }
 
     async function logout(){
@@ -1772,6 +1920,131 @@
             '</div>' +
           '</div>';
         }).join('');
+    }
+
+    // ====== RICHIESTE SERVIZIO (Consulenza F&B / Analisi Rischio) ======
+    let _servizioSelezionato = null;
+
+    function apriRichiestaServizio(tipoServizio, areaId, areaLabel){
+      _servizioSelezionato = { tipo: tipoServizio, area: areaId, label: areaLabel };
+      const tipoLabel = tipoServizio === 'consulenza_fb' ? '🍷 Consulenza Food &amp; Beverage' : '📊 Analisi del Rischio';
+      document.getElementById('rs-tipo').innerHTML = tipoLabel;
+      document.getElementById('rs-area').innerHTML = areaLabel;
+      document.getElementById('rs-note').value = '';
+      document.getElementById('modal-richiesta-servizio').style.display = 'flex';
+    }
+
+    function chiudiRichiestaServizio(){
+      document.getElementById('modal-richiesta-servizio').style.display = 'none';
+      _servizioSelezionato = null;
+    }
+
+    async function inviaRichiestaServizio(){
+      if(!_servizioSelezionato) return;
+      const note = document.getElementById('rs-note').value.trim();
+
+      const {data:{user}} = await supabaseClient.auth.getUser();
+      const {data: profilo} = await supabaseClient
+        .from('profili_aziende')
+        .select('nome_azienda,email')
+        .eq('id', user.id)
+        .single();
+      if(!profilo){ alert("Errore: profilo azienda non trovato."); return; }
+
+      const {error: errIns} = await supabaseClient
+        .from('richieste_servizi')
+        .insert([{
+          azienda_id: user.id,
+          nome_azienda: profilo.nome_azienda,
+          email_azienda: profilo.email,
+          tipo_servizio: _servizioSelezionato.tipo,
+          area_richiesta: _servizioSelezionato.area,
+          note: note || null
+        }]);
+
+      if(errIns){
+        alert("Errore nel salvataggio: " + errIns.message);
+        return;
+      }
+
+      // Email admin in background
+      fetch('/api/richiesta-servizio', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          nomeAzienda: profilo.nome_azienda,
+          emailAzienda: profilo.email,
+          tipoServizio: _servizioSelezionato.tipo,
+          areaRichiesta: _servizioSelezionato.label,
+          note: note
+        })
+      }).catch(e => console.log('Notifica email admin fallita:', e));
+
+      alert("✅ Richiesta inviata con successo!\n\nVerrai contattata a breve dal nostro team.");
+      chiudiRichiestaServizio();
+      caricaMieRichiesteServizi();
+    }
+
+    async function caricaMieRichiesteServizi(){
+      const {data:{user}} = await supabaseClient.auth.getUser();
+      const {data: richieste} = await supabaseClient
+        .from('richieste_servizi')
+        .select('id,created_at,tipo_servizio,area_richiesta,note,stato,contattata_il')
+        .eq('azienda_id', user.id)
+        .order('created_at', {ascending:false});
+
+      const labelAreeConsulenza = {
+        formazione_docenza: '🎓 Formazione tecnica &amp; docenza',
+        management_food: '📈 Management &amp; business food',
+        strategica_operativa: '🧭 Consulenza strategica &amp; supporto operativo'
+      };
+      const labelAreeRischio = {
+        finanziari: '💶 Rischi finanziari',
+        operativi: '⚙️ Rischi operativi',
+        strategici: '🧭 Rischi strategici',
+        organizzativi: '👥 Rischi organizzativi',
+        mercato_clienti: '🛒 Rischi di mercato e clienti'
+      };
+
+      const containers = {
+        consulenza_fb: document.getElementById('lista-mie-richieste-consulenza'),
+        analisi_rischio: document.getElementById('lista-mie-richieste-rischio')
+      };
+      if(containers.consulenza_fb) containers.consulenza_fb.innerHTML = '';
+      if(containers.analisi_rischio) containers.analisi_rischio.innerHTML = '';
+
+      if(!richieste || richieste.length === 0) return;
+
+      const grouped = { consulenza_fb: [], analisi_rischio: [] };
+      richieste.forEach(r => { if(grouped[r.tipo_servizio]) grouped[r.tipo_servizio].push(r); });
+
+      Object.keys(grouped).forEach(tipo => {
+        const cont = containers[tipo];
+        if(!cont || grouped[tipo].length === 0) return;
+        const mapLabel = tipo === 'consulenza_fb' ? labelAreeConsulenza : labelAreeRischio;
+        cont.innerHTML = '<h3 style="font-size:16px;color:#1a2e1a;margin:0 0 12px;font-family:\'Playfair Display\',serif;">Le tue richieste</h3>' +
+          grouped[tipo].map(r => {
+            const data = new Date(r.created_at).toLocaleDateString('it-IT');
+            let badge;
+            if(r.stato === 'contattata'){
+              badge = '<span style="background:#c9a84c;color:#1a2e1a;padding:3px 8px;border-radius:5px;font-size:10px;font-weight:700;">📞 CONTATTATA</span>';
+            } else if(r.stato === 'chiusa'){
+              badge = '<span style="background:#2d6a4f;color:white;padding:3px 8px;border-radius:5px;font-size:10px;font-weight:700;">✅ CHIUSA</span>';
+            } else {
+              badge = '<span style="background:#6b705c;color:white;padding:3px 8px;border-radius:5px;font-size:10px;font-weight:700;">🆕 NUOVA</span>';
+            }
+            return '<div style="background:#f0f2ee;border-radius:10px;padding:12px 14px;margin-bottom:8px;">' +
+              '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px;">' +
+                '<strong style="font-size:14px;color:#1a2e1a;">' + (mapLabel[r.area_richiesta] || r.area_richiesta) + '</strong>' +
+                badge +
+              '</div>' +
+              '<div style="font-size:12px;color:var(--pietra);">' +
+                '📅 ' + data +
+                (r.note ? '<br>📝 "' + r.note + '"' : '') +
+              '</div>' +
+            '</div>';
+          }).join('');
+      });
     }
   </script>
 </body>
